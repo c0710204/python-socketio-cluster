@@ -1,0 +1,129 @@
+account_01: &account_01
+ username: guxi
+ password: cft6&UJM
+account_02: &account_02
+ username: guxi
+ password: dHtFkI6g
+
+client:
+ -
+  name: pelican01
+  host: pelican01.eecs.oregonstate.edu
+  port: 22
+  <<: *account_01
+ -
+  name: pelican02
+  host: pelican02.eecs.oregonstate.edu
+  port: 22
+  <<: *account_01
+ -
+  name: pelican03
+  host: pelican03.eecs.oregonstate.edu
+  port: 22
+  <<: *account_01
+ -
+  name: pelican04
+  host: pelican04.eecs.oregonstate.edu
+  port: 22
+  <<: *account_01
+ -
+  name: star_gpu_on_star_lab
+  host: localhost
+  port: 50022
+  <<: *account_02
+# -
+#  name: star_gpu_local
+#  host: localhost
+#  port: 22
+#  <<: *account_02
+
+connection:
+ -
+  from:
+   server: pelican01
+   port: 30021
+  to:
+   server: star_gpu_on_star_lab
+   port: 30021
+ -
+  from:
+   server: pelican02
+   port: 30021
+  to:
+   server: star_gpu_on_star_lab
+   port: 30021
+ -
+  from:
+   server: pelican03
+   port: 30021
+  to:
+   server: star_gpu_on_star_lab
+   port: 30021
+ -
+  from:
+   server: pelican04
+   port: 30021
+  to:
+   server: star_gpu_on_star_lab
+   port: 30021
+
+
+ -
+  from:
+   server: pelican01
+   port: 30001
+  to:
+   server: star_gpu_on_star_lab
+   port: 30001
+ -
+  from:
+   server: pelican02
+   port: 30001
+  to:
+   server: star_gpu_on_star_lab
+   port: 30001
+ -
+  from:
+   server: pelican03
+   port: 30001
+  to:
+   server: star_gpu_on_star_lab
+   port: 30001
+ -
+  from:
+   server: pelican04
+   port: 30001
+  to:
+   server: star_gpu_on_star_lab
+   port: 30001
+
+
+
+ -
+  from:
+   server: pelican01
+   port: 50022
+  to:
+   server: star_gpu_on_star_lab
+   port: 22
+ -
+  from:
+   server: pelican02
+   port: 50022
+  to:
+   server: star_gpu_on_star_lab
+   port: 22
+ -
+  from:
+   server: pelican03
+   port: 50022
+  to:
+   server: star_gpu_on_star_lab
+   port: 22
+ -
+  from:
+   server: pelican04
+   port: 50022
+  to:
+   server: star_gpu_on_star_lab
+   port: 22
