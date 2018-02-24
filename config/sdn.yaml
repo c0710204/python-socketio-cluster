@@ -97,8 +97,6 @@ connection:
    server: star_gpu_on_star_lab
    port: 30001
 
-
-
  -
   from:
    server: pelican01
