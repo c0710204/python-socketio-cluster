@@ -4,6 +4,7 @@ import random
 import subprocess
 import uuid
 import logging
+import argparse
 from multiprocessing import Process
 fmt = "[%(asctime)-15s][%(levelname)s][%(filename)s:%(lineno)d][%(process)d]%(message)s"
 datefmt = "%a %d %b %Y %H:%M:%S"
@@ -93,6 +94,7 @@ if __name__ == "__main__":
         rev.start()
         procs.append(snd)
         procs.append(rev)
+        conn['pid'] = [snd, rev]
         logging.info("{0}:{1} =={4}==> {2}:{3}".format(
             conn['from']['server'], conn['from']['port'], conn['to']['server'],
             conn['to']['port'], inner))
