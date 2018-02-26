@@ -83,7 +83,7 @@ class pspnet_pre(task):
         local_id = uuid.uuid4()
         args_d['local_id'] = local_id
         self.requestQueue.put(args_d)
-        p = multiprocessing.Process(target=self.run)
+        p = multiprocessing.Process(target=self.run,args=(self.requestQueue,self.responseQueue))
         p.start()
         while (1):
             p = self.responseQueue.get()
@@ -91,11 +91,15 @@ class pspnet_pre(task):
                 break
             self.responseQueue.put(p)
 
-    def run(self):
-        args_d = self.requestQueue.get()
+    def run(self,reqQ=None,respQ=None):
+        if reqQ==None:
+            reqQ=self.requestQueue
+        if respQ==None:
+            respQ=self.responseQueue
+        args_d = reqQ.get()
         pre_process.pre_process(
             namedtuple('Struct', args_d.keys())(*args_d.values()))
-        self.responseQueue.put(args_d['local_id'])
+        respQ.put(args_d['local_id'])
 
 
 class pspnet_img_combine(task):
@@ -116,7 +120,7 @@ class pspnet_img_combine(task):
         local_id = uuid.uuid4()
         args_d['local_id'] = local_id
         self.requestQueue.put(args_d)
-        p = multiprocessing.Process(target=self.run)
+        p = multiprocessing.Process(target=self.run,args=(self.requestQueue,self.responseQueue))
         p.start()
         while (1):
             p = self.responseQueue.get()
@@ -124,8 +128,12 @@ class pspnet_img_combine(task):
                 break
             self.responseQueue.put(p)
 
-    def run(self):
-        args_d = self.requestQueue.get()
+    def run(self,reqQ=None,respQ=None):
+        if reqQ==None:
+            reqQ=self.requestQueue
+        if respQ==None:
+            respQ=self.responseQueue
+        args_d = reqQ.get()
         panid = args_d['panid']
         ext = args_d['ext']
         filename = args_d['filename']
@@ -142,7 +150,7 @@ class pspnet_img_combine(task):
         #colored_class_image is [0.0-1.0] img is [0-255]
         alpha_blended = 0.5 * colored_class_image + 0.5 * img
         misc.imsave(panid + "_seg_blended" + ext, alpha_blended)
-        self.responseQueue.put(args_d['local_id'])
+        respQ.put(args_d['local_id'])
 
 
 class pspnet_dl(task):
