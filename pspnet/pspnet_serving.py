@@ -52,7 +52,7 @@ class pspnet_dl(task):
         # config.gpu_options.allow_growth = True
         # config.gpu_options.per_process_gpu_memory_fraction = 0.4
         self.sess = tf.Session(config=config)
-        set_session(sess)
+        set_session(self.sess)
         self.pspnet = PSPNet50(
             nb_classes=150, input_shape=(473, 473), weights="pspnet50_ade20k")
 
