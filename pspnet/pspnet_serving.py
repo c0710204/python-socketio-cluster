@@ -125,7 +125,7 @@ class pspnet_img_combine(task):
                                                       args_d['model'])
         #colored_class_image is [0.0-1.0] img is [0-255]
         alpha_blended = 0.5 * colored_class_image + 0.5 * img
-        misc.imsave(filename + "_seg_blended" + ext, alpha_blended)
+        misc.imsave(panid + "_seg_blended" + ext, alpha_blended)
 
 
 class pspnet_dl(task):
