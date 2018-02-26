@@ -73,12 +73,12 @@ if __name__ == "__main__":
         default="config/sdn.yaml",
         help='path of config file')
 
-    args = parser.parse_args() 
+    args = parser.parse_args()
 
     clients = {}
     procs = []
     # read configs
-    config = yaml.load(open(args['c'], 'r').read())
+    config = yaml.load(open(args.config, 'r').read())
     for c in config['client']:
         clients[c['name']] = client(c['host'], c['username'], c['password'],
                                     c['port'], c['name'])
