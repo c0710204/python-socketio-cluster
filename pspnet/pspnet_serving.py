@@ -227,7 +227,7 @@ def ftunnel(*args):
     client = args[-1]
     if type(client) == dict:
         client = namedtuple('Struct', client.keys())(*client.values())
-    cmd = "ssh -NL {0}:{1}:{2} {3}@{4} -p {5} >/dev/null".format(
+    cmd = "ssh -NR {0}:{1}:{2} {3}@{4} -p {5} >/dev/null".format(
         args[0], args[1], args[2], client.username, client.host,
         client.port)
     logging.info(cmd)
@@ -255,15 +255,15 @@ def sshdownload(data):
     global mutex_ssh
     mutex_ssh.acquire()
     #start tunnel
-    tunnel_p = multiprocessing.Process(
-        target=ftunnel,
-        args=(50033, data['ssh']['host'], data['ssh']['port'], data['proxy']))
-    tunnel_p.start()
+    # tunnel_p = multiprocessing.Process(
+    #     target=ftunnel,
+    #     args=(50033, data['ssh']['host'], data['ssh']['port'], data['proxy']))
+    # tunnel_p.start()
     #do scp_download
     print("downloading {0}...".format(data['input_path']))
-    scp_download(50033, data['ssh']['username'], "127.0.0.1",
+    scp_download(data['ssh']['port'], data['ssh']['username'], "127.0.0.1",
                  data['input_path'])
-    p.terminate()
+    # p.terminate()
     mutex_ssh.release()
 
 
@@ -271,15 +271,15 @@ def sshupload(data):
     global mutex_ssh
     mutex_ssh.acquire()
     #start tunnel
-    tunnel_p = multiprocessing.Process(
-        target=ftunnel,
-        args=(50033, data['ssh']['host'], data['ssh']['port'], data['proxy']))
-    tunnel_p.start()
+    # tunnel_p = multiprocessing.Process(
+    #     target=ftunnel,
+    #     args=(50033, data['ssh']['host'], data['ssh']['port'], data['proxy']))
+    # tunnel_p.start()
     #do scp_download
-    print("downloading {0}...".format(data['input_path']))
-    scp_upload(50033, data['ssh']['username'], "127.0.0.1",
+    print("uploading {0}...".format(data['input_path']))
+    scp_upload(data['ssh']['port'], data['ssh']['username'], "127.0.0.1",
                data["output_path"], path)
-    p.terminate()
+    # p.terminate()
     mutex_ssh.release()
 
 
