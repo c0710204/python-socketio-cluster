@@ -54,7 +54,7 @@ class pspnet_dl(task):
         self.sess = tf.Session(config=config)
         set_session(self.sess)
         self.pspnet = PSPNet50(
-            nb_classes=150, input_shape=(473, 473), weights="pspnet50_ade20k")
+            nb_classes=150, input_shape=(473, 473), weights="pspnet50_ade20k",path="./pspnet/weights")
 
         self.remote_uuid = "{0}{1}".format(uuid.uuid4(), "_deeplearning")
         self.socketIO = SocketIO('localhost', 30001, LoggingNamespace)

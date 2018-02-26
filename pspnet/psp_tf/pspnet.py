@@ -38,11 +38,11 @@ GPU_count = 0
 class PSPNet(object):
     """Pyramid Scene Parsing Network by Hengshuang Zhao et al 2017."""
 
-    def __init__(self, nb_classes, resnet_layers, input_shape, weights):
+    def __init__(self, nb_classes, resnet_layers, input_shape, weights,path="./weights"):
         """Instanciate a PSPNet."""
         self.input_shape = input_shape
-        json_path = join("./weights", "keras", weights + ".json")
-        h5_path = join("./weights", "keras", weights + ".h5")
+        json_path = join(path, "keras", weights + ".json")
+        h5_path = join(path, "keras", weights + ".h5")
         if isfile(json_path) and isfile(h5_path):
             print("Keras model & weights found, loading...")
             with open(json_path, 'r') as file_handle:
@@ -160,10 +160,10 @@ class PSPNet(object):
 class PSPNet50(PSPNet):
     """Build a PSPNet based on a 50-Layer ResNet."""
 
-    def __init__(self, nb_classes, weights, input_shape):
+    def __init__(self, nb_classes, weights, input_shape,path="./weights"):
         """Instanciate a PSPNet50."""
         PSPNet.__init__(self, nb_classes=nb_classes, resnet_layers=50,
-                        input_shape=input_shape, weights=weights)
+                        input_shape=input_shape, weights=weights,path=path)
 
 
 class PSPNet101(PSPNet):
