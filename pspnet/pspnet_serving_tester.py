@@ -72,7 +72,8 @@ def connect(sid, environ):
 @sio.on('next', namespace='/pspnet')
 def next(sid,data):
     global img_list
-    print(data['input_path'])
+    if data:
+        print(data['input_path'])
     if len(img_list) > 0:
         img_local = img_list[-1]
         del img_list[-1]

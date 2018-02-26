@@ -257,7 +257,7 @@ def sshupload(data, path):
 # global data storage
 class Pspnet_namespace(BaseNamespace):
     def on_asknext(self, *args):
-        self.emit("next")
+        self.emit("next",None)
 
     def on_request(self, *args):
         # tf.reset_default_graph()
