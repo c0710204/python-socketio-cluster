@@ -136,12 +136,12 @@ class pspnet_img_combine(task):
         #colored_class_image is [0.0-1.0] img is [0-255]
         alpha_blended = 0.5 * colored_class_image + 0.5 * img
         misc.imsave(panid + "_seg_blended" + ext, alpha_blended)
-        for filename in tqdm.tqdm(os.listdir('/tmp')):
-            if filename.endswith(".npy"):
-                try:
-                    os.remove(filename)
-                except Exception:
-                    pass
+        # for filename in tqdm.tqdm(os.listdir('/tmp')):
+        #     if filename.endswith(".npy"):
+        #         try:
+        #             os.remove(filename)
+        #         except Exception:
+        #             pass
         self.responseQueue.put(args_d['local_id'])
 
 
