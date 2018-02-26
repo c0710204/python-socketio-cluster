@@ -83,7 +83,7 @@ class pspnet_pre(task):
         local_id ="{0}".format( uuid.uuid4())
         print(local_id)
         args_d['local_id'] = local_id
-        p = multiprocessing.Process(target=self.run,args=(json.dumps(args_d)))
+        p = multiprocessing.Process(target=self.run,args=(json.dumps(args_d),))
         p.start()
         p.join()
 
