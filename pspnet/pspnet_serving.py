@@ -82,7 +82,7 @@ class pspnet_pre(task):
         pass
 
     def ask_and_wait(self, args_d):
-        local_id = uuid.uuid4()
+        local_id ="{0}".format( uuid.uuid4())
         print(local_id)
         args_d['local_id'] = local_id
         self.requestQueue.put(json.dumps(args_d))
@@ -121,7 +121,7 @@ class pspnet_img_combine(task):
         pass
 
     def ask_and_wait(self, args_d):
-        local_id = uuid.uuid4()
+        local_id ="{0}".format( uuid.uuid4())
         args_d['local_id'] = local_id
         self.requestQueue.put(args_d)
         p = multiprocessing.Process(target=self.run)
@@ -177,7 +177,7 @@ class pspnet_dl(task):
         # end
 
     def ask_and_wait(self, args_d):
-        local_id = uuid.uuid4()
+        local_id ="{0}".format( uuid.uuid4())
         args_d['local_id'] = local_id
         self.requestQueue.put(args_d)
         while (1):
