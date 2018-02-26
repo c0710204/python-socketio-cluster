@@ -5,7 +5,7 @@ from keras.layers import BatchNormalization, Activation, Input, Dropout, ZeroPad
 from keras.layers.merge import Concatenate, Add
 from keras.models import Model
 from keras.optimizers import SGD
-
+import tensorflow as tf
 learning_rate = 1e-3  # Layer specific learning rate
 # Weight decay not implemented
 
@@ -222,7 +222,7 @@ def build_pspnet(nb_classes, resnet_layers, input_shape, activation='softmax'):
     x = Activation('softmax')(x)
     x = tf.image.resize_bilinear(x,x.shape[1:2])
     model = Model(inputs=inp, outputs=x)
-    
+
     # Solver
     sgd = SGD(lr=learning_rate, momentum=0.9, nesterov=True)
     model.compile(optimizer=sgd,
