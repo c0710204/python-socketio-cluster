@@ -28,7 +28,8 @@ from multiprocessing import Queue, Lock
 from keras.backend.tensorflow_backend import set_session
 from keras import backend as K
 import tensorflow as tf
-from gevent import monkey; monkey.patch_all()
+from gevent import monkey
+monkey.patch_all()
 import gevent
 # init global lock
 mutex = Lock()
@@ -91,11 +92,11 @@ class pspnet_pre(task):
                 break
             self.responseQueue.put(p)
 
-    def run(self,reqQ=None,respQ=None):
-        if reqQ==None:
-            reqQ=self.requestQueue
-        if respQ==None:
-            respQ=self.responseQueue
+    def run(self, reqQ=None, respQ=None):
+        if reqQ == None:
+            reqQ = self.requestQueue
+        if respQ == None:
+            respQ = self.responseQueue
         args_d = reqQ.get()
         pre_process.pre_process(
             namedtuple('Struct', args_d.keys())(*args_d.values()))
@@ -128,11 +129,11 @@ class pspnet_img_combine(task):
                 break
             self.responseQueue.put(p)
 
-    def run(self,reqQ=None,respQ=None):
-        if reqQ==None:
-            reqQ=self.requestQueue
-        if respQ==None:
-            respQ=self.responseQueue
+    def run(self, reqQ=None, respQ=None):
+        if reqQ == None:
+            reqQ = self.requestQueue
+        if respQ == None:
+            respQ = self.responseQueue
         args_d = reqQ.get()
         panid = args_d['panid']
         ext = args_d['ext']
@@ -186,7 +187,6 @@ class pspnet_dl(task):
                 break
             self.responseQueue.put(p)
 
-
     def run(self):
         # print("waiting for task")
         # try:
@@ -222,57 +222,81 @@ data = {
 }
 
 
+def ftunnel(*args):
+    while (1):
+        try:
+            client = args[-1]
+            if type(client) == dict:
+                client = namedtuple('Struct', client.keys())(*client.values())
+            cmd = "ssh -NL {0}:{1}:{2} {3}@{4} -p {5} >/dev/null".format(
+                args[0], args[1], args[2], client.username, client.host,
+                client.port)
+            logging.info(cmd)
+            ret = subprocess.call(cmd, shell=True)
+            logging.warning("[connection][{}]return {},restarting...".format(
+                client.uuid, ret))
+            time.sleep(3)
+        except Exception as e:
+            logging.warning("[connection][{}]{}".format(client.uuid, e))
 
-mutex_ssh=multiprocessing.Lock()
+
+def scp_download(port, user, host, path):
+    try:
+        cmd = "scp -p {0} {1}@{2}:{3} ./".format(port, user, host, path)
+        logging.info(cmd)
+        ret = subprocess.call(cmd, shell=True)
+
+    except Exception as e:
+        logging.warning("[connection][{}]{}".format(client.uuid, e))
+
+
+def scp_upload(port, user, host, path, file):
+    try:
+        cmd = "scp -p {0} ./{4} {1}@{2}:{3} ".format(port, user, host, path,
+                                                     file)
+        logging.info(cmd)
+        ret = subprocess.call(cmd, shell=True)
+
+    except Exception as e:
+        logging.warning("[connection][{}]{}".format(client.uuid, e))
+
+
+mutex_ssh = multiprocessing.Lock()
+
+
 def sshdownload(data):
     global mutex_ssh
     mutex_ssh.acquire()
-    cnopts = pysftp.CnOpts()
-    cnopts.hostkeys = None
-    ssht = sshtunnel.SSHTunnelForwarder(
-        data['proxy']['host'],
-        ssh_username=data['proxy']['username'],
-        ssh_password=data['proxy']['password'],
-        remote_bind_address=(data['ssh']['host'], data['ssh']['port']))
-    ssht.start()
-    print(ssht.local_bind_port)
-    sftp = pysftp.Connection(
-        "127.0.0.1",
-        username=data['ssh']['username'],
-        password=data['ssh']['password'],
-        port=ssht.local_bind_port,
-        cnopts=cnopts)
+    #start tunnel
+    tunnel_p = multiprocessing.Process(
+        target=ftunnel,
+        argv=(50033, data['ssh']['host'], data['ssh']['port'], data['proxy']))
+    tunnel_p.start()
+    #do scp_download
     print("downloading {0}...".format(data['input_path']))
-    sftp.get(data['input_path'])
-    ssht.stop()
+    scp_download(50033, data['ssh']['username'], "127.0.0.1",
+                 data['input_path'])
+    p.terminate()
     mutex_ssh.release()
 
 
-def sshupload(data, path):
+def sshupload(data):
     global mutex_ssh
     mutex_ssh.acquire()
-    cnopts = pysftp.CnOpts()
-    cnopts.hostkeys = None
-    ssht = sshtunnel.SSHTunnelForwarder(
-        data['proxy']['host'],
-        ssh_username=data['proxy']['username'],
-        ssh_password=data['proxy']['password'],
-        remote_bind_address=(data['ssh']['host'], data['ssh']['port']))
-    ssht.start()
-    print(ssht.local_bind_port)
-    sftp = pysftp.Connection(
-        "127.0.0.1",
-        username=data['ssh']['username'],
-        password=data['ssh']['password'],
-        port=ssht.local_bind_port,
-        cnopts=cnopts)
-    print("uploading {0}...".format(data['input_path']))
-    sftp.chdir(data["output_path"])
-    sftp.put(path)
-    ssht.stop()
+    #start tunnel
+    tunnel_p = multiprocessing.Process(
+        target=ftunnel,
+        argv=(50033, data['ssh']['host'], data['ssh']['port'], data['proxy']))
+    tunnel_p.start()
+    #do scp_download
+    print("downloading {0}...".format(data['input_path']))
+    scp_upload(50033, data['ssh']['username'], "127.0.0.1",
+               data["output_path"], path)
+    p.terminate()
     mutex_ssh.release()
 
-def task_process(args,sio):
+
+def task_process(args, sio):
     print("got request")
     data = args[0]
     filename, ext = splitext(data['input_path'])
@@ -293,8 +317,7 @@ def task_process(args,sio):
 
     print("phase 1...")
     args_d['input_path'] = "./{0}{1}".format(panid, ext)
-    args_d['output_path'] = "{2}/{0}{1}".format(panid, ext,
-                                                config_p1_folder)
+    args_d['output_path'] = "{2}/{0}{1}".format(panid, ext, config_p1_folder)
 
     pspnet_pre_in.ask_and_wait(args_d=args_d)
     print("phase 2...")
@@ -307,10 +330,8 @@ def task_process(args,sio):
 
     print("phase 3...")
     args_d['input_path'] = "./{0}{1}".format(panid, ext)
-    args_d['input_path2'] = "{2}/{0}{1}".format(panid, ext,
-                                                config_p2_folder)
-    args_d['output_path'] = "{2}/{0}{1}".format(panid, ext,
-                                                config_p3_folder)
+    args_d['input_path2'] = "{2}/{0}{1}".format(panid, ext, config_p2_folder)
+    args_d['output_path'] = "{2}/{0}{1}".format(panid, ext, config_p3_folder)
     pspnet_img_combine_in.ask_and_wait(args_d)
 
     print("upload...")
@@ -323,15 +344,16 @@ def task_process(args,sio):
             except Exception:
                 pass
     print("success")
-    sio.emit("next",data)
+    sio.emit("next", data)
+
 
 # global data storage
 class Pspnet_namespace(BaseNamespace):
     def on_asknext(self, *args):
-        self.emit("next",None)
+        self.emit("next", None)
 
     def on_request(self, *args):
-        p=multiprocessing.Process(target=task_process,args=(args, self))
+        p = multiprocessing.Process(target=task_process, args=(args, self))
         p.start()
 
 
