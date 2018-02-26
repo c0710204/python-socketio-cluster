@@ -304,7 +304,6 @@ def main():
     if os.path.exists("temp_arg.json"):
         os.remove("temp_arg.json")
 
-    #create tunnel to remote server
 
     asio = async_socketIO(SocketIO('localhost', 30021))
 
