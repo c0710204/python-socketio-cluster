@@ -223,8 +223,10 @@ data = {
 
 
 
-
+mutex_ssh=multiprocessing.Lock()
 def sshdownload(data):
+    global mutex_ssh
+    mutex_ssh.acquire()
     cnopts = pysftp.CnOpts()
     cnopts.hostkeys = None
     ssht = sshtunnel.SSHTunnelForwarder(
@@ -243,9 +245,12 @@ def sshdownload(data):
     print("downloading {0}...".format(data['input_path']))
     sftp.get(data['input_path'])
     ssht.stop()
+    mutex_ssh.release()
 
 
 def sshupload(data, path):
+    global mutex_ssh
+    mutex_ssh.acquire()
     cnopts = pysftp.CnOpts()
     cnopts.hostkeys = None
     ssht = sshtunnel.SSHTunnelForwarder(
@@ -265,6 +270,7 @@ def sshupload(data, path):
     sftp.chdir(data["output_path"])
     sftp.put(path)
     ssht.stop()
+    mutex_ssh.release()
 
 def task_process(args,sio):
     print("got request")
