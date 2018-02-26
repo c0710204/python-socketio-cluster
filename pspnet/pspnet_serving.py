@@ -298,7 +298,7 @@ class Pspnet_namespace(BaseNamespace):
         print("upload...")
         sshupload(data, panid + "_seg_blended" + ext)
         print("garbage cleaning")
-        for filename in tqdm(os.listdir('/tmp')):
+        for filename in tqdm.tqdm(os.listdir('/tmp')):
             if filename.endswith(".npy"):
                 try:
                     os.remove(filename)
