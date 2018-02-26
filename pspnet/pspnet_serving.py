@@ -236,14 +236,14 @@ def ftunnel(*args):
 
 
 def scp_download(port, user, host, path):
-    cmd = "scp -p {0} {1}@{2}:{3} ./".format(port, user, host, path)
+    cmd = "scp -P {0} {1}@{2}:{3} ./".format(port, user, host, path)
     logging.info(cmd)
     ret = subprocess.call(cmd, shell=True)
 
 
 
 def scp_upload(port, user, host, path, file):
-    cmd = "scp -p {0} ./{4} {1}@{2}:{3} ".format(port, user, host, path, file)
+    cmd = "scp -P {0} ./{4} {1}@{2}:{3} ".format(port, user, host, path, file)
     logging.info(cmd)
     ret = subprocess.call(cmd, shell=True)
 
