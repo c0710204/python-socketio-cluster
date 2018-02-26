@@ -97,8 +97,8 @@ class pspnet_pre(task):
             self.responseQueue.put(p)
 
     @staticmethod
-    def run(self,req,resq):
-        print(self,req,resq)
+    def run(req,resq):
+        print(req,resq)
 
         args_d = json.loads(req.get())
         print("{0} start pre".format(args_d['local_id']))
