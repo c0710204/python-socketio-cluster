@@ -69,14 +69,12 @@ class task():
 
 class pspnet_pre(task):
 
-    handler_type = "Queue"
+    handler_type = "Process"
     handle = ""
     mainthread = False
 
     def prepare(self):
         task.prepare(self)
-        self.requestQueue = multiprocessing.Queue(10)
-        self.responseQueue = multiprocessing.Queue(10)
 
     def deploy(self):
         pass
@@ -85,28 +83,16 @@ class pspnet_pre(task):
         local_id ="{0}".format( uuid.uuid4())
         print(local_id)
         args_d['local_id'] = local_id
-        self.requestQueue.put(json.dumps(args_d))
-        
-        p = multiprocessing.Process(target=pspnet_pre.run,args=(self.requestQueue,self.responseQueue))
+        p = multiprocessing.Process(target=pspnet_pre.run,args=(json.dumps(args_d)))
         p.start()
-        while (1):
-            p = self.responseQueue.get()
-            print(p)
-            if p == local_id:
-                break
-            self.responseQueue.put(p)
+        p.join()
 
-    @staticmethod
-    def run(req,resq):
-        print(req,resq)
-
-        args_d = json.loads(req.get())
+    def run(self,args_s):
+        args_d = json.loads(args_s)
         print("{0} start pre".format(args_d['local_id']))
         pre_process.pre_process(
             namedtuple('Struct', args_d.keys())(*args_d.values()))
 
-        resq.put(args_d['local_id'])
-        resq.close()
 
 
 class pspnet_img_combine(task):
