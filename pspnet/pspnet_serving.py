@@ -83,15 +83,18 @@ class pspnet_pre(task):
 
     def ask_and_wait(self, args_d):
         local_id = uuid.uuid4()
+        print(local_id)
         args_d['local_id'] = local_id
         self.requestQueue.put(args_d)
         p = multiprocessing.Process(target=self.run)
         p.start()
         while (1):
             p = self.responseQueue.get()
+            print(p)
             if p == local_id:
                 break
             self.responseQueue.put(p)
+
 
     def run(self, reqQ=None, respQ=None):
         if reqQ == None:
