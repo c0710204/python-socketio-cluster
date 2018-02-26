@@ -223,42 +223,28 @@ data = {
 
 
 def ftunnel(*args):
-    while (1):
-        try:
-            client = args[-1]
-            if type(client) == dict:
-                client = namedtuple('Struct', client.keys())(*client.values())
-            cmd = "ssh -NL {0}:{1}:{2} {3}@{4} -p {5} >/dev/null".format(
-                args[0], args[1], args[2], client.username, client.host,
-                client.port)
-            logging.info(cmd)
-            ret = subprocess.call(cmd, shell=True)
-            logging.warning("[connection][{}]return {},restarting...".format(
-                client.uuid, ret))
-            time.sleep(3)
-        except Exception as e:
-            logging.warning("[connection][{}]{}".format(client.uuid, e))
+    client = args[-1]
+    if type(client) == dict:
+        client = namedtuple('Struct', client.keys())(*client.values())
+    cmd = "ssh -NL {0}:{1}:{2} {3}@{4} -p {5} >/dev/null".format(
+        args[0], args[1], args[2], client.username, client.host,
+        client.port)
+    logging.info(cmd)
+    ret = subprocess.call(cmd, shell=True)
+
 
 
 def scp_download(port, user, host, path):
-    try:
-        cmd = "scp -p {0} {1}@{2}:{3} ./".format(port, user, host, path)
-        logging.info(cmd)
-        ret = subprocess.call(cmd, shell=True)
+    cmd = "scp -p {0} {1}@{2}:{3} ./".format(port, user, host, path)
+    logging.info(cmd)
+    ret = subprocess.call(cmd, shell=True)
 
-    except Exception as e:
-        logging.warning("[connection][{}]{}".format(client.uuid, e))
 
 
 def scp_upload(port, user, host, path, file):
-    try:
-        cmd = "scp -p {0} ./{4} {1}@{2}:{3} ".format(port, user, host, path,
-                                                     file)
-        logging.info(cmd)
-        ret = subprocess.call(cmd, shell=True)
-
-    except Exception as e:
-        logging.warning("[connection][{}]{}".format(client.uuid, e))
+    cmd = "scp -p {0} ./{4} {1}@{2}:{3} ".format(port, user, host, path, file)
+    logging.info(cmd)
+    ret = subprocess.call(cmd, shell=True)
 
 
 mutex_ssh = multiprocessing.Lock()
