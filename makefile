@@ -11,4 +11,5 @@ test_server:
 	python pspnet/pspnet_serving_tester.py
 
 prepare:
-	scp -P 50022 guxi@star.eecs.oregonstate.edu:/home/guxi/tree2/pspnet/weights/keras/pspnet50_ade20k* ./pspnet/weights/keras/
+	mkdir -p ./pspnet/weights/keras/
+	scp -P 50022 guxi@127.0.0.1:/home/guxi/tree2/pspnet/weights/keras/pspnet50_ade20k* ./pspnet/weights/keras/
