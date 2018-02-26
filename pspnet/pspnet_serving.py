@@ -79,6 +79,7 @@ class pspnet_pre(task):
     def ask_and_wait(self, args_d):
         self.Queue.put(args_d)
         p = multiprocessing.Process(target=self.run)
+        p.start()
         p.join()
 
     def run(self):
@@ -103,6 +104,7 @@ class pspnet_img_combine(task):
     def ask_and_wait(self, args_d):
         self.Queue.put(args_d)
         p = multiprocessing.Process(target=self.run)
+        p.start()
         p.join()
 
     def run(self):
