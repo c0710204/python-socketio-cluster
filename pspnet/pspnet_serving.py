@@ -23,7 +23,7 @@ import json
 import tqdm
 import multiprocessing
 from multiprocessing import Queue, Lock
-
+import logging
 # init tensorflow
 from keras.backend.tensorflow_backend import set_session
 from keras import backend as K
