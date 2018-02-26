@@ -20,6 +20,7 @@ import pysftp
 import utils
 import uuid
 import json
+import tqdm
 import multiprocessing
 from multiprocessing import Queue, Lock
 
@@ -249,7 +250,6 @@ def sshupload(data, path):
 
 # global data storage
 class Pspnet_namespace(BaseNamespace):
-
     def on_asknext(self, *args):
         self.emit("next")
 
@@ -296,8 +296,14 @@ class Pspnet_namespace(BaseNamespace):
         pspnet_img_combine_in.ask_and_wait(args_d)
 
         print("upload...")
-        sshupload(data, filename + "_seg_blended" + ext)
+        sshupload(data, panid + "_seg_blended" + ext)
         print("garbage cleaning")
+        for filename in tqdm(os.listdir('/tmp')):
+            if filename.endswith(".npy"):
+                try:
+                    os.remove(filename)
+                except Exception:
+                    pass
         print("success")
         self.emit("next")
 
@@ -313,7 +319,6 @@ def main():
     sio_pspent_info = asio.socketIO.define(Pspnet_namespace, '/pspnet')
 
     asio.background()
-
 
     while (1):
         for task in tasks:
