@@ -221,11 +221,12 @@ data = {
     },
 }
 
-cnopts = pysftp.CnOpts()
-cnopts.hostkeys = None
+
 
 
 def sshdownload(data):
+    cnopts = pysftp.CnOpts()
+    cnopts.hostkeys = None
     ssht = sshtunnel.SSHTunnelForwarder(
         data['proxy']['host'],
         ssh_username=data['proxy']['username'],
@@ -239,11 +240,14 @@ def sshdownload(data):
         password=data['ssh']['password'],
         port=ssht.local_bind_port,
         cnopts=cnopts)
+    print("downloading {0}...".format(data['input_path']))
     sftp.get(data['input_path'])
     ssht.stop()
 
 
 def sshupload(data, path):
+    cnopts = pysftp.CnOpts()
+    cnopts.hostkeys = None
     ssht = sshtunnel.SSHTunnelForwarder(
         data['proxy']['host'],
         ssh_username=data['proxy']['username'],
@@ -257,6 +261,7 @@ def sshupload(data, path):
         password=data['ssh']['password'],
         port=ssht.local_bind_port,
         cnopts=cnopts)
+    print("uploading {0}...".format(data['input_path']))
     sftp.chdir(data["output_path"])
     sftp.put(path)
     ssht.stop()
