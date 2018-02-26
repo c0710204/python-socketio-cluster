@@ -247,9 +247,6 @@ def sshupload(data, path):
 
 # global data storage
 class Pspnet_namespace(BaseNamespace):
-    def __init__(*argv):
-        print(argv)
-        super.__init__(*argv)
 
     def on_asknext(self, *args):
         self.emit("next")
