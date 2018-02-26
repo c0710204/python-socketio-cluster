@@ -86,7 +86,7 @@ class pspnet_pre(task):
         print(local_id)
         args_d['local_id'] = local_id
         self.requestQueue.put(json.dumps(args_d))
-        self.requestQueue.close()
+        
         p = multiprocessing.Process(target=pspnet_pre.run,args=(self.requestQueue,self.responseQueue))
         p.start()
         while (1):
