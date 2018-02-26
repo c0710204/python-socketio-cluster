@@ -309,7 +309,7 @@ class Pspnet_namespace(BaseNamespace):
                 except Exception:
                     pass
         print("success")
-        self.emit("next")
+        self.emit("next",data)
 
 
 def main():

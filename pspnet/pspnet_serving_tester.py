@@ -70,12 +70,13 @@ def connect(sid, environ):
 
 
 @sio.on('next', namespace='/pspnet')
-def next(sid):
+def next(sid,data):
     global img_list
+    print(data['input_path'])
     if len(img_list) > 0:
         img_local = img_list[-1]
         del img_list[-1]
-        print("sending request : {0} image left".format(len(img_list)))
+        print("[{1}]sending request : {0} image left".format(len(img_list),time.asctime( time.localtime(time.time()) )))
         sio.emit(
             "request",
             package(img_local, "/home/guxi/tree2/output/"),
