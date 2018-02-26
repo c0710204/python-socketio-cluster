@@ -28,7 +28,8 @@ from multiprocessing import Queue, Lock
 from keras.backend.tensorflow_backend import set_session
 from keras import backend as K
 import tensorflow as tf
-
+from gevent import monkey; monkey.patch_all()
+import gevent
 # init global lock
 mutex = Lock()
 mutex1 = Queue(1)
@@ -176,6 +177,7 @@ class pspnet_dl(task):
             if p == local_id:
                 break
             self.responseQueue.put(p)
+
 
     def run(self):
         # print("waiting for task")
