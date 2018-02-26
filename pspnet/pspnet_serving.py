@@ -77,19 +77,19 @@ class pspnet_pre(task):
         pass
 
     def ask_and_wait(self, args_d):
-        local_id ="{0}".format( uuid.uuid4())
+        local_id = "{0}".format(uuid.uuid4())
         print(local_id)
         args_d['local_id'] = local_id
-        p = multiprocessing.Process(target=self.run,args=(json.dumps(args_d),))
+        p = multiprocessing.Process(
+            target=self.run, args=(json.dumps(args_d), ))
         p.start()
         p.join()
 
-    def run(self,args_s):
+    def run(self, args_s):
         args_d = json.loads(args_s)
         print("{0} start pre".format(args_d['local_id']))
         pre_process.pre_process(
             namedtuple('Struct', args_d.keys())(*args_d.values()))
-
 
 
 class pspnet_img_combine(task):
@@ -107,19 +107,15 @@ class pspnet_img_combine(task):
         pass
 
     def ask_and_wait(self, args_d):
-        local_id ="{0}".format( uuid.uuid4())
+        local_id = "{0}".format(uuid.uuid4())
         args_d['local_id'] = local_id
-        self.requestQueue.put(args_d)
-        p = multiprocessing.Process(target=self.run)
+        p = multiprocessing.Process(
+            target=self.run, args=(json.dumps(args_d), ))
         p.start()
-        while (1):
-            p = self.responseQueue.get()
-            if p == local_id:
-                break
-            self.responseQueue.put(p)
+        p.join()
 
-    def run(self):
-        args_d = self.requestQueue.get()
+    def run(self, args_s=""):
+        args_d = json.loads(args_s)
         panid = args_d['panid']
         ext = args_d['ext']
         filename = args_d['filename']
@@ -169,7 +165,7 @@ class pspnet_dl(task):
         # end
 
     def ask_and_wait(self, args_d):
-        local_id ="{0}".format( uuid.uuid4())
+        local_id = "{0}".format(uuid.uuid4())
         args_d['local_id'] = local_id
         self.requestQueue.put(args_d)
         while (1):
@@ -218,18 +214,15 @@ def ftunnel(*args):
     if type(client) == dict:
         client = namedtuple('Struct', client.keys())(*client.values())
     cmd = "ssh -NR {0}:{1}:{2} {3}@{4} -p {5} >/dev/null".format(
-        args[0], args[1], args[2], client.username, client.host,
-        client.port)
+        args[0], args[1], args[2], client.username, client.host, client.port)
     logging.info(cmd)
     ret = subprocess.call(cmd, shell=True)
-
 
 
 def scp_download(port, user, host, path):
     cmd = "scp -P {0} {1}@{2}:{3} ./".format(port, user, host, path)
     logging.info(cmd)
     ret = subprocess.call(cmd, shell=True)
-
 
 
 def scp_upload(port, user, host, path, file):
@@ -257,7 +250,7 @@ def sshdownload(data):
     mutex_ssh.release()
 
 
-def sshupload(data,path):
+def sshupload(data, path):
     global mutex_ssh
     mutex_ssh.acquire()
     #start tunnel
