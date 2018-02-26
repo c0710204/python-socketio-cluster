@@ -75,8 +75,8 @@ class pspnet_pre(task):
 
     def prepare(self):
         task.prepare(self)
-        self.requestQueue = multiprocessing.Queue()
-        self.responseQueue = multiprocessing.Queue()
+        self.requestQueue = multiprocessing.Queue(10)
+        self.responseQueue = multiprocessing.Queue(10)
 
     def deploy(self):
         pass
@@ -98,6 +98,7 @@ class pspnet_pre(task):
 
     def run(self,req,resq):
         print(req,resq)
+
         args_d = json.loads(req.get())
         print("{0} start pre".format(args_d['local_id']))
         pre_process.pre_process(
