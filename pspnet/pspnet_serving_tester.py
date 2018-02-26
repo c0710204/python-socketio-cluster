@@ -73,7 +73,7 @@ def connect(sid, environ):
 def next(sid,data):
     global img_list
     if data:
-        print(data['input_path'],time.asctime( time.localtime(time.time()) ))
+        print(data['input_path'],time.asctime( time.localtime(time.time())  ))
     if len(img_list) > 0:
         img_local = img_list[-1]
         del img_list[-1]
