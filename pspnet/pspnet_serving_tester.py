@@ -54,7 +54,7 @@ def package(input_path, output_path):
     }
 
 
-node_thread_number = 2
+node_thread_number = 4
 
 
 @sio.on('connect', namespace='/pspnet')
