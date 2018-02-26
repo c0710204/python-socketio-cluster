@@ -261,6 +261,58 @@ def sshupload(data, path):
     sftp.put(path)
     ssht.stop()
 
+def task_process(args,sio):
+    print("got request")
+    data = args[0]
+    filename, ext = splitext(data['input_path'])
+    panid = basename(filename)
+    # download file from upper server
+    print("download...")
+    sshdownload(data)
+    args_d = {}
+    args_d['panid'] = panid
+    args_d['filename'] = filename
+    args_d['ext'] = ext
+
+    args_d['model'] = "pspnet50_ade20k"
+
+    args_d['sliding'] = True
+    args_d['flip'] = True
+    args_d['multi_scale'] = True
+
+    print("phase 1...")
+    args_d['input_path'] = "./{0}{1}".format(panid, ext)
+    args_d['output_path'] = "{2}/{0}{1}".format(panid, ext,
+                                                config_p1_folder)
+
+    pspnet_pre_in.ask_and_wait(args_d=args_d)
+    print("phase 2...")
+    # args_d['sess']=sess
+    # args_d['model_ok']=pspnet
+    args_d['input_path'] = config_p1_folder + '/'
+    args_d['input_path_filter'] = panid
+    args_d['output_path'] = config_p2_folder + '/'
+    pspnet_dl_in.ask_and_wait(args_d)
+
+    print("phase 3...")
+    args_d['input_path'] = "./{0}{1}".format(panid, ext)
+    args_d['input_path2'] = "{2}/{0}{1}".format(panid, ext,
+                                                config_p2_folder)
+    args_d['output_path'] = "{2}/{0}{1}".format(panid, ext,
+                                                config_p3_folder)
+    pspnet_img_combine_in.ask_and_wait(args_d)
+
+    print("upload...")
+    sshupload(data, panid + "_seg_blended" + ext)
+    print("garbage cleaning")
+    for filename in tqdm.tqdm(os.listdir('/tmp')):
+        if filename.endswith(".npy"):
+            try:
+                os.remove(filename)
+            except Exception:
+                pass
+    print("success")
+    sio.emit("next",data)
 
 # global data storage
 class Pspnet_namespace(BaseNamespace):
@@ -268,58 +320,8 @@ class Pspnet_namespace(BaseNamespace):
         self.emit("next",None)
 
     def on_request(self, *args):
-        # tf.reset_default_graph()
-        print("got request")
-        data = args[0]
-        filename, ext = splitext(data['input_path'])
-        panid = basename(filename)
-        # download file from upper server
-        print("download...")
-        sshdownload(data)
-        args_d = {}
-        args_d['panid'] = panid
-        args_d['filename'] = filename
-        args_d['ext'] = ext
-
-        args_d['model'] = "pspnet50_ade20k"
-
-        args_d['sliding'] = True
-        args_d['flip'] = True
-        args_d['multi_scale'] = True
-
-        print("phase 1...")
-        args_d['input_path'] = "./{0}{1}".format(panid, ext)
-        args_d['output_path'] = "{2}/{0}{1}".format(panid, ext,
-                                                    config_p1_folder)
-
-        pspnet_pre_in.ask_and_wait(args_d=args_d)
-        print("phase 2...")
-        # args_d['sess']=sess
-        # args_d['model_ok']=pspnet
-        args_d['input_path'] = config_p1_folder + '/'
-        args_d['input_path_filter'] = panid
-        args_d['output_path'] = config_p2_folder + '/'
-        pspnet_dl_in.ask_and_wait(args_d)
-
-        print("phase 3...")
-        args_d['input_path'] = "./{0}{1}".format(panid, ext)
-        args_d['input_path2'] = "{2}/{0}{1}".format(panid, ext,
-                                                    config_p2_folder)
-        args_d['output_path'] = "{2}/{0}{1}".format(panid, ext,
-                                                    config_p3_folder)
-        pspnet_img_combine_in.ask_and_wait(args_d)
-
-        print("upload...")
-        sshupload(data, panid + "_seg_blended" + ext)
-        print("garbage cleaning")
-        for filename in tqdm.tqdm(os.listdir('/tmp')):
-            if filename.endswith(".npy"):
-                try:
-                    os.remove(filename)
-                except Exception:
-                    pass
-        print("success")
-        self.emit("next",data)
+        p=multiprocessing.process(target=task_process,args=(args, self))
+        p.start()
 
 
 def main():
