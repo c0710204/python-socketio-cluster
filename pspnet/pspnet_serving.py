@@ -303,14 +303,14 @@ class Pspnet_namespace(BaseNamespace):
 def main():
     if os.path.exists("temp_arg.json"):
         os.remove("temp_arg.json")
-    asio.background()
+
     for task in tasks:
         task.prepare()
-
-
     asio = async_socketIO(SocketIO('localhost', 30021))
 
     sio_pspent_info = asio.socketIO.define(Pspnet_namespace, '/pspnet')
+
+    asio.background()
 
 
     while (1):
