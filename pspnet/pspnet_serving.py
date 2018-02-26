@@ -96,15 +96,13 @@ class pspnet_pre(task):
             self.responseQueue.put(p)
 
 
-    def run(self, reqQ=None, respQ=None):
-        if reqQ == None:
-            reqQ = self.requestQueue
-        if respQ == None:
-            respQ = self.responseQueue
-        args_d = reqQ.get()
+    def run(self):
+        args_d = self.requestQueue.get()
+        print("{0} start pre".format(args_d['local_id']))
         pre_process.pre_process(
             namedtuple('Struct', args_d.keys())(*args_d.values()))
-        respQ.put(args_d['local_id'])
+
+        self.responseQueue.put(args_d['local_id'])
 
 
 class pspnet_img_combine(task):
@@ -133,12 +131,8 @@ class pspnet_img_combine(task):
                 break
             self.responseQueue.put(p)
 
-    def run(self, reqQ=None, respQ=None):
-        if reqQ == None:
-            reqQ = self.requestQueue
-        if respQ == None:
-            respQ = self.responseQueue
-        args_d = reqQ.get()
+    def run(self):
+        args_d = self.requestQueue.get()
         panid = args_d['panid']
         ext = args_d['ext']
         filename = args_d['filename']
@@ -155,7 +149,7 @@ class pspnet_img_combine(task):
         #colored_class_image is [0.0-1.0] img is [0-255]
         alpha_blended = 0.5 * colored_class_image + 0.5 * img
         misc.imsave(panid + "_seg_blended" + ext, alpha_blended)
-        respQ.put(args_d['local_id'])
+        self.responseQueue.put(args_d['local_id'])
 
 
 class pspnet_dl(task):
