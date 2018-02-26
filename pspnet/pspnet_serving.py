@@ -19,7 +19,8 @@ import sshtunnel
 import pysftp
 import utils
 import uuid
-import json, multiprocessing
+import json
+import multiprocessing
 from multiprocessing import Queue, Lock
 
 # init tensorflow
@@ -32,32 +33,116 @@ mutex = Lock()
 mutex1 = Queue(1)
 mutex2 = Queue(1)
 mutex_data = None
+
 # end init global lock
 
+
 class task():
-    def run():
+    """
+    mainthread:
+
+        True    : need to maintain the run() in the main thread to provide service
+        False   : auto create process to provide service
+
+    handler_type:
+
+        "file"  : using file as status and args transfer tool
+        "queue" : build-in queue transfer
+
+
+
+    """
+    mainthread = False
+    handler_type = 'None'
+
+    def prepare(self):
+        """
+        using to init before running code
+        """
+        self.remote_uuid = "{0}{1}".format(uuid.uuid4(), "_deeplearning")
+        self.socketIO = SocketIO('localhost', 30001, LoggingNamespace)
+
+
+class pspnet_pre(task):
+
+    handler_type = "process"
+    handle = ""
+    mainthread = False
+
+    def prepare(self):
+        super.prepare(self)
+        self.Queue = multiprocessing.Queue()
+
+    def deploy(self):
         pass
+
+    def ask_and_wait(self, args_d):
+        self.Queue.put(args_d)
+        p = multiprocessing.Process(target=self.run)
+        p.join()
+
+    def run(self):
+        args_d = self.Queue.get()
+        pre_process.pre_process(
+            namedtuple('Struct', args_d.keys())(*args_d.values()))
+
+
+class pspnet_img_combine(task):
+
+    handler_type = "process"
+    handle = ""
+    mainthread = False
+
+    def prepare(self):
+        super.prepare(self)
+        self.Queue = multiprocessing.Queue()
+
+    def deploy(self):
+        pass
+
+    def ask_and_wait(self, args_d):
+        self.Queue.put(args_d)
+        p = multiprocessing.Process(target=self.run)
+        p.join()
+
+    def run(self):
+        args_d = self.Queue.get()
+        panid = args_d['panid']
+        ext = args_d['ext']
+        filename = args_d['filename']
+        class_scores = img_combine2.img_combine2(
+            namedtuple('Struct', args_d.keys())(*args_d.values()))
+        print("blended...")
+        img = misc.imread("./{0}{1}".format(panid, ext))
+        img = misc.imresize(img, 10)
+
+        class_image = np.argmax(class_scores, axis=2)
+        pm = np.max(class_scores, axis=2)
+        colored_class_image = utils.color_class_image(class_image,
+                                                      args_d['model'])
+        #colored_class_image is [0.0-1.0] img is [0-255]
+        alpha_blended = 0.5 * colored_class_image + 0.5 * img
+        misc.imsave(filename + "_seg_blended" + ext, alpha_blended)
 
 
 class pspnet_dl(task):
-    def __init__(self):
-        self.mainthread = True
-        self.handler_type = 'file'
-        self.handler = "temp_arg.json"
-        self.mutex = multiprocessing.Lock()
+    mainthread = True
+    handler_type = 'file'
+    handler = "temp_arg.json"
 
     def prepare(self):
-
+        super.prepare(self)
+        self.mutex = multiprocessing.Lock()
         config = tf.ConfigProto()
         # config.gpu_options.allow_growth = True
         # config.gpu_options.per_process_gpu_memory_fraction = 0.4
         self.sess = tf.Session(config=config)
         set_session(self.sess)
         self.pspnet = PSPNet50(
-            nb_classes=150, input_shape=(473, 473), weights="pspnet50_ade20k",path="./pspnet/weights")
-
-        self.remote_uuid = "{0}{1}".format(uuid.uuid4(), "_deeplearning")
-        self.socketIO = SocketIO('localhost', 30001, LoggingNamespace)
+            nb_classes=150,
+            input_shape=(473, 473),
+            weights="pspnet50_ade20k",
+            path="./pspnet/weights")
 
         # end
 
@@ -98,7 +183,12 @@ class pspnet_dl(task):
         self.mutex.release()
         time.sleep(1)
 
+
 pspnet_dl_in = pspnet_dl()
+pspnet_pre_in = pspnet_pre()
+pspnet_img_combine_in = pspnet_img_combine()
+tasks = [pspnet_pre_in, pspnet_dl_in, pspnet_img_combine_in]
+
 # config
 config_p1_folder = './p1'
 config_p2_folder = './p2'
@@ -157,11 +247,14 @@ def sshupload(data, path):
 
 # global data storage
 class Pspnet_namespace(BaseNamespace):
+    def __init__(*argv):
+        print(argv)
+        super.__init__(*argv)
+
     def on_asknext(self, *args):
         self.emit("next")
 
     def on_request(self, *args):
-        global mutex1, mutex2, mutex, mutex_data
         # tf.reset_default_graph()
         print("got request")
         data = args[0]
@@ -171,51 +264,38 @@ class Pspnet_namespace(BaseNamespace):
         print("download...")
         sshdownload(data)
         args_d = {}
-        remote_uuid = "{0}{1}".format(uuid.uuid4(), "_deeplearning")
-        socketIO = SocketIO('localhost', 30001, LoggingNamespace)
-        args_d['remote_uuid'] = remote_uuid
-        args_d['socketIO'] = socketIO
+        args_d['panid'] = panid
+        args_d['filename'] = filename
+        args_d['ext'] = ext
+
         args_d['model'] = "pspnet50_ade20k"
 
         args_d['sliding'] = True
         args_d['flip'] = True
         args_d['multi_scale'] = True
+
         print("phase 1...")
         args_d['input_path'] = "./{0}{1}".format(panid, ext)
         args_d['output_path'] = "{2}/{0}{1}".format(panid, ext,
                                                     config_p1_folder)
-        pre_process.pre_process(
-            namedtuple('Struct', args_d.keys())(*args_d.values()))
+
+        pspnet_pre.ask_and_wait(args_d=args_d)
         print("phase 2...")
         # args_d['sess']=sess
         # args_d['model_ok']=pspnet
         args_d['input_path'] = config_p1_folder + '/'
         args_d['input_path_filter'] = panid
-
         args_d['output_path'] = config_p2_folder + '/'
-        del args_d['socketIO']
         pspnet_dl_in.ask_and_wait(args_d)
-        # mutex2.get(block=True)
-        args_d['socketIO'] = socketIO
+
         print("phase 3...")
         args_d['input_path'] = "./{0}{1}".format(panid, ext)
         args_d['input_path2'] = "{2}/{0}{1}".format(panid, ext,
                                                     config_p2_folder)
         args_d['output_path'] = "{2}/{0}{1}".format(panid, ext,
                                                     config_p3_folder)
-        class_scores = img_combine2.img_combine2(
-            namedtuple('Struct', args_d.keys())(*args_d.values()))
-        print("blended...")
-        img = misc.imread("./{0}{1}".format(panid, ext))
-        img = misc.imresize(img, 10)
+        pspnet_img_combine_in.ask_and_wait(args_d)
 
-        class_image = np.argmax(class_scores, axis=2)
-        pm = np.max(class_scores, axis=2)
-        colored_class_image = utils.color_class_image(class_image,
-                                                      args_d['model'])
-        #colored_class_image is [0.0-1.0] img is [0-255]
-        alpha_blended = 0.5 * colored_class_image + 0.5 * img
-        misc.imsave(filename + "_seg_blended" + ext, alpha_blended)
         print("upload...")
         sshupload(data, filename + "_seg_blended" + ext)
         print("garbage cleaning")
@@ -223,8 +303,7 @@ class Pspnet_namespace(BaseNamespace):
         self.emit("next")
 
 
-
-if __name__ == "__main__":
+def main():
     if os.path.exists("temp_arg.json"):
         os.remove("temp_arg.json")
 
@@ -233,10 +312,19 @@ if __name__ == "__main__":
     asio = async_socketIO(SocketIO('localhost', 30021))
 
     sio_pspent_info = asio.socketIO.define(Pspnet_namespace, '/pspnet')
+
     asio.background()
-    pspnet_dl_in.prepare()
+    for task in tasks:
+        task.prepare()
+
     while (1):
-        pspnet_dl_in.run()
+        for task in tasks:
+            if task.mainthread:
+                task.run()
     #mutex2.put("success",block=True)
     #except:
     #   pass
+
+
+if __name__ == "__main__":
+    main()
