@@ -194,9 +194,9 @@ pspnet_img_combine_in = pspnet_img_combine()
 tasks = [pspnet_pre_in, pspnet_dl_in, pspnet_img_combine_in]
 
 # config
-config_p1_folder = './p1'
-config_p2_folder = './p2'
-config_p3_folder = './p3'
+config_p1_folder = '/dev/shm/p1'
+config_p2_folder = '/dev/shm/p2'
+config_p3_folder = '/dev/shm/p3'
 
 # init remote link
 data = {

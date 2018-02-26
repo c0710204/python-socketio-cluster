@@ -5,6 +5,11 @@ sdn:
 	python server/sdn.py -c config/sdn.yaml
 
 client:
+	mkdir -p /dev/shm/guxi
+	mkdir -p /dev/shm/guxi/p1
+	mkdir -p /dev/shm/guxi/p2
+	mkdir -p /dev/shm/guxi/p3
+	mkdir -p /dev/shm/guxi/tmp
 	python pspnet/pspnet_serving.py
 
 test_server:
