@@ -34,6 +34,70 @@ mutex2 = Queue(1)
 mutex_data = None
 # end init global lock
 
+class task():
+    def run():
+        pass
+
+
+class pspnet_dl(task):
+    def __init__(self):
+        self.mainthread = True
+        self.handler_type = 'file'
+        self.handler = "temp_arg.json"
+        self.mutex = multiprocessing.Lock()
+
+    def prepare(self):
+
+        config = tf.ConfigProto()
+        # config.gpu_options.allow_growth = True
+        # config.gpu_options.per_process_gpu_memory_fraction = 0.4
+        self.sess = tf.Session(config=config)
+        set_session(sess)
+        self.pspnet = PSPNet50(
+            nb_classes=150, input_shape=(473, 473), weights="pspnet50_ade20k")
+
+        self.remote_uuid = "{0}{1}".format(uuid.uuid4(), "_deeplearning")
+        self.socketIO = SocketIO('localhost', 30001, LoggingNamespace)
+
+        # end
+
+    def ask_and_wait(self, args_d):
+        while (1):
+            self.mutex.acquire()
+            if not os.path.exists(self.handler):
+                with open(self.handler, 'w+') as fout:
+                    fout.write(json.dumps(args_d))
+                self.mutex.release()
+                break
+            self.mutex.release()
+        while (1):
+            # print("waiting...")
+            self.mutex.acquire()
+            if not os.path.exists(self.handler):
+                break
+            self.mutex.release()
+            time.sleep(1)
+        self.mutex.release()
+
+    def run(self):
+        # print("waiting for task")
+        # try:
+        self.mutex.acquire()
+        if os.path.exists(self.handler):
+            print("received task")
+            f = open(self.handler)
+            json_data = f.read()
+            args_d = json.loads(json_data)
+            args_d['sess'] = self.sess
+            args_d['model_ok'] = self.pspnet
+            args_d['remote_uuid'] = self.remote_uuid
+            args_d['socketIO'] = self.socketIO
+            global_arg = namedtuple('Struct', args_d.keys())(*args_d.values())
+            deeplearning.deep_process(global_arg)
+            os.remove(self.handler)
+        self.mutex.release()
+        time.sleep(1)
+
 pspnet_dl_in = pspnet_dl()
 # config
 config_p1_folder = './p1'
@@ -158,70 +222,6 @@ class Pspnet_namespace(BaseNamespace):
         print("success")
         self.emit("next")
 
-
-class task():
-    def run():
-        pass
-
-
-class pspnet_dl(task):
-    def __init__(self):
-        self.mainthread = True
-        self.handler_type = 'file'
-        self.handler = "temp_arg.json"
-        self.mutex = multiprocessing.Lock()
-
-    def prepare(self):
-
-        config = tf.ConfigProto()
-        # config.gpu_options.allow_growth = True
-        # config.gpu_options.per_process_gpu_memory_fraction = 0.4
-        self.sess = tf.Session(config=config)
-        set_session(sess)
-        self.pspnet = PSPNet50(
-            nb_classes=150, input_shape=(473, 473), weights="pspnet50_ade20k")
-
-        self.remote_uuid = "{0}{1}".format(uuid.uuid4(), "_deeplearning")
-        self.socketIO = SocketIO('localhost', 30001, LoggingNamespace)
-
-        # end
-
-    def ask_and_wait(self, args_d):
-        while (1):
-            self.mutex.acquire()
-            if not os.path.exists(self.handler):
-                with open(self.handler, 'w+') as fout:
-                    fout.write(json.dumps(args_d))
-                self.mutex.release()
-                break
-            self.mutex.release()
-        while (1):
-            # print("waiting...")
-            self.mutex.acquire()
-            if not os.path.exists(self.handler):
-                break
-            self.mutex.release()
-            time.sleep(1)
-        self.mutex.release()
-
-    def run(self):
-        # print("waiting for task")
-        # try:
-        self.mutex.acquire()
-        if os.path.exists(self.handler):
-            print("received task")
-            f = open(self.handler)
-            json_data = f.read()
-            args_d = json.loads(json_data)
-            args_d['sess'] = self.sess
-            args_d['model_ok'] = self.pspnet
-            args_d['remote_uuid'] = self.remote_uuid
-            args_d['socketIO'] = self.socketIO
-            global_arg = namedtuple('Struct', args_d.keys())(*args_d.values())
-            deeplearning.deep_process(global_arg)
-            os.remove(self.handler)
-        self.mutex.release()
-        time.sleep(1)
 
 
 if __name__ == "__main__":
