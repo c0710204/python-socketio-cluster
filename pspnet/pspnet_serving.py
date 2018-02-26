@@ -66,50 +66,65 @@ class task():
 
 class pspnet_pre(task):
 
-    handler_type = "process"
+    handler_type = "Queue"
     handle = ""
     mainthread = False
 
     def prepare(self):
         task.prepare(self)
-        self.Queue = multiprocessing.Queue()
+        self.requestQueue = multiprocessing.Queue()
+        self.responseQueue = multiprocessing.Queue()
 
     def deploy(self):
         pass
 
     def ask_and_wait(self, args_d):
-        self.Queue.put(args_d)
+        local_id = uuid.uuid4()
+        args_d['local_id'] = local_id
+        self.requestQueue.put(args_d)
         p = multiprocessing.Process(target=self.run)
         p.start()
-        p.join()
+        while (1):
+            p = self.responseQueue.get()
+            if p == local_id:
+                break
+            self.responseQueue.put(p)
 
     def run(self):
-        args_d = self.Queue.get()
+        args_d = self.requestQueue.get()
         pre_process.pre_process(
             namedtuple('Struct', args_d.keys())(*args_d.values()))
+        self.responseQueue.put(args_d['local_id'])
 
 
 class pspnet_img_combine(task):
 
-    handler_type = "process"
+    handler_type = "Queue"
     handle = ""
     mainthread = False
 
     def prepare(self):
         task.prepare(self)
-        self.Queue = multiprocessing.Queue()
+        self.requestQueue = multiprocessing.Queue()
+        self.responseQueue = multiprocessing.Queue()
 
     def deploy(self):
         pass
 
     def ask_and_wait(self, args_d):
-        self.Queue.put(args_d)
+        local_id = uuid.uuid4()
+        args_d['local_id'] = local_id
+        self.requestQueue.put(args_d)
         p = multiprocessing.Process(target=self.run)
         p.start()
-        p.join()
+        while (1):
+            p = self.responseQueue.get()
+            if p == local_id:
+                break
+            self.responseQueue.put(p)
 
     def run(self):
-        args_d = self.Queue.get()
+        args_d = self.requestQueue.get()
         panid = args_d['panid']
         ext = args_d['ext']
         filename = args_d['filename']
@@ -126,15 +141,18 @@ class pspnet_img_combine(task):
         #colored_class_image is [0.0-1.0] img is [0-255]
         alpha_blended = 0.5 * colored_class_image + 0.5 * img
         misc.imsave(panid + "_seg_blended" + ext, alpha_blended)
+        self.responseQueue.put(args_d['local_id'])
 
 
 class pspnet_dl(task):
     mainthread = True
-    handler_type = 'file'
-    handler = "temp_arg.json"
+    handler_type = 'Queue'
+    handler = ""
 
     def prepare(self):
         task.prepare(self)
+        self.requestQueue = multiprocessing.Queue()
+        self.responseQueue = multiprocessing.Queue()
         self.mutex = multiprocessing.Lock()
         config = tf.ConfigProto()
         # config.gpu_options.allow_growth = True
@@ -150,40 +168,26 @@ class pspnet_dl(task):
         # end
 
     def ask_and_wait(self, args_d):
+        local_id = uuid.uuid4()
+        args_d['local_id'] = local_id
+        self.requestQueue.put(args_d)
         while (1):
-            self.mutex.acquire()
-            if not os.path.exists(self.handler):
-                with open(self.handler, 'w+') as fout:
-                    fout.write(json.dumps(args_d))
-                self.mutex.release()
+            p = self.responseQueue.get()
+            if p == local_id:
                 break
-            self.mutex.release()
-        while (1):
-            # print("waiting...")
-            self.mutex.acquire()
-            if not os.path.exists(self.handler):
-                break
-            self.mutex.release()
-            time.sleep(1)
-        self.mutex.release()
+            self.responseQueue.put(p)
 
     def run(self):
         # print("waiting for task")
         # try:
-        self.mutex.acquire()
-        if os.path.exists(self.handler):
-            print("received task")
-            f = open(self.handler)
-            json_data = f.read()
-            args_d = json.loads(json_data)
-            args_d['sess'] = self.sess
-            args_d['model_ok'] = self.pspnet
-            args_d['remote_uuid'] = self.remote_uuid
-            args_d['socketIO'] = self.socketIO
-            global_arg = namedtuple('Struct', args_d.keys())(*args_d.values())
-            deeplearning.deep_process(global_arg)
-            os.remove(self.handler)
-        self.mutex.release()
+        args_d = self.requestQueue.get()
+        args_d['sess'] = self.sess
+        args_d['model_ok'] = self.pspnet
+        args_d['remote_uuid'] = self.remote_uuid
+        args_d['socketIO'] = self.socketIO
+        global_arg = namedtuple('Struct', args_d.keys())(*args_d.values())
+        deeplearning.deep_process(global_arg)
+        self.responseQueue.put(args_d['local_id'])
         time.sleep(1)
 
 
