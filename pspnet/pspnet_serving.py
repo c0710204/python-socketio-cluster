@@ -22,7 +22,7 @@ import uuid
 import json
 import multiprocessing
 from multiprocessing import Queue, Lock
- 
+
 # init tensorflow
 from keras.backend.tensorflow_backend import set_session
 from keras import backend as K
@@ -70,7 +70,7 @@ class pspnet_pre(task):
     mainthread = False
 
     def prepare(self):
-        super.prepare(self)
+        task.prepare(self)
         self.Queue = multiprocessing.Queue()
 
     def deploy(self):
@@ -94,7 +94,7 @@ class pspnet_img_combine(task):
     mainthread = False
 
     def prepare(self):
-        super.prepare(self)
+        task.prepare(self)
         self.Queue = multiprocessing.Queue()
 
     def deploy(self):
@@ -131,7 +131,7 @@ class pspnet_dl(task):
     handler = "temp_arg.json"
 
     def prepare(self):
-        super.prepare(self)
+        task.prepare(self)
         self.mutex = multiprocessing.Lock()
         config = tf.ConfigProto()
         # config.gpu_options.allow_growth = True
