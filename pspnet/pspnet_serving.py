@@ -270,7 +270,7 @@ def sshdownload(data):
     #start tunnel
     tunnel_p = multiprocessing.Process(
         target=ftunnel,
-        argv=(50033, data['ssh']['host'], data['ssh']['port'], data['proxy']))
+        args=(50033, data['ssh']['host'], data['ssh']['port'], data['proxy']))
     tunnel_p.start()
     #do scp_download
     print("downloading {0}...".format(data['input_path']))
@@ -286,7 +286,7 @@ def sshupload(data):
     #start tunnel
     tunnel_p = multiprocessing.Process(
         target=ftunnel,
-        argv=(50033, data['ssh']['host'], data['ssh']['port'], data['proxy']))
+        args=(50033, data['ssh']['host'], data['ssh']['port'], data['proxy']))
     tunnel_p.start()
     #do scp_download
     print("downloading {0}...".format(data['input_path']))
