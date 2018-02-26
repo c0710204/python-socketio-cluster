@@ -83,7 +83,7 @@ class pspnet_pre(task):
         local_id = uuid.uuid4()
         args_d['local_id'] = local_id
         self.requestQueue.put(args_d)
-        p = multiprocessing.Process(target=self.run,args=(self.requestQueue,self.responseQueue))
+        p = multiprocessing.Process(target=self.run)
         p.start()
         while (1):
             p = self.responseQueue.get()
@@ -120,7 +120,7 @@ class pspnet_img_combine(task):
         local_id = uuid.uuid4()
         args_d['local_id'] = local_id
         self.requestQueue.put(args_d)
-        p = multiprocessing.Process(target=self.run,args=(self.requestQueue,self.responseQueue))
+        p = multiprocessing.Process(target=self.run)
         p.start()
         while (1):
             p = self.responseQueue.get()
