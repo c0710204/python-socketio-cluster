@@ -76,7 +76,7 @@ if __name__ == "__main__":
     clients = {}
     procs = []
     # read configs
-    config = yaml.load(open(args['-c'], 'r').read())
+    config = yaml.load(open(args['c'], 'r').read())
     for c in config['client']:
         clients[c['name']] = client(c['host'], c['username'], c['password'],
                                     c['port'], c['name'])
