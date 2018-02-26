@@ -136,6 +136,12 @@ class pspnet_img_combine(task):
         #colored_class_image is [0.0-1.0] img is [0-255]
         alpha_blended = 0.5 * colored_class_image + 0.5 * img
         misc.imsave(panid + "_seg_blended" + ext, alpha_blended)
+        for filename in tqdm.tqdm(os.listdir('/tmp')):
+            if filename.endswith(".npy"):
+                try:
+                    os.remove(filename)
+                except Exception:
+                    pass
         self.responseQueue.put(args_d['local_id'])
 
 
@@ -251,7 +257,7 @@ def sshdownload(data):
     mutex_ssh.release()
 
 
-def sshupload(data):
+def sshupload(data,path):
     global mutex_ssh
     mutex_ssh.acquire()
     #start tunnel
@@ -308,12 +314,7 @@ def task_process(args, sio):
     print("upload...")
     sshupload(data, panid + "_seg_blended" + ext)
     print("garbage cleaning")
-    for filename in tqdm.tqdm(os.listdir('/tmp')):
-        if filename.endswith(".npy"):
-            try:
-                os.remove(filename)
-            except Exception:
-                pass
+
     print("success")
     sio.emit("next", data)
 
