@@ -276,7 +276,7 @@ class Pspnet_namespace(BaseNamespace):
         args_d['output_path'] = "{2}/{0}{1}".format(panid, ext,
                                                     config_p1_folder)
 
-        pspnet_pre.ask_and_wait(args_d=args_d)
+        pspnet_pre_in.ask_and_wait(args_d=args_d)
         print("phase 2...")
         # args_d['sess']=sess
         # args_d['model_ok']=pspnet
