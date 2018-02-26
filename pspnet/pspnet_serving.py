@@ -86,7 +86,7 @@ class pspnet_pre(task):
         print(local_id)
         args_d['local_id'] = local_id
         self.requestQueue.put(args_d)
-        p = multiprocessing.Process(target=self.run,args=(self.requestQueue,self.responseQueue))
+        p = multiprocessing.Process(target=self.run,args=(self,self.requestQueue,self.responseQueue))
         p.start()
         while (1):
             p = self.responseQueue.get()
@@ -97,7 +97,7 @@ class pspnet_pre(task):
 
 
     def run(self,req,resq):
-        print(req)
+        print(self,req,resq)
         args_d = self.requestQueue.get()
         print("{0} start pre".format(args_d['local_id']))
         pre_process.pre_process(
