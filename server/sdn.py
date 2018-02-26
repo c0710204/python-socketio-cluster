@@ -64,10 +64,19 @@ def rftunnel(*args):
 
 
 if __name__ == "__main__":
+    # argparse
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument(
+        '-c',
+        default="config/sdn.yaml",
+        help='path of config file')
+
+    args = parser.parse_args()
+
     clients = {}
     procs = []
     # read configs
-    config = yaml.load(open("config.yaml", 'r').read())
+    config = yaml.load(open(args['-c'], 'r').read())
     for c in config['client']:
         clients[c['name']] = client(c['host'], c['username'], c['password'],
                                     c['port'], c['name'])
