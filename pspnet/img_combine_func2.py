@@ -138,7 +138,7 @@ def predict_multi_scale(funchandler, full_image_shape, net, scales,
         probs_inp = []
         for scale in pbar:
             pbar.set_description("Predicting image scaled by %f" % scale)
-            n = "/tmp/" + str(uuid.uuid4()) + '.npy'
+            n = "/dev/shm/" + str(uuid.uuid4()) + '.npy'
             probs_inp.append(
                 (args.input_path2, scale, h_ori, w_ori, flip_evaluation, net,
                  n, full_image_shape, sliding_evaluation))
