@@ -320,7 +320,7 @@ class Pspnet_namespace(BaseNamespace):
         self.emit("next",None)
 
     def on_request(self, *args):
-        p=multiprocessing.process(target=task_process,args=(args, self))
+        p=multiprocessing.Process(target=task_process,args=(args, self))
         p.start()
 
 
