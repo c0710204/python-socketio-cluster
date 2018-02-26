@@ -54,7 +54,7 @@ def package(input_path, output_path):
     }
 
 
-node_thread_number =2
+node_thread_number =4
 
 
 @sio.on('connect', namespace='/pspnet')
@@ -73,7 +73,7 @@ def connect(sid, environ):
 def next(sid,data):
     global img_list
     if data:
-        print(data['input_path'])
+        print(data['input_path'],time.asctime( time.localtime(time.time()) ))
     if len(img_list) > 0:
         img_local = img_list[-1]
         del img_list[-1]
