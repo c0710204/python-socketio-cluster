@@ -19,13 +19,13 @@ def update(sid, data):
     global db
     if data['id'] in db:
         if (data['max']):
-			db[data['id']]['max'] = data['max']
+            db[data['id']]['max'] = data['max']
 
-		if (data['val']):
-			db[data['id']]['val'] = data['val']
+        if (data['val']):
+            db[data['id']]['val'] = data['val']
 
-		if (data['phase']):
-			db[data['id']]['phase'] = data['phase']
+        if (data['phase']):
+            db[data['id']]['phase'] = data['phase']
     else:
         db[data['id']]=data
     sio.emit('progress_upgrade_server',data=db.values())
