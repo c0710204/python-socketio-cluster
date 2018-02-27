@@ -5,7 +5,7 @@ def worker(i):
 def main():
     p_list=[]
     try:
-        tasks=["server/sdn.py","pspnet/pspnet_serving_test.py","server/logserv.py"]
+        tasks=["pspnet/pspnet_serving_test.py","server/logserv.py"]
         for i in tasks:
             p = multiprocessing.Process(target=worker(i))
             p.start()
