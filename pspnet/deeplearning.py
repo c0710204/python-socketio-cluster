@@ -8,7 +8,7 @@ from math import ceil
 import argparse
 import numpy as np
 from scipy import misc, ndimage
-from keras.backend.tensorflow_backend import set_session  
+from keras.backend.tensorflow_backend import set_session
 from keras import backend as K
 from psp_tf.pspnet import *
 import tensorflow as tf
@@ -73,17 +73,14 @@ def deep_process(args):
         for fpath in onlyfiles1:
             if fpath.find(args.input_path_filter)>=0:
                 onlyfiles.append(fpath)
-            else:
-                try:
-                    os.remove(fpath)
-                except:
-                    pass
-
     for fpath in tqdm.tqdm(onlyfiles):
       #read
       ind+=1
       padded_img=np.load(args.input_path+'/'+fpath)
-      #os.remove(args.input_path+'/'+fpath)
+      try:
+          os.remove(args.input_path+'/'+fpath)
+      except Exception as e:
+          pass
       iname,scale,y1,y2,x1,x2,_=fpath.split('_-_')
       y1=int(y1)
       y2=int(y2)
@@ -106,7 +103,7 @@ def deep_process(args):
       cache=[]
       image_cache=[]
       padded_prediction=[]
-      
+
     if len(image_cache)>0:
         padded_prediction=pspnet.predict(np.array(image_cache),  args.flip)
         for i in range(len(cache)):
@@ -118,9 +115,9 @@ def deep_process(args):
         filename=fpath.split('_-_')
         args.socketIO.emit('update',{'id':iname,"phase":2,'val':ind,'max':len(onlyfiles)})
         #args.socketIO.wait(seconds=1)
-    
+
 if __name__=='__main__':
-  
+
   remote_uuid="{0}{1}".format(uuid.uuid4(),"_deeplearning")
   socketIO=SocketIO('localhost', 30001, LoggingNamespace)
   parser = argparse.ArgumentParser()
