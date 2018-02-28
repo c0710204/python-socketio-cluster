@@ -16,6 +16,7 @@ def connect(sid, environ):
 @sio.on('update', namespace='/')
 def update(sid, data):
     global db
+    print(data)
     if data['id'] in db:
         if (data['max']):
             db[data['id']]['max'] = data['max']
