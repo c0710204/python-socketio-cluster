@@ -73,15 +73,11 @@ def deep_process(args):
             if fpath.find(args.input_path_filter)>=0:
                 onlyfiles.append(fpath)
     args.socketIO.emit('update',{'id':iname,"phase":2,'val':0,'max':len(onlyfiles)})
-    args.socketIO.wait(seconds=1)                
+    args.socketIO.wait(seconds=1)
     for fpath in tqdm.tqdm(onlyfiles):
       #read
       ind+=1
       padded_img=np.load(args.input_path+'/'+fpath)
-      try:
-          os.remove(args.input_path+'/'+fpath)
-      except Exception as e:
-          pass
       iname,scale,y1,y2,x1,x2,_=fpath.split('_-_')
       y1=int(y1)
       y2=int(y2)
@@ -104,7 +100,12 @@ def deep_process(args):
       cache=[]
       image_cache=[]
       padded_prediction=[]
-
+    for fpath in onlyfiles:
+        try:
+            os.remove(args.input_path+'/'+fpath)
+        except Exception as e:
+                pass
+        pass
     if len(image_cache)>0:
         padded_prediction=pspnet.predict(np.array(image_cache),  args.flip)
         for i in range(len(cache)):
