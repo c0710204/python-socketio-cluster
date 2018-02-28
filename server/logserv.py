@@ -28,7 +28,9 @@ def update(sid, data):
         if (data['phase']):
             db[data['id']]['phase'] = data['phase']
     else:
+        data['label']=data['id']
         db[data['id']]=data
+
     sio.emit('progress_upgrade_server',data=db.values())
     pass
 
