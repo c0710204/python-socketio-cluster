@@ -87,6 +87,9 @@ class pspnet_pre(task):
 
     def run(self, args_s):
         args_d = json.loads(args_s)
+        iname = args_d['panid']
+        self.socketIO.emit('update', {'id': iname, "phase": 1, 'val': -1, 'max': -1})
+        self.socketIO.wait(seconds=1)
         print("{0} start pre".format(args_d['local_id']))
         pre_process.pre_process(
             namedtuple('Struct', args_d.keys())(*args_d.values()))
@@ -116,9 +119,11 @@ class pspnet_img_combine(task):
 
     def run(self, args_s=""):
         args_d = json.loads(args_s)
-        panid = args_d['panid']
+        iname = args_d['panid']
         ext = args_d['ext']
         filename = args_d['filename']
+        self.socketIO.emit('update', {'id': iname, "phase": 3, 'val': -1, 'max': -1})
+        self.socketIO.wait(seconds=1)
         class_scores = img_combine2.img_combine2(
             namedtuple('Struct', args_d.keys())(*args_d.values()))
         print("blended...")
@@ -138,6 +143,8 @@ class pspnet_img_combine(task):
         #             os.remove(filename)
         #         except Exception:
         #             pass
+        self.socketIO.emit('update', {'id': iname, "phase": 3, 'val': 1, 'max': 1})
+        self.socketIO.wait(seconds=1)
         self.responseQueue.put(args_d['local_id'])
 
 
