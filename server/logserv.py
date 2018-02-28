@@ -8,12 +8,12 @@ app = socketio.Middleware(sio)
 db = {}
 
 
-@sio.on('connect', namespace='/')
+@sio.on('connect')
 def connect(sid, environ):
     pass
 
 
-@sio.on('update', namespace='/')
+@sio.on('update')
 def update(sid, data):
     global db
     print(data)
@@ -32,7 +32,7 @@ def update(sid, data):
     pass
 
 @sio.on(
-    'disconnect', )
+    'disconnect')
 def disconnect(sid):
     print('disconnect ', sid)
 
