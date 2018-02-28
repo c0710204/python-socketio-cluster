@@ -65,14 +65,15 @@ def deep_process(args):
     image_cache=[]
     ind=0
     iname=onlyfiles[0].split('_-_')[0]
-    args.socketIO.emit('update',{'id':iname,"phase":2,'val':0,'max':len(onlyfiles)})
-    args.socketIO.wait(seconds=1)
+
     if args.input_path_filter:
         onlyfiles1=onlyfiles
         onlyfiles=[]
         for fpath in onlyfiles1:
             if fpath.find(args.input_path_filter)>=0:
                 onlyfiles.append(fpath)
+    args.socketIO.emit('update',{'id':iname,"phase":2,'val':0,'max':len(onlyfiles)})
+    args.socketIO.wait(seconds=1)                
     for fpath in tqdm.tqdm(onlyfiles):
       #read
       ind+=1

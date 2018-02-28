@@ -31,8 +31,7 @@ def update(sid, data):
     sio.emit('progress_upgrade_server',data=db.values())
     pass
 
-@sio.on(
-    'disconnect')
+@sio.on('disconnect')
 def disconnect(sid):
     print('disconnect ', sid)
 
