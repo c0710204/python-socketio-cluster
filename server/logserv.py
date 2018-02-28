@@ -10,6 +10,7 @@ db = {}
 
 @sio.on('connect')
 def connect(sid, environ):
+    print('logserv - connect ', sid)
     pass
 
 
@@ -33,7 +34,7 @@ def update(sid, data):
 
 @sio.on('disconnect')
 def disconnect(sid):
-    print('disconnect ', sid)
+    print('logserv - disconnect ', sid)
 
 
 if __name__ == '__main__':
