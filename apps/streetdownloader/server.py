@@ -11,11 +11,12 @@ class stv_app_server(app_server):
         """
         #read from list
         #return request
+        return {"lat":-37.83314,"lon": 144.919085}
     def process_result(self,ret):
         """
         :param ret result from client.run
         """
-
+        return ret
 
 def main():
     #dummy
