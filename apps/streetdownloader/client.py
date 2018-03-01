@@ -1,4 +1,4 @@
-from apps.streetview.pkg.streetview import streetview
+from apps.streetdownloader.pkg.streetview import streetview
 class app_client():
     pass
 class stv_app_client(app_client):

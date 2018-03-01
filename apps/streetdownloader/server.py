@@ -1,4 +1,4 @@
-from apps.streetview.pkg.streetview import streetview
+from apps.streetdownloader.pkg.streetview import streetview
 from apps.streetdownloader import client as mdl_cli
 class app_server():
     pass
