@@ -1,3 +1,4 @@
+from apps.streetview.pkg.streetview import streetview
 class app_client():
     pass
 class stv_app_client(app_client):
@@ -5,7 +6,7 @@ class stv_app_client(app_client):
         """
         :param args all needed data from server
         """
-        import apps.streetview.pkg.streetview.streetview
+
         panoids = streetview.panoids(lat= args['lat'], lon= args['lng'])
         return panoids
 

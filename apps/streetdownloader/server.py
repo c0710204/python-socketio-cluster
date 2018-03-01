@@ -1,3 +1,5 @@
+from apps.streetview.pkg.streetview import streetview
+from apps.streetdownloader import client as mdl_cli
 class app_server():
     pass
 class stv_app_server(app_server):
@@ -21,7 +23,7 @@ class stv_app_server(app_server):
 def main():
     #dummy
     srv=stv_app_server()
-    import apps.streetdownloader.client as mdl_cli
+
     client = mdl_cli.stv_app_client()
     print(srv.process_result(client.run(srv.get_task()))
 if __name__ == '__main__':
