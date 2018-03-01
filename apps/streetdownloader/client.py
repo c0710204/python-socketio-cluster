@@ -7,6 +7,7 @@ class stv_app_client(app_client):
         :param args all needed data from server
         """
 
+
         panoids = streetview.panoids(lat= args['lat'], lon= args['lng'])
         return panoids
 
