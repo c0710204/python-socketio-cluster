@@ -1,6 +1,8 @@
-import apps.streetdownloader.pkg.streetview
+import apps.streetdownloader.pkg.streetview as streetview
 import apps.streetdownloader.client as mdl_cli
 class app_server():
+    def __init__(self):
+        pass
     pass
 class stv_app_server(app_server):
     def __init__(self):

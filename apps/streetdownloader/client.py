@@ -1,6 +1,7 @@
-import apps.streetdownloader.pkg.streetview
+import apps.streetdownloader.pkg.streetview as streetview
 class app_client():
-    pass
+    def __init__(self):
+            pass
 class stv_app_client(app_client):
     def run(self,args):
         """
