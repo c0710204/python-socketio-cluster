@@ -25,6 +25,6 @@ def main():
     srv=stv_app_server()
 
     client = mdl_cli.stv_app_client()
-    print(srv.process_result(client.run(srv.get_task()))
+    print(srv.process_result(client.run(srv.get_task())))
 if __name__ == '__main__':
     main()
