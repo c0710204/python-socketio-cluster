@@ -9,7 +9,7 @@ class stv_app_client(app_client):
         """
 
 
-        panoids = streetview.panoids(lat= args['lat'], lon= args['lng'])
+        panoids = streetview.panoids(lat= args['lat'], lon= args['lon'])
         return panoids
 
 def main():
