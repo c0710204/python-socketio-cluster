@@ -10,7 +10,7 @@ class stv_app_client(app_client):
         return panoids
 
 def main():
-    loc_test=stv_app_client():
+    loc_test=stv_app_client()
     ret=loc_test.run({"lat":-37.83314,"lon": 144.919085})
     print()
 if __name__ == '__main__':
