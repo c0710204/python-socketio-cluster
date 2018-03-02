@@ -1,6 +1,6 @@
 import apps.streetdownloader.client as cli
 import time
-import SocketIO
+from socketIO_client import SocketIO, LoggingNamespace, BaseNamespace
 from pspnet.async_socketIO import async_socketIO
 cli_handle=cli.handler()
 def main():
