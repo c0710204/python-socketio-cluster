@@ -1,18 +1,30 @@
 import apps.streetdownloader.pkg.streetview as streetview
 import apps.streetdownloader.client as mdl_cli
 import csv
-class app_server():
-    def __init__(self):
-        pass
-    pass
+
+class app_server(socketio.Namespace):
+    def __init__(self,*args):
+        socketio.Namespace.__init__(self,*args)
+    def event(self,noti,sid):
+        if noti=='free':
+            pkg=self.get_task()
+            self.emit('task',pkg)
+    def on_free(self,sid,data):
+        self.event('free',data)
+    def on_result(self,sid,data):
+        self.process_result(data)
+        self.event('free',sid)
+
+
 class stv_app_server(app_server):
-    def __init__(self):
-        app_server.__init__(self)
+    def __init__(self,*args):
+        app_server.__init__(self,*args)
         self.fin=open("Pulseplace_unique_locations.csv",'r+')
         self.fincsv=csv.DictReader(self.fin, delimiter=',')
         self.fout=open("ret.csv",'a+')
         fieldnames = ['id','panoid', 'lat','lon','month','year']
         self.foutcsv=csv.DictWriter(self.fout,fieldnames=fieldnames)
+
     def get_task(self):
         """
         :param args all needed data from server
@@ -29,7 +41,8 @@ class stv_app_server(app_server):
         for line in ret:
             self.foutcsv.writerow(line)
         return ret
-
+def handler():
+    return stv_app_server
 def main():
     #dummy
     srv=stv_app_server()
