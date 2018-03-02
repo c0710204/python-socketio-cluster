@@ -31,6 +31,7 @@ class stv_app_server(app_server):
         self.fincsv=csv.DictReader(self.fin, delimiter=',')
         self.ferr=open("err.log",'a+')
         self.fout=open("ret.csv",'a+')
+        self.processed=0;
         fieldnames = ['id','panoid', 'lat','lon','month','year']
         self.foutcsv=csv.DictWriter(self.fout,fieldnames=fieldnames)
     def handle_error(self,err,arg):
@@ -43,6 +44,9 @@ class stv_app_server(app_server):
         """
         #read from list
         ret=self.fincsv.next()
+        self.processed+=1
+        if (self.processed%1000)==0:
+            print("processed: {0}".format(self.processed))
         #return request
         return ret
     def process_result(self,ret):
