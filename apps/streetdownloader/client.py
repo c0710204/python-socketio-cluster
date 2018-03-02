@@ -12,7 +12,7 @@ class app_client(BaseNamespace):
         self.emit("free", None)
 
     def on_task(self, *args):
-        p = multiprocessing.Process(target=self.run_mp, args=(args[0]))
+        p = multiprocessing.Process(target=self.run_mp, args=(args[0],))
         p.start()
         return
 
