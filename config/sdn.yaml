@@ -103,32 +103,32 @@ connection:
   to:
    server: star_gpu_on_star_lab
    port: 30001
-
- -
-  from:
-   server: pelican01
-   port: 50022
-  to:
-   server: star_gpu_on_star_lab
-   port: 22
- -
-  from:
-   server: pelican02
-   port: 50022
-  to:
-   server: star_gpu_on_star_lab
-   port: 22
- -
-  from:
-   server: pelican03
-   port: 50022
-  to:
-   server: star_gpu_on_star_lab
-   port: 22
- -
-  from:
-   server: pelican04
-   port: 50022
-  to:
-   server: star_gpu_on_star_lab
-   port: 22
+ # 
+ # -
+ #  from:
+ #   server: pelican01
+ #   port: 50022
+ #  to:
+ #   server: star_gpu_on_star_lab
+ #   port: 22
+ # -
+ #  from:
+ #   server: pelican02
+ #   port: 50022
+ #  to:
+ #   server: star_gpu_on_star_lab
+ #   port: 22
+ # -
+ #  from:
+ #   server: pelican03
+ #   port: 50022
+ #  to:
+ #   server: star_gpu_on_star_lab
+ #   port: 22
+ # -
+ #  from:
+ #   server: pelican04
+ #   port: 50022
+ #  to:
+ #   server: star_gpu_on_star_lab
+ #   port: 22
