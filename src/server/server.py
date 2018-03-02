@@ -18,8 +18,6 @@ if __name__ == '__main__':
     port = 30021
     if len(sys.argv) >= 2:
         port = int(sys.argv[1])
-    print("creating remote port forward...")
-    data = package("", "")
 
     print("starting at local port {0}...".format(port))
     sio.register_namespace(srv_handle('/'))
