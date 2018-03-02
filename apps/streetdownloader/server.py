@@ -1,7 +1,7 @@
 import apps.streetdownloader.pkg.streetview as streetview
 import apps.streetdownloader.client as mdl_cli
 import csv
-
+import socketio
 class app_server(socketio.Namespace):
     def __init__(self,*args):
         socketio.Namespace.__init__(self,*args)

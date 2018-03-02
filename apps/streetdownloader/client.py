@@ -1,8 +1,10 @@
 import apps.streetdownloader.pkg.streetview as streetview
 import logging
 import subprocess
-import socketio
+
 import multiprocessing
+
+from socketIO_client import SocketIO, LoggingNamespace, BaseNamespace
 class app_client(BaseNamespace):
     def on_connect(self, *args):
         self.emit("free", None)
