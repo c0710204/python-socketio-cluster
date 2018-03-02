@@ -34,6 +34,7 @@ from PIL import Image
 from io import BytesIO
 import os
 import json
+import uuid
 from collections import OrderedDict
 def _panoids_url(lat, lon):
     """
@@ -64,7 +65,7 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
     try:
 
 
-        with open('temp{0:.5}.json'.format(lat))as fout:
+        with open('temp{0}.json'.format(uuid.uuid4()))as fout:
             fout.write(resp.text)
         # bypass jsonp
         text=resp.text.replace("/**/_xdc_._v2mub5 && _xdc_._v2mub5(","")
@@ -119,7 +120,8 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
             return pans
         pass
     except Exception as e:
-        print(resp.text)
+        raise e
+        #print(resp.text)
 
 
 
