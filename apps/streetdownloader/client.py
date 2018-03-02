@@ -29,7 +29,7 @@ class stv_app_client(app_client):
         panoids_ret=[]
         for line in panoids:
             line['id']=args['id']
-            panoids_ret.push(line)
+            panoids_ret.append(line)
         return panoids_ret
 
 def main():
