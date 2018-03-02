@@ -20,7 +20,7 @@ class stv_app_server(app_server):
         #read from list
         ret=self.fincsv.next()
         #return request
-        return {"lat":-37.83314,"long": 144.919085}
+        return ret
     def process_result(self,ret):
         """
         :param ret result from client.run
