@@ -12,7 +12,7 @@ class stv_app_server(app_server):
         self.fincsv=csv.DictReader(self.fin, delimiter=',')
         self.fout=open("ret.csv",'a+')
         fieldnames = ['id','panoid', 'lat','lon','month','year']
-        self.foutcsv=csv.Dictwriter(self.fout,fieldnames=fieldnames)
+        self.foutcsv=csv.DictWriter(self.fout,fieldnames=fieldnames)
     def get_task(self):
         """
         :param args all needed data from server
