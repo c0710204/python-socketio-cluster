@@ -12,7 +12,8 @@ class app_server(socketio.Namespace):
             pkg=self.get_task()
             self.emit('task',pkg)
     def on_free(self,sid,data):
-        self.event('free',data)
+        pass
+        #self.event('free',data)
     def on_result(self,sid,data):
         #print(data)
         if data['status']>0:
@@ -33,7 +34,7 @@ class stv_app_server(app_server):
         fieldnames = ['id','panoid', 'lat','lon','month','year']
         self.foutcsv=csv.DictWriter(self.fout,fieldnames=fieldnames)
     def handle_error(self,err,arg):
-        s="{0},|{1}|".format(arg['id'],err)
+        s="{0},|{1}|\n".format(arg['id'],err)
         print(s)
         self.ferr.write(s)
     def get_task(self):
