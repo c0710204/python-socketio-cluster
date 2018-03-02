@@ -9,7 +9,7 @@ sio = socketio.Server(async_mode='eventlet')
 app = socketio.Middleware(sio)
 
 #temp
-import apps.streetdownloader.Server as srv
+import apps.streetdownloader.server as srv
 srv_handle=srv.handler()
 
 node_thread_number =4
