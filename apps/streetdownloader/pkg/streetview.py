@@ -121,7 +121,7 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
             return pans
         pass
     except Exception as e:
-        raise eg
+        raise e
         #print(resp.text)
 
 
