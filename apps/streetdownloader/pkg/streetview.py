@@ -64,12 +64,12 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
     resp = _panoids_data(lat, lon)
     try:
 
-        resp.encoding='UTF-8'
+        resp.encoding='utf-8'
         with open('temp{0}.json'.format(uuid.uuid4()),'a+')as fout:
             print(len(resp.text))
             fout.write(resp.text)
         #fix utf-8
-        text=resp.text.encode('utf-8')
+        text=resp.text
         # bypass jsonp
         text=text.replace("/**/_xdc_._v2mub5 && _xdc_._v2mub5(","")
         text=text[:-1]
@@ -123,6 +123,7 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
             return pans
         pass
     except Exception as e:
+        print(e.args)
         raise e
         #print(resp.text)
 
