@@ -65,7 +65,8 @@ class stv_app_server(app_server):
         self.processed+=1
         if (self.processed%1000)<=2:
             print("processed: {0}".format(self.processed))
-
+        self.readlock.release()
+        return ret
     def process_result(self,ret):
         """
         :param ret result from client.run
