@@ -14,6 +14,7 @@ class app_server(socketio.Namespace):
     def on_free(self,sid,data):
         self.event('free',data)
     def on_result(self,sid,data):
+        print(data)
         if data['status']>0:
             self.process_result(data['arg'])
         self.event('free',sid)
