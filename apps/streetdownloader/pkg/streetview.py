@@ -69,7 +69,7 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
         print(len(resp.text))
 
     #fix utf-8
-    text=resp.text.encoding('utf-8')
+    text=resp.text.encode('utf8')
     # bypass jsonp
     text=text.replace("/**/_xdc_._v2mub5 && _xdc_._v2mub5(","")
     text=text[:-1]
