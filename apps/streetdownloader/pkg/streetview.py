@@ -64,7 +64,7 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
     resp = _panoids_data(lat, lon)
     try:
 
-
+        resp.encoding='UTF-8'
         with open('temp{0}.json'.format(uuid.uuid4()),'a+')as fout:
             print(len(resp.text))
             fout.write(resp.text)
