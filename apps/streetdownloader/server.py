@@ -9,22 +9,22 @@ class stv_app_server(app_server):
     def __init__(self):
         app_server.__init__(self)
         self.fin=open("Pulseplace_unique_locations.csv",'r+')
-        self.fincsv=csv.reader(self.fin, delimiter=',')
+        self.fincsv=csv.DictReader(self.fin, delimiter=',')
         self.fout=open("ret.csv",'w+')
-        self.foutcsv=csv.writer(self.fout)
+        self.foutcsv=csv.Dictwriter(self.fout)
     def get_task(self):
         """
         :param args all needed data from server
         """
         #read from list
-        self.fincsv.read
+        ret=self.fincsv.read()
         #return request
         return {"lat":-37.83314,"long": 144.919085}
     def process_result(self,ret):
         """
         :param ret result from client.run
         """
-        self.foutcsv.writerow(ret.values())
+        self.foutcsv.writerow(ret)
         return ret
 
 def main():

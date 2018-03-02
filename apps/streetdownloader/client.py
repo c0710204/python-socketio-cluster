@@ -26,9 +26,11 @@ class stv_app_client(app_client):
         :param args all needed data from server
         """
         panoids = streetview.panoids(lat= args['lat'], lon= args['long'])
-        for i in panoids:
-            i['id']=args['id']
-        return panoids
+        panoids_ret=[]
+        for line in panoids:
+            line['id']=args['id']
+            panoids_ret.push(line)
+        return panoids_ret
 
 def main():
     loc_test=stv_app_client()
