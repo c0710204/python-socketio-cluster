@@ -17,6 +17,8 @@ class app_server(socketio.Namespace):
         print(data)
         if data['status']>0:
             self.process_result(data['arg'])
+        else:
+            self.handle_error(data['err'],data['arg'])
         self.event('free',sid)
 
 
@@ -26,10 +28,12 @@ class stv_app_server(app_server):
         app_server.__init__(self,*args)
         self.fin=open("Pulseplace_unique_locations.csv",'r+')
         self.fincsv=csv.DictReader(self.fin, delimiter=',')
+        self.ferr=open("err.log",'a+')
         self.fout=open("ret.csv",'a+')
         fieldnames = ['id','panoid', 'lat','lon','month','year']
         self.foutcsv=csv.DictWriter(self.fout,fieldnames=fieldnames)
-
+    def handle_error(self,err,arg):
+        self.ferr.write("{0},|{1}|".format(arg['id'],err))
     def get_task(self):
         """
         :param args all needed data from server
