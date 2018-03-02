@@ -74,36 +74,36 @@ connection:
    server: local
    port: 30021
 
-
- -
-  from:
-   server: pelican01
-   port: 30001
-  to:
-   server: star_gpu_on_star_lab
-   port: 30001
- -
-  from:
-   server: pelican02
-   port: 30001
-  to:
-   server: star_gpu_on_star_lab
-   port: 30001
- -
-  from:
-   server: pelican03
-   port: 30001
-  to:
-   server: star_gpu_on_star_lab
-   port: 30001
- -
-  from:
-   server: pelican04
-   port: 30001
-  to:
-   server: star_gpu_on_star_lab
-   port: 30001
  # 
+ # -
+ #  from:
+ #   server: pelican01
+ #   port: 30001
+ #  to:
+ #   server: star_gpu_on_star_lab
+ #   port: 30001
+ # -
+ #  from:
+ #   server: pelican02
+ #   port: 30001
+ #  to:
+ #   server: star_gpu_on_star_lab
+ #   port: 30001
+ # -
+ #  from:
+ #   server: pelican03
+ #   port: 30001
+ #  to:
+ #   server: star_gpu_on_star_lab
+ #   port: 30001
+ # -
+ #  from:
+ #   server: pelican04
+ #   port: 30001
+ #  to:
+ #   server: star_gpu_on_star_lab
+ #   port: 30001
+ #
  # -
  #  from:
  #   server: pelican01
