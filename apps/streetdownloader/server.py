@@ -25,6 +25,7 @@ class stv_app_server(app_server):
         """
         :param ret result from client.run
         """
+        print(ret)
         self.foutcsv.writerow(ret)
         return ret
 
