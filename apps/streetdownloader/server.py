@@ -29,6 +29,9 @@ class app_server(socketio.Namespace):
 class stv_app_server(app_server):
     def __init__(self,*args):
         app_server.__init__(self,*args)
+        self.readlock=multiprocessing.Lock()
+        self.writelock=multiprocessing.Lock()
+        self.errlock=multiprocessing.Lock()
         self.fin=open("Pulseplace_unique_locations.csv",'r+')
         self.fincsv=csv.DictReader(self.fin, delimiter=',')
         self.flog=open("done.log",'a+')
@@ -38,29 +41,34 @@ class stv_app_server(app_server):
         fieldnames = ['id','panoid', 'lat','lon','month','year']
         self.foutcsv=csv.DictWriter(self.fout,fieldnames=fieldnames)
     def handle_error(self,err,arg):
+        self.errlock.acquire()
         s="{0},|{1}|\n".format(arg['id'],err)
-        print(s)
         self.ferr.write(s)
+        self.ferr.flush()
+        self.errlock.release()
     def get_task(self):
         """
         :param args all needed data from server
         """
         #read from list
-
+        self.readlock.acquire()
         ret=self.fincsv.next()
         self.flog.write("{0}\n".format(ret['id']))
+        self.flog.flush()
         self.processed+=1
         if (self.processed%1000)<=2:
             print("processed: {0}".format(self.processed))
-        #return request
+        self.readlock.release()
         return ret
     def process_result(self,ret):
         """
         :param ret result from client.run
         """
         #print(ret)
+        self.writelock.acquire()
         for line in ret:
             self.foutcsv.writerow(line)
+        self.writelock.release()
         return ret
 def handler():
     return stv_app_server
