@@ -18,7 +18,7 @@ class stv_app_server(app_server):
         :param args all needed data from server
         """
         #read from list
-        ret=self.fincsv.read()
+        ret=self.fincsv.next()
         #return request
         return {"lat":-37.83314,"long": 144.919085}
     def process_result(self,ret):
