@@ -66,7 +66,7 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
 
 
         with open('temp{0}.json'.format(uuid.uuid4()),'a+')as fout:
-             print(_panoids_url(lat, lon)+'\n')
+            print(_panoids_url(lat, lon)+'\n')
             fout.write(resp.text)
         # bypass jsonp
         text=resp.text.replace("/**/_xdc_._v2mub5 && _xdc_._v2mub5(","")
