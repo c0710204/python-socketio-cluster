@@ -39,7 +39,7 @@ class stv_app_server(app_server):
         """
         :param ret result from client.run
         """
-        print(ret)
+        #print(ret)
         for line in ret:
             self.foutcsv.writerow(line)
         return ret

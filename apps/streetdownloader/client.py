@@ -18,7 +18,10 @@ class app_client(BaseNamespace):
 
 
     def run_mp(self,arg):
-        ret=self.run(arg)
+        try:
+            ret=self.run(arg)
+        except Exception as e:
+            print(e)
         self.emit('result',ret)
 
 
