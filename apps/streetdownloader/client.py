@@ -19,10 +19,11 @@ class app_client(BaseNamespace):
 
     def run_mp(self,arg):
         ret={"status":-1,"arg":arg,"err":""}
-        try:
-            ret={"status":1,"arg":self.run(arg)}
-        except Exception as e:
-            ret['err']="{0}".format(e)
+        #try:
+        ret={"status":1,"arg":self.run(arg)}
+        #except Exception as e:
+    #        raise e
+    #        ret['err']="{0}".format(e)
 
         self.emit('result',ret)
 
