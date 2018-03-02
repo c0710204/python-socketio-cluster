@@ -1,5 +1,6 @@
 import apps.streetdownloader.pkg.streetview as streetview
 import apps.streetdownloader.client as mdl_cli
+import multiprocessing
 import csv
 import socketio
 class app_server(socketio.Namespace):
