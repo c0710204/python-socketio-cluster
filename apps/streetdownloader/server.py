@@ -11,9 +11,9 @@ class app_server(socketio.Namespace):
         if noti=='free':
             pkg=self.get_task()
             self.emit('task',pkg)
-    def on_free(self,sid,data):
+    def on_client_free(self,sid,data):
         pass
-        #self.event('free',data)
+        self.event('free',data)
     def on_result(self,sid,data):
         #print(data)
         if data['status']>0:
