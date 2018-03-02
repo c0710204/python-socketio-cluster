@@ -9,11 +9,6 @@ account_02: &account_02
 
 client:
  -
-  name: local
-  host: 127.0.0.1
-  port: 22
-  <<: *account_01
- -
   name: pelican01
   host: pelican01.eecs.oregonstate.edu
   port: 22
@@ -74,7 +69,7 @@ connection:
    server: local
    port: 30021
 
- # 
+ #
  # -
  #  from:
  #   server: pelican01

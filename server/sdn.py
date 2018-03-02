@@ -91,21 +91,32 @@ if __name__ == "__main__":
 
             # inner=inner_base
             inner_base += 1
-        snd = Process(
-            target=ftunnel,
-            args=(inner, 'localhost', conn['to']['port'],
-                  clients[conn['to']['server']]))
-        rev = Process(
-            target=rftunnel,
-            args=(conn['from']['port'], 'localhost', inner,
-                  clients[conn['from']['server']]))
-        snd.daemon = True
-        rev.daemon = True
-        snd.start()
-        rev.start()
-        procs.append(snd)
-        procs.append(rev)
-        conn['pid'] = [snd, rev]
+        if conn['to']['server']=='local':
+            rev = Process(
+                target=rftunnel,
+                args=(conn['from']['port'], 'localhost', conn['to']['port'],
+                      clients[conn['from']['server']]))
+            rev.daemon = True
+            rev.start()
+            procs.append(rev)
+            conn['pid'] = [rev]
+        else:
+            snd = Process(
+                target=ftunnel,
+                args=(inner, 'localhost', conn['to']['port'],
+                      clients[conn['to']['server']]))
+            rev = Process(
+                target=rftunnel,
+                args=(conn['from']['port'], 'localhost', inner,
+                      clients[conn['from']['server']]))
+            snd.daemon = True
+            rev.daemon = True
+            snd.start()
+            rev.start()
+            procs.append(snd)
+            procs.append(rev)
+            conn['pid'] = [snd, rev]
+
         logging.info("{0}:{1} =={4}==> {2}:{3}".format(
             conn['from']['server'], conn['from']['port'], conn['to']['server'],
             conn['to']['port'], inner))
