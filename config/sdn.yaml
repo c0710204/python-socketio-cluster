@@ -5,7 +5,14 @@ account_02: &account_02
  username: guxi
  password: dHtFkI6g
 
+
+
 client:
+ -
+  name: local
+  host: 127.0.0.1
+  port: 22
+  <<: *account_01
  -
   name: pelican01
   host: pelican01.eecs.oregonstate.edu
@@ -43,28 +50,28 @@ connection:
    server: pelican01
    port: 30021
   to:
-   server: star_gpu_on_star_lab
+   server: local
    port: 30021
  -
   from:
    server: pelican02
    port: 30021
   to:
-   server: star_gpu_on_star_lab
+   server: local
    port: 30021
  -
   from:
    server: pelican03
    port: 30021
   to:
-   server: star_gpu_on_star_lab
+   server: local
    port: 30021
  -
   from:
    server: pelican04
    port: 30021
   to:
-   server: star_gpu_on_star_lab
+   server: local
    port: 30021
 
 
