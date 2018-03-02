@@ -12,7 +12,8 @@ class app_server(socketio.Namespace):
     def event(self,noti,sid):
         if noti=='free':
             pkg=self.get_task()
-            self.emit('task',pkg,room=sid)
+            if pkg!=None:
+                self.emit('task',pkg,room=sid)
     def on_client_free(self,sid,data):
         pass
         self.event('free',data)
@@ -34,8 +35,8 @@ class stv_app_server(app_server):
         self.errlock=multiprocessing.Lock()
         self.fin=open("Pulseplace_unique_locations.csv",'r+')
         self.fincsv=csv.DictReader(self.fin, delimiter=',')
-        self.flog=open("done.log",'a+')
-        self.ferr=open("err.log",'a+')
+        self.flog=open("done.csv",'a+')
+        self.ferr=open("err.csv",'a+')
         self.fout=open("ret.csv",'a+')
         self.processed=0;
         fieldnames = ['id','panoid', 'lat','lon','month','year']
@@ -52,14 +53,18 @@ class stv_app_server(app_server):
         """
         #read from list
         self.readlock.acquire()
-        ret=self.fincsv.next()
+        try:
+            ret=self.fincsv.next()
+        except Exception as e:
+            self.readlock.release()
+            return None
+
         self.flog.write("{0}\n".format(ret['id']))
         self.flog.flush()
         self.processed+=1
         if (self.processed%1000)<=2:
             print("processed: {0}".format(self.processed))
-        self.readlock.release()
-        return ret
+
     def process_result(self,ret):
         """
         :param ret result from client.run
