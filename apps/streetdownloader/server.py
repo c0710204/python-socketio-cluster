@@ -10,8 +10,9 @@ class stv_app_server(app_server):
         app_server.__init__(self)
         self.fin=open("Pulseplace_unique_locations.csv",'r+')
         self.fincsv=csv.DictReader(self.fin, delimiter=',')
-        self.fout=open("ret.csv",'w+')
-        self.foutcsv=csv.Dictwriter(self.fout)
+        self.fout=open("ret.csv",'a+')
+        fieldnames = ['id','panoid', 'lat','lon','month','year']
+        self.foutcsv=csv.Dictwriter(self.fout,fieldnames=fieldnames)
     def get_task(self):
         """
         :param args all needed data from server
