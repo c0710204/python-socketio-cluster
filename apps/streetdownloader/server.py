@@ -29,6 +29,7 @@ class stv_app_server(app_server):
         app_server.__init__(self,*args)
         self.fin=open("Pulseplace_unique_locations.csv",'r+')
         self.fincsv=csv.DictReader(self.fin, delimiter=',')
+        self.flog=open("done.log",'a+')
         self.ferr=open("err.log",'a+')
         self.fout=open("ret.csv",'a+')
         self.processed=0;
@@ -43,9 +44,11 @@ class stv_app_server(app_server):
         :param args all needed data from server
         """
         #read from list
+
         ret=self.fincsv.next()
+        self.flog.write("{0}\n".format(ret['id']))
         self.processed+=1
-        if (self.processed%1000)==0:
+        if (self.processed%1000)<=2:
             print("processed: {0}".format(self.processed))
         #return request
         return ret
