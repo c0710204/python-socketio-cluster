@@ -8,7 +8,7 @@ def main():
 
     asio = async_socketIO(SocketIO('localhost', 30021))
 
-    sio_pspent_info = asio.socketIO.define(cli_handle, '/')
+    sio_pspent_info = asio.socketIO.define(cli_handle, '/task')
 
     asio.background()
 
