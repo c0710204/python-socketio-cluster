@@ -6,6 +6,8 @@ import multiprocessing
 
 from socketIO_client import SocketIO, LoggingNamespace, BaseNamespace
 class app_client(BaseNamespace):
+    def on_ask_init(self,*args):
+        self.emit("free", None)
     def on_connect(self, *args):
         self.emit("free", None)
 

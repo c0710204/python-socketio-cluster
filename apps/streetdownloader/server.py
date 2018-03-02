@@ -5,6 +5,8 @@ import socketio
 class app_server(socketio.Namespace):
     def __init__(self,*args):
         socketio.Namespace.__init__(self,*args)
+    def on_connect(self, sid, environ):
+        self.emit("ask_init")
     def event(self,noti,sid):
         if noti=='free':
             pkg=self.get_task()
