@@ -35,6 +35,6 @@ class stv_app_client(app_client):
 def main():
     loc_test=stv_app_client()
     ret=loc_test.run({"id":-1,"lat":-37.83314,"long": 144.919085})
-    print()
+    print(ret)
 if __name__ == '__main__':
     main()
