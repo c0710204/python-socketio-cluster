@@ -68,8 +68,10 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
         with open('temp{0}.json'.format(uuid.uuid4()),'a+')as fout:
             print(len(resp.text))
             fout.write(resp.text)
+        #fix utf-8
+        text=resp.text.encode('utf-8')
         # bypass jsonp
-        text=resp.text.replace("/**/_xdc_._v2mub5 && _xdc_._v2mub5(","")
+        text=text.replace("/**/_xdc_._v2mub5 && _xdc_._v2mub5(","")
         text=text[:-1]
         json_content=json.loads(text,object_pairs_hook=OrderedDict)
         loc_info=json_content[1][5][0][3][0]
