@@ -61,58 +61,64 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
     will be gotten (at all the available dates)
     """
     resp = _panoids_data(lat, lon)
-    #print(resp.text)
-    # bypass jsonp
-    text=resp.text.replace("/**/_xdc_._v2mub5 && _xdc_._v2mub5(","")
-    text=text[:-1]
-    json_content=json.loads(text,object_pairs_hook=OrderedDict)
-    loc_info=json_content[1][5][0][3][0]
-    # Get all the panorama ids and coordinates
-    # I think the latest panorama should be the first one. And the previous
-    # successive ones ought to be in reverse order from bottom to top. The final
-    # images don't seem to correspond to a particular year. So if there is one
-    # image per year I expect them to be orded like:
-    # 2015
-    # XXXX
-    # XXXX
-    # 2012
-    # 2013
-    # 2014
-    #pans = re.findall('\[[0-9]+,"(.+?)"\].+?\[\[null,null,(-?[0-9]+.[0-9]+),(-?[0-9]+.[0-9]+)', resp.text)
+    try:
 
-    # coordinates order:
-    #   The upper object contained the nearest image information
-    #   The time list include the id link image metadata list and used for historial information
-    #   Other images are the around image and use for the 360 view.
-    #
-    nearest_point = {
-        "panoid": loc_info[0][0][1],
-        "lat":float(loc_info[0][2][0][2]),
-        "lon":float(loc_info[0][2][0][3]),
-        'year': json_content[1][6][7][0],
-        "month": json_content[1][6][7][1]
-    }
-    historial_list = json_content[1][5][0][8]
-    historial_dict = {p[0]:p[1] for p in historial_list}
-    pans=[nearest_point]
-    for i in range(len(loc_info)):
-        if i in historial_dict.keys():
-            dt=historial_dict[i]
-            p=loc_info[i]
-            pans.append({
-            "panoid": p[0][1],
-            "lat": float(p[2][0][2]),
-            "lon": float(p[2][0][3]),
-            'year': dt[0], "month": dt[1]
-            })
 
-    if disp:
-        for pan in pans:
-            print(pan)
-    if closest:
-        return [pans[i] for i in range(len(dates))]
-    else:
-        return pans
+        print(resp.text)
+        # bypass jsonp
+        text=resp.text.replace("/**/_xdc_._v2mub5 && _xdc_._v2mub5(","")
+        text=text[:-1]
+        json_content=json.loads(text,object_pairs_hook=OrderedDict)
+        loc_info=json_content[1][5][0][3][0]
+        # Get all the panorama ids and coordinates
+        # I think the latest panorama should be the first one. And the previous
+        # successive ones ought to be in reverse order from bottom to top. The final
+        # images don't seem to correspond to a particular year. So if there is one
+        # image per year I expect them to be orded like:
+        # 2015
+        # XXXX
+        # XXXX
+        # 2012
+        # 2013
+        # 2014
+        #pans = re.findall('\[[0-9]+,"(.+?)"\].+?\[\[null,null,(-?[0-9]+.[0-9]+),(-?[0-9]+.[0-9]+)', resp.text)
+
+        # coordinates order:
+        #   The upper object contained the nearest image information
+        #   The time list include the id link image metadata list and used for historial information
+        #   Other images are the around image and use for the 360 view.
+        #
+        nearest_point = {
+            "panoid": loc_info[0][0][1],
+            "lat":float(loc_info[0][2][0][2]),
+            "lon":float(loc_info[0][2][0][3]),
+            'year': json_content[1][6][7][0],
+            "month": json_content[1][6][7][1]
+        }
+        historial_list = json_content[1][5][0][8]
+        historial_dict = {p[0]:p[1] for p in historial_list}
+        pans=[nearest_point]
+        for i in range(len(loc_info)):
+            if i in historial_dict.keys():
+                dt=historial_dict[i]
+                p=loc_info[i]
+                pans.append({
+                "panoid": p[0][1],
+                "lat": float(p[2][0][2]),
+                "lon": float(p[2][0][3]),
+                'year': dt[0], "month": dt[1]
+                })
+
+        if disp:
+            for pan in pans:
+                print(pan)
+        if closest:
+            return [pans[i] for i in range(len(dates))]
+        else:
+            return pans
+        pass
+    except Exception as e:
+        print(resp.text)
 
 
 
