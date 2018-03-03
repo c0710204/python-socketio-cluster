@@ -76,6 +76,7 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
     text=text.replace("/**/_xdc_._v2mub5 && _xdc_._v2mub5(","")
     text=text[:-1]
     json_content=json.loads(text,object_pairs_hook=OrderedDict)
+
     loc_info=json_content[1][5][0][3][0]
     # Get all the panorama ids and coordinates
     # I think the latest panorama should be the first one. And the previous
