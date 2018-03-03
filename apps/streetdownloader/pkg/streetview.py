@@ -65,9 +65,9 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
     #try:
 
     resp.encoding='utf-8'
-    with open('temp{0}.json'.format(uuid.uuid4()),'a+')as fout:
+    #with open('temp{0}.json'.format(uuid.uuid4()),'a+')as fout:
 
-        fout.write(resp.text.encode('utf8'))
+    #    fout.write(resp.text.encode('utf8'))
 
     #fix utf-8
     text=resp.text.encode('utf8')
