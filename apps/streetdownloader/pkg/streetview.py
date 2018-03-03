@@ -66,7 +66,7 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
 
     resp.encoding='utf-8'
     with open('temp{0}.json'.format(uuid.uuid4()),'a+')as fout:
-        
+
         fout.write(resp.text.encode('utf8'))
 
     #fix utf-8
@@ -102,7 +102,12 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
         'year': json_content[1][6][7][0],
         "month": json_content[1][6][7][1]
     }
-    historial_list = json_content[1][5][0][8]
+    historial_list=[]
+    if len( json_content[1][5][0])>=9):
+        #no historial information - only nearest point
+        historial_list = json_content[1][5][0][8]
+        if historial_list==None:
+            historial_list=[]
     historial_dict = {p[0]:p[1] for p in historial_list}
     pans=[nearest_point]
     for i in range(len(loc_info)):
