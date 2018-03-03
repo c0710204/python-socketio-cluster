@@ -3,7 +3,7 @@ import logging
 import subprocess
 
 import multiprocessing
-
+import sys
 from socketIO_client import SocketIO, LoggingNamespace, BaseNamespace
 class app_client(BaseNamespace):
     def on_ask_init(self,*args):
