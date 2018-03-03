@@ -103,7 +103,7 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
         "month": json_content[1][6][7][1]
     }
     historial_list=[]
-    if len( json_content[1][5][0])>=9):
+    if len( json_content[1][5][0])>=9:
         #no historial information - only nearest point
         historial_list = json_content[1][5][0][8]
         if historial_list==None:
