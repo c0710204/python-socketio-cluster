@@ -4,7 +4,7 @@ import socketio
 class app_server(socketio.Namespace):
     def __init__(self,*args):
         socketio.Namespace.__init__(self,*args)
-        self.max_task_node=100
+        self.max_task_node=2
     def on_connect(self, sid, environ):
         for i in range(self.max_task_node):
             self.emit("ask_init",room=sid)
