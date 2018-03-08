@@ -80,7 +80,7 @@ def sshupload(data, path):
     mutex_ssh.release()
 
 
-def task_process(args):
+def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
     print("got request")
     data = args[0]
     filename, ext = splitext(data['input_path'])
@@ -153,7 +153,7 @@ class pspnet_app_client(app_client):
         """
         print("receive {0}".format(args))
         sys.stdout.flush()
-        return task_process(args)
+        return task_process(args,self.tasks[0],self.tasks[1],self.tasks[2])
 
 
 def handler():
