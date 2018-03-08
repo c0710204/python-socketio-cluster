@@ -1,4 +1,4 @@
-import src.libs.app.client as cli
+import client as cli
 import multiprocessing
 import socketio
 class app_server(socketio.Namespace):
@@ -23,3 +23,9 @@ class app_server(socketio.Namespace):
         else:
             self.handle_error(data['err'],data['arg'])
         self.event('free',sid)
+    def handle_error(self,args):
+        raise NotImplementedError()
+    def process_result(self,err,args):
+        raise NotImplementedError()
+    def get_task(self):
+        raise NotImplementedError()

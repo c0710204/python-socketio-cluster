@@ -17,7 +17,9 @@ test_server:
 
 server:
 	python server/server_root.py
-	
+
 prepare:
 	mkdir -p ./pspnet/weights/keras/
+	mkdir -p ./apps/pspnet/pkg/pspnet/weights/keras/
 	scp -P 50022 guxi@127.0.0.1:/home/guxi/tree2/pspnet/weights/keras/pspnet50_ade20k* ./pspnet/weights/keras/
+	cp ./pspnet/weights/keras/pspnet50_ade20k* ./apps/pspnet/pkg/pspnet/weights/keras/

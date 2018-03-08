@@ -1,9 +1,13 @@
-import apps.streetdownloader.pkg.streetview as streetview
 import logging
 import subprocess
 import multiprocessing
 import sys
 class app_client(BaseNamespace):
+    def prepare(self):
+        """
+        run on the start and init all
+        """
+        pass
     def on_ask_init(self,*args):
         self.emit("free", None)
     def on_connect(self, *args):
@@ -21,3 +25,5 @@ class app_client(BaseNamespace):
             ret['err']="{0}".format(sys.exc_info())
 
         self.emit('result',ret)
+    def run(self,args):
+        raise NotImplementedError()
