@@ -78,6 +78,7 @@ class pspnet_app_server(app_server):
             img_local = img_list[-1]
             del img_list[-1]
             print("[{1}]sending request : {0} image left".format(len(img_list),time.asctime( time.localtime(time.time()) )))
+            sys.stdout.flush()
             return package(img_local, "/scratch/guxi/googlestreeview_download/result/000/")
 
     def process_result(self,ret):

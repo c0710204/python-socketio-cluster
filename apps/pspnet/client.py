@@ -56,6 +56,7 @@ def sshdownload(data):
     # tunnel_p.start()
     #do scp_download
     print("downloading {0}...".format(data['input_path']))
+    sys.stdout.flush()
     scp_download(data['ssh']['port'], data['ssh']['username'], "127.0.0.1",
                  data['input_path'])
     # p.terminate()
@@ -72,6 +73,7 @@ def sshupload(data, path):
     # tunnel_p.start()
     #do scp_download
     print("uploading {0}...".format(data['input_path']))
+    sys.stdout.flush()
     scp_upload(data['ssh']['port'], data['ssh']['username'], "127.0.0.1",
                data["output_path"], path)
     # p.terminate()
@@ -85,6 +87,7 @@ def task_process(args):
     panid = basename(filename)
     # download file from upper server
     print("download...")
+    sys.stdout.flush()
     sshdownload(data)
     args_d = {}
     args_d['panid'] = panid
@@ -103,6 +106,7 @@ def task_process(args):
 
     pspnet_pre_in.ask_and_wait(args_d=args_d)
     print("phase 2...")
+    sys.stdout.flush()
     # args_d['sess']=sess
     # args_d['model_ok']=pspnet
     args_d['input_path'] = config_p1_folder + '/'
@@ -111,24 +115,28 @@ def task_process(args):
     pspnet_dl_in.ask_and_wait(args_d)
 
     print("phase 3...")
+    sys.stdout.flush()
     args_d['input_path'] = "./{0}{1}".format(panid, ext)
     args_d['input_path2'] = "{2}/{0}{1}".format(panid, ext, config_p2_folder)
     args_d['output_path'] = "{2}/{0}{1}".format(panid, ext, config_p3_folder)
     pspnet_img_combine_in.ask_and_wait(args_d)
 
     print("upload...")
+    sys.stdout.flush()
     sshupload(data, panid + "_seg_blended" + ext)
     print("garbage cleaning")
-
+    sys.stdout.flush()
     return "success";
 
 class pspnet_app_client(app_client):
     def mainthread(self):
         print("pspnet.app.client mainthread start...")
+        sys.stdout.flush()
         for task in self.tasks:
             if task.mainthread:
                 task.prepare_mainthread()
         print("pspnet.app.client mainthread started...")
+        sys.stdout.flush()
         while (1):
             for task in self.tasks:
                 if task.mainthread:
@@ -144,6 +152,7 @@ class pspnet_app_client(app_client):
         :param args all needed data from server
         """
         print("receive {0}".format(args))
+        sys.stdout.flush()
         return task_process(args)
 
 
