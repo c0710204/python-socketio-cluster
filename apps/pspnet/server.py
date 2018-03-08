@@ -1,5 +1,6 @@
 from src.libs.app.server import app_server
 import time
+import sys
 img_list = [
     "/scratch/guxi/googlestreeview_download/image/000/DimBS_bGYVSVQ1teobDOsw.jpg",
     "/scratch/guxi/googlestreeview_download/image/000/dJailiEhu-HSpp9LLh3f0Q.jpg",

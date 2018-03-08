@@ -10,7 +10,7 @@ from ..pkg.pspnet import utils
 import uuid
 import multiprocessing
 import logging
-
+import sys
 class pre(task):
 
     handler_type = "Process"

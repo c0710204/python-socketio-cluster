@@ -12,7 +12,7 @@ import uuid
 import multiprocessing
 import logging
 import json
-
+import sys
 class image_combine(task):
 
     handler_type = "Queue"
