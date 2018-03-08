@@ -22,10 +22,6 @@ node_thread_number =4
 
 if __name__ == '__main__':
     port = 30021
-    if len(sys.argv) >= 2:
-        port = int(sys.argv[1])
-
-
     print("starting at local port {0}...".format(port))
     sio.register_namespace(srv_handle('/task'))
     eventlet.wsgi.server(eventlet.listen(('', port)), app)
