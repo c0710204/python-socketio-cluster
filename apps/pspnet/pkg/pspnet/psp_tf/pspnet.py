@@ -6,7 +6,7 @@ Original paper & code published by Hengshuang Zhao et al. (2017)
 """
 from __future__ import print_function
 from __future__ import division
-from os.path import splitext, join, isfile
+from os.path import splitext, join, isfile,realpath
 from os import environ
 from math import ceil
 import argparse
@@ -41,6 +41,7 @@ class PSPNet(object):
     def __init__(self, nb_classes, resnet_layers, input_shape, weights,path="./weights"):
         """Instanciate a PSPNet."""
         self.input_shape = input_shape
+        path=os.path.realpath(os.path.split(os.path.realpath(__file__))[0]+"../weights/")
         json_path = join(path, "keras", weights + ".json")
         h5_path = join(path, "keras", weights + ".h5")
         if isfile(json_path) and isfile(h5_path):
