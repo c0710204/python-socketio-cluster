@@ -7,7 +7,7 @@ import argparse
 def main():
 
     parser = argparse.ArgumentParser(description='distrube client')
-    parser.add_argument('client','c', type=str,help='an integer for the accumulator')
+    parser.add_argument('--client','-c', type=str,help='an integer for the accumulator')
     args=parser.parse_args()
     cli=importlib.import_module("app.{0}.client".format(args.client))
     cli_handle=cli.handler()
