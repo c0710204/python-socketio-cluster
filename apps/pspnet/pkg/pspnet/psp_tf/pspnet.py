@@ -41,7 +41,7 @@ class PSPNet(object):
     def __init__(self, nb_classes, resnet_layers, input_shape, weights,path="./weights"):
         """Instanciate a PSPNet."""
         self.input_shape = input_shape
-        path=os.path.realpath(os.path.split(os.path.realpath(__file__))[0]+"../weights/")
+        path=realpath(split(realpath(__file__))[0]+"../weights/")
         json_path = join(path, "keras", weights + ".json")
         h5_path = join(path, "keras", weights + ".h5")
         if isfile(json_path) and isfile(h5_path):
