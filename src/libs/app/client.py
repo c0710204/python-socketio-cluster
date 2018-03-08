@@ -9,6 +9,7 @@ class app_client(BaseNamespace):
         BaseNamespace.__init__(self,*args)
         self.run_ready=multiprocessing.Lock()
         self.run_ready.acquire()
+        self.prepare()
     def prepare(self):
         """
         run on the start and init all
