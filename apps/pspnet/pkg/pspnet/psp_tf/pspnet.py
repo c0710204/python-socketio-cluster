@@ -14,7 +14,7 @@ import numpy as np
 from scipy import misc, ndimage
 from keras.backend.tensorflow_backend import set_session
 from keras import backend as K
-
+import sys
 from keras.models import model_from_json
 import tensorflow as tf
 import layers_builder as layers
@@ -42,6 +42,8 @@ class PSPNet(object):
         """Instanciate a PSPNet."""
         self.input_shape = input_shape
         path=realpath(split(realpath(__file__))[0]+"../weights/")
+        print(path)
+        sys.stdout.flush()
         json_path = join(path, "keras", weights + ".json")
         h5_path = join(path, "keras", weights + ".h5")
         if isfile(json_path) and isfile(h5_path):
