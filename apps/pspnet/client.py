@@ -159,7 +159,7 @@ class pspnet_app_client(app_client):
         """
         #print("receive {0}".format(args))
         sys.stdout.flush()
-        return task_process(args,self.tasks[0],self.tasks[1],self.tasks[2])
+        return task_process([args],self.tasks[0],self.tasks[1],self.tasks[2])
 
 
 def handler():
