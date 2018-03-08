@@ -5,6 +5,11 @@ from tasks.deeplearning import deeplearning
 from tasks.image_combine import image_combine
 import multiprocessing
 import sys
+from os.path import splitext, join, isfile, basename
+from os import environ
+from math import ceil
+import subprocess
+import logging
 # config
 config_p1_folder = '/dev/shm/guxi/p1'
 config_p2_folder = '/dev/shm/guxi/p2'
