@@ -4,7 +4,7 @@ from task import task
 import time
 import numpy as np
 from scipy import misc, ndimage
-import ..pkg.pspnet.img_combine2 as img_combine2
+from ..pkg.pspnet import img_combine2
 from ..pkg.pspnet.psp_tf.pspnet import PSPNet50
 from collections import namedtuple
 import pkg.pspnet.utils as utils

@@ -4,7 +4,7 @@ from task import task
 import time
 import numpy as np
 from scipy import misc, ndimage
-import ..pkg.pspnet.pre_process as pre_process
+from ..pkg.pspnet import pre_process
 from collections import namedtuple
 import pkg.pspnet.utils as utils
 import uuid
