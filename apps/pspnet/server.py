@@ -66,6 +66,7 @@ def package(input_path, output_path):
 class pspnet_app_server(app_server):
     def __init__(self,*args):
         app_server.__init__(self,*args)
+        self.max_task_node=2
     def handle_error(self,err,arg):
         pass
     def get_task(self):
