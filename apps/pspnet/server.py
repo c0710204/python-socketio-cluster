@@ -69,7 +69,7 @@ class pspnet_app_server(app_server):
         app_server.__init__(self,*args)
         self.max_task_node=2
     def handle_error(self,err,arg):
-        pass
+        print(err)
     def get_task(self):
         """
         :param args all needed data from server
