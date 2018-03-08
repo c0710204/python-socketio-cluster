@@ -1,4 +1,4 @@
-from src.libs.app.client import app_server
+from src.libs.app.server import app_server
 import time
 img_list = [
     "/scratch/guxi/googlestreeview_download/image/000/DimBS_bGYVSVQ1teobDOsw.jpg",
