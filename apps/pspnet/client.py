@@ -10,6 +10,7 @@ from os import environ
 from math import ceil
 import subprocess
 import logging
+import json
 # config
 config_p1_folder = '/dev/shm/guxi/p1'
 config_p2_folder = '/dev/shm/guxi/p2'
