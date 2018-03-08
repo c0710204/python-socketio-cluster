@@ -141,6 +141,7 @@ class pspnet_app_client(app_client):
         """
         :param args all needed data from server
         """
+        print("receive {0}".format(args))
         return task_process(args)
 
 

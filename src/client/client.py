@@ -12,7 +12,9 @@ def main():
     cli_handle=cli.handler()
     asio = async_socketIO(SocketIO('localhost', 30021))
     sio_pspent_info = asio.socketIO.define(cli_handle, '/task')
+    print("ready to receive order")
     asio.background()
+
     while (1):
         time.sleep(1)
     #mutex2.put("success",block=True)
