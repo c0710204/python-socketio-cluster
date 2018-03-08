@@ -145,7 +145,6 @@ class pspnet_app_client(app_client):
     def prepare(self):
         self.is_ready=multiprocessing.Lock()
         self.is_ready.acquire()
-        self.prepare()
         self.tasks=[pre(),deeplearning(),image_combine()]
         for task in self.tasks:
             task.prepare()
