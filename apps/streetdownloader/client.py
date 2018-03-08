@@ -23,7 +23,7 @@ class app_client(BaseNamespace):
             ret={"status":1,"arg":self.run(arg)}
         except Exception as e:
             ret['err']="{0}".format(sys.exc_info())
-
+            
         self.emit('result',ret)
 
 
