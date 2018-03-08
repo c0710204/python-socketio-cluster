@@ -137,16 +137,22 @@ class pspnet_app_client(app_client):
                 task.prepare_mainthread()
         print("pspnet.app.client mainthread started...")
         sys.stdout.flush()
+        self.is_ready().release()
         while (1):
             for task in self.tasks:
                 if task.mainthread:
                     task.run()
     def prepare(self):
+        self.is_ready=multiprocessing.Lock()
+        self.is_ready.acquire()
+        self.prepare()
         self.tasks=[pre(),deeplearning(),image_combine()]
         for task in self.tasks:
             task.prepare()
         p=multiprocessing.Process(target=self.mainthread)
         p.start()
+        self.is_ready.acquire()
+
     def run(self,args):
         """
         :param args all needed data from server
