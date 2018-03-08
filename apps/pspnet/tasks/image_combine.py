@@ -13,7 +13,7 @@ import multiprocessing
 import logging
 import json
 
-class pspnet_img_combine(task):
+class image_combine(task):
 
     handler_type = "Queue"
     handle = ""

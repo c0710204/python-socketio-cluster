@@ -11,7 +11,7 @@ import uuid
 import multiprocessing
 import logging
 
-class pspnet_pre(task):
+class pre(task):
 
     handler_type = "Process"
     handle = ""
