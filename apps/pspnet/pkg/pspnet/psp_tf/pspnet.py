@@ -6,7 +6,7 @@ Original paper & code published by Hengshuang Zhao et al. (2017)
 """
 from __future__ import print_function
 from __future__ import division
-from os.path import splitext, join, isfile,realpath
+from os.path import splitext, join, isfile,realpath,split
 from os import environ
 from math import ceil
 import argparse
