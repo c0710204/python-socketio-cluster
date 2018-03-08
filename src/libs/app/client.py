@@ -6,7 +6,7 @@ import sys
 from socketIO_client import SocketIO, LoggingNamespace, BaseNamespace
 class app_client(BaseNamespace):
     def __init__(self,*args):
-        BaseNamespace.__init__(self,*args):
+        BaseNamespace.__init__(self,*args)
         self.prepare()
     def prepare(self):
         """
