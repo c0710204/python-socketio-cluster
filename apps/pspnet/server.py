@@ -74,8 +74,6 @@ class pspnet_app_server(app_server):
         :param args all needed data from server
         """
         global img_list
-        if data:
-            print(data['input_path'],time.asctime( time.localtime(time.time())  ))
         if len(img_list) > 0:
             img_local = img_list[-1]
             del img_list[-1]

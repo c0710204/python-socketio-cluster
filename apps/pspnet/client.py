@@ -124,9 +124,11 @@ def task_process(args):
 
 class pspnet_app_client(app_client):
     def mainthread(self):
+        print("pspnet.app.client mainthread start...")
         for task in self.tasks:
             if task.mainthread:
                 task.prepare_mainthread()
+        print("pspnet.app.client mainthread started...")
         while (1):
             for task in self.tasks:
                 if task.mainthread:
