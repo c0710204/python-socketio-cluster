@@ -1,0 +1,23 @@
+import apps.streetdownloader.pkg.streetview as streetview
+import logging
+import subprocess
+import multiprocessing
+import sys
+class app_client(BaseNamespace):
+    def on_ask_init(self,*args):
+        self.emit("free", None)
+    def on_connect(self, *args):
+        self.emit("client_free", None)
+        pass
+    def on_task(self, *args):
+        p = multiprocessing.Process(target=self.run_mp, args=(args[0],))
+        p.start()
+        return
+    def run_mp(self,arg):
+        ret={"status":-1,"arg":arg,"err":""}
+        try:
+            ret={"status":1,"arg":self.run(arg)}
+        except Exception as e:
+            ret['err']="{0}".format(sys.exc_info())
+
+        self.emit('result',ret)
