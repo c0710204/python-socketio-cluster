@@ -152,12 +152,12 @@ class pspnet_app_client(app_client):
         p=multiprocessing.Process(target=self.mainthread)
         p.start()
         self.is_ready.acquire()
-
+        self.run_ready.release()
     def run(self,args):
         """
         :param args all needed data from server
         """
-        print("receive {0}".format(args))
+        #print("receive {0}".format(args))
         sys.stdout.flush()
         return task_process(args,self.tasks[0],self.tasks[1],self.tasks[2])
 
