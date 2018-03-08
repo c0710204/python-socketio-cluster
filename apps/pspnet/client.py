@@ -101,6 +101,7 @@ def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
     args_d['multi_scale'] = True
 
     print("phase 1...")
+    sys.stdout.flush()
     args_d['input_path'] = "./{0}{1}".format(panid, ext)
     args_d['output_path'] = "{2}/{0}{1}".format(panid, ext, config_p1_folder)
 

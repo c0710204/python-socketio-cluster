@@ -7,6 +7,7 @@ class app_server(socketio.Namespace):
     def __init__(self,*args):
         socketio.Namespace.__init__(self,*args)
         self.max_task_node=100
+
     def on_connect(self, sid, environ):
         for i in range(self.max_task_node):
             self.emit("ask_init",room=sid)
@@ -14,7 +15,8 @@ class app_server(socketio.Namespace):
         if noti=='free':
             pkg=self.get_task()
             if pkg!=None:
-                self.emit('task',pkg,room=sid)
+                self.tasking.acquire()
+                
     def on_client_free(self,sid,data):
         pass
         self.event('free',data)
