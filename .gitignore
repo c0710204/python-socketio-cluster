@@ -1,4 +1,5 @@
 apps/pspnet/pkg/pspnet/weights/*
+pspnet/weights/*
 *.npy
 *.h5
 
