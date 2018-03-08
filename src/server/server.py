@@ -15,7 +15,7 @@ app = socketio.Middleware(sio)
 parser = argparse.ArgumentParser(description='distrube server')
 parser.add_argument('--app','-a', type=str,help='an integer for the accumulator')
 args=parser.parse_args()
-srv=importlib.import_module("apps.{0}.client".format(args.app))
+srv=importlib.import_module("apps.{0}.server".format(args.app))
 srv_handle=srv.handler()
 
 node_thread_number =4
