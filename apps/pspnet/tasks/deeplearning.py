@@ -7,7 +7,7 @@ from scipy import misc, ndimage
 from ..pkg.pspnet import deeplearning
 from ..pkg.pspnet.psp_tf.pspnet import PSPNet50
 from collections import namedtuple
-import pkg.pspnet.utils as utils
+form ..pkg.pspnet import utils
 import uuid
 import multiprocessing
 import logging

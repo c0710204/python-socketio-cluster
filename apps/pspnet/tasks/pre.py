@@ -6,7 +6,7 @@ import numpy as np
 from scipy import misc, ndimage
 from ..pkg.pspnet import pre_process
 from collections import namedtuple
-import pkg.pspnet.utils as utils
+form ..pkg.pspnet import utils
 import uuid
 import multiprocessing
 import logging
