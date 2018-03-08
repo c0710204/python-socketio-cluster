@@ -137,7 +137,7 @@ class pspnet_app_client(app_client):
                 task.prepare_mainthread()
         print("pspnet.app.client mainthread started...")
         sys.stdout.flush()
-        self.is_ready().release()
+        self.is_ready.release()
         while (1):
             for task in self.tasks:
                 if task.mainthread:
