@@ -1,2 +1,3 @@
 gevent
 tensorflow_gpu=1.5.0
+pymongo
