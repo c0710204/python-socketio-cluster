@@ -1,0 +1,9 @@
+services:
+  manager:
+    port: 30031
+  log:
+    port: 30011
+  app_comm:
+    port: 30021
+  ssh:
+    port: 50022

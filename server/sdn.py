@@ -6,6 +6,9 @@ import uuid
 import logging
 import argparse
 from multiprocessing import Process
+
+from src.libs.conf.conf import conf as conf
+
 fmt = "[%(asctime)-15s][%(levelname)s][%(filename)s:%(lineno)d][%(process)d]%(message)s"
 datefmt = "%a %d %b %Y %H:%M:%S"
 logging.basicConfig(format=fmt, datefmt=datefmt, level=21)
@@ -78,7 +81,9 @@ if __name__ == "__main__":
     clients = {}
     procs = []
     # read configs
-    config = yaml.load(open(args.config, 'r').read())
+    confloader=conf()
+    confloader.load(sdn,args.config)
+    config = conf.sdn
     for c in config['client']:
         clients[c['name']] = client(c['host'], c['username'], c['password'],
                                     c['port'], c['name'])
