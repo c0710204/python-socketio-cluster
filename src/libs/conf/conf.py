@@ -15,5 +15,5 @@ class conf(object):
     def __getattr__(self,target):
         if target in self._configs:
             return self._configs[target]
-        else
+        else:
             raise AttributeError
