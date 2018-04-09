@@ -6,7 +6,7 @@ Original paper & code published by Hengshuang Zhao et al. (2017)
 """
 from __future__ import print_function
 from __future__ import division
-from os.path import splitext, join, isfile
+from os.path import splitext, join, isfile,realpath,split
 from os import environ
 from math import ceil
 import argparse
@@ -14,7 +14,7 @@ import numpy as np
 from scipy import misc, ndimage
 from keras.backend.tensorflow_backend import set_session
 from keras import backend as K
-
+import sys
 from keras.models import model_from_json
 import tensorflow as tf
 import layers_builder as layers
@@ -41,6 +41,9 @@ class PSPNet(object):
     def __init__(self, nb_classes, resnet_layers, input_shape, weights,path="./weights"):
         """Instanciate a PSPNet."""
         self.input_shape = input_shape
+        path=realpath(split(realpath(__file__))[0]+"/../weights/")
+        print(path)
+        sys.stdout.flush()
         json_path = join(path, "keras", weights + ".json")
         h5_path = join(path, "keras", weights + ".h5")
         if isfile(json_path) and isfile(h5_path):

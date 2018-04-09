@@ -1,4 +1,7 @@
+apps/pspnet/pkg/pspnet/weights/*
 pspnet/weights/*
+*.npy
+*.h5
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
