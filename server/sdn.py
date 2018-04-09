@@ -82,7 +82,7 @@ if __name__ == "__main__":
     procs = []
     # read configs
     confloader=conf()
-    confloader.load(sdn,args.config)
+    confloader.load("sdn",args.config)
     config = conf.sdn
     for c in config['client']:
         clients[c['name']] = client(c['host'], c['username'], c['password'],
