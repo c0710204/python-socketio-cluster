@@ -83,12 +83,37 @@ if __name__ == "__main__":
     # read configs
     confloader=conf()
     confloader.load("sdn",args.config)
+    confloader.load("service")
     config = confloader.sdn
+    config_s = confloader.service
+    config_connection=[]
+    if 'proxy' in config:
+        for server_node_type in config['proxy']['service']:
+            service_info_list=config['proxy']['service'][server_node_type]
+
+
+            for service in service_info_list:
+                server_port=config_s['services'][service['type']]['port']
+                client_port=config_s['services'][service['type']]['port']
+                client_list=config['client_type'][service['avaliable']]
+                if port in service:
+                    server_port=service['port']
+
+                for node_client in client_list:
+                    for node_server in config['client_type'][server_node_type]
+                        config_connection.append(
+                            {
+                                'from':{'server':node_client,'port':client_port},
+                                'to':{'server':node_server,'port':server_port}
+                            }
+                        )
+
+
     for c in config['client']:
         clients[c['name']] = client(c['host'], c['username'], c['password'],
                                     c['port'], c['name'])
     inner_base = 43000
-    for conn in config['connection']:
+    for conn in config_connection:#config['connection']:
         if 'inner' in conn:
             inner = conn['inner']
         else:

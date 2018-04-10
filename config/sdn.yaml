@@ -38,6 +38,32 @@ client:
 #  host: localhost
 #  port: 22
 #  <<: *account_02
+client_type:
+  pelican:
+    - pelican01
+    - pelican02
+    - pelican03
+    - pelican04
+  core:
+#    - star_gpu_on_star_lab
+#    - star_gpu_local
+    - local
+proxy:
+  service:
+    core:
+      -
+        type: ssh
+        avaliable: pelican
+        port: 22
+      -
+        type: app_comm
+        avaliable: pelican
+      -
+        type: log
+        avaliable: pelican
+      -
+        type: manager
+        avaliable: pelican
 
 connection:
  -
