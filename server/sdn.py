@@ -37,7 +37,7 @@ def ftunnel(*args):
     while (1):
         try:
             client = args[-1]
-            cmd = "ssh -NL {0}:{1}:{2} {3}@{4} -p {5} >/dev/null".format(
+            cmd = "ssh -NL {0}:{1}:{2} {3}@{4} -p {5} >/dev/null 2>&1".format(
                 args[0], args[1], args[2], client.username, client.host,
                 client.port)
             logging.info(cmd)
