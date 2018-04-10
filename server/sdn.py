@@ -122,6 +122,7 @@ if __name__ == "__main__":
             # inner=inner_base
             inner_base += 1
         if conn['to']['server']=='local':
+            inner='====='
             rev = Process(
                 target=rftunnel,
                 args=(conn['from']['port'], 'localhost', conn['to']['port'],
