@@ -100,7 +100,7 @@ if __name__ == "__main__":
                     server_port=service['port']
 
                 for node_client in client_list:
-                    for node_server in config['client_type'][server_node_type]
+                    for node_server in config['client_type'][server_node_type]:
                         config_connection.append(
                             {
                                 'from':{'server':node_client,'port':client_port},
