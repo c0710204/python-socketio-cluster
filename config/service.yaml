@@ -1,11 +1,16 @@
 services:
   manager:
     port: 30031
+    type: sio
   log:
     port: 30011
+    type: sio
   app_comm:
     port: 30021
+    type: sio
   ssh:
     port: 50022
+    type: tcp
   mysql:
     port: 33060
+    
