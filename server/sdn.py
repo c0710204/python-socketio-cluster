@@ -83,7 +83,7 @@ if __name__ == "__main__":
     # read configs
     confloader=conf()
     confloader.load("sdn",args.config)
-    config = conf.sdn
+    config = confloader.sdn
     for c in config['client']:
         clients[c['name']] = client(c['host'], c['username'], c['password'],
                                     c['port'], c['name'])
