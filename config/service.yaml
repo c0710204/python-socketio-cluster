@@ -7,3 +7,5 @@ services:
     port: 30021
   ssh:
     port: 50022
+  mysql:
+    port: 33306

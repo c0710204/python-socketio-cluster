@@ -131,6 +131,16 @@ if __name__ == "__main__":
             rev.start()
             procs.append(rev)
             conn['pid'] = [rev]
+        elif conn['from']['server']=='local':
+            inner='====='
+            rev = Process(
+                target=ftunnel,
+                args=(conn['from']['port'], 'localhost', conn['to']['port'],
+                      clients[conn['to']['server']]))
+            rev.daemon = True
+            rev.start()
+            procs.append(rev)
+            conn['pid'] = [rev]
         else:
             snd = Process(
                 target=ftunnel,

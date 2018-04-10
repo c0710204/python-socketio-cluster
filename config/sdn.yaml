@@ -44,12 +44,19 @@ client_type:
     - pelican02
     - pelican03
     - pelican04
+  db:
+    - star_gpu_on_star_lab
   core:
 #    - star_gpu_on_star_lab
 #    - star_gpu_local
     - local
 proxy:
   service:
+    db:
+      -
+        type: mysql
+        avaliable: core
+        port: 3306
     core:
       -
         type: ssh
