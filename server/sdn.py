@@ -96,7 +96,7 @@ if __name__ == "__main__":
                 server_port=config_s['services'][service['type']]['port']
                 client_port=config_s['services'][service['type']]['port']
                 client_list=config['client_type'][service['avaliable']]
-                if port in service:
+                if 'port' in service:
                     server_port=service['port']
 
                 for node_client in client_list:
