@@ -16,4 +16,4 @@ class conf(object):
         if target in self._configs:
             return self._configs[target]
         else:
-            raise AttributeError
+            raise AttributeError("config not loaded.")
