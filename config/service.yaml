@@ -8,4 +8,4 @@ services:
   ssh:
     port: 50022
   mysql:
-    port: 33306
+    port: 33060
