@@ -11,7 +11,7 @@ from src.libs.conf.conf import conf as conf
 
 fmt = "[%(asctime)-15s][%(levelname)s][%(filename)s:%(lineno)d][%(process)d]%(message)s"
 datefmt = "%a %d %b %Y %H:%M:%S"
-logging.basicConfig(format=fmt, datefmt=datefmt, level=21)
+logging.basicConfig(format=fmt, datefmt=datefmt, level=1)
 
 
 class client():
