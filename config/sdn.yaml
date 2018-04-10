@@ -38,92 +38,36 @@ client:
 #  host: localhost
 #  port: 22
 #  <<: *account_02
-
-connection:
- -
-  from:
-   server: pelican01
-   port: 30021
-  to:
-   server: local
-   port: 30021
- -
-  from:
-   server: pelican02
-   port: 30021
-  to:
-   server: local
-   port: 30021
- -
-  from:
-   server: pelican03
-   port: 30021
-  to:
-   server: local
-   port: 30021
- -
-  from:
-   server: pelican04
-   port: 30021
-  to:
-   server: local
-   port: 30021
-
-
- -
-  from:
-   server: pelican01
-   port: 30001
-  to:
-   server: local
-   port: 30001
- -
-  from:
-   server: pelican02
-   port: 30001
-  to:
-   server: local
-   port: 30001
- -
-  from:
-   server: pelican03
-   port: 30001
-  to:
-   server: local
-   port: 30001
- -
-  from:
-   server: pelican04
-   port: 30001
-  to:
-   server: local
-   port: 30001
-
- -
-  from:
-   server: pelican01
-   port: 50022
-  to:
-   server: local
-   port: 22
- -
-  from:
-   server: pelican02
-   port: 50022
-  to:
-   server: local
-   port: 22
- -
-  from:
-   server: pelican03
-   port: 50022
-  to:
-   server: local
-   port: 22
- -
-  from:
-   server: pelican04
-   port: 50022
-  to:
-   server: local
-   port: 22
+client_type:
+  pelican:
+    - pelican01
+    - pelican02
+    - pelican03
+    - pelican04
+  db:
+    - star_gpu_on_star_lab
+  core:
+#    - star_gpu_on_star_lab
+#    - star_gpu_local
+    - local
+proxy:
+  service:
+    db:
+      -
+        type: mysql
+        avaliable: core
+        port: 3306
+    core:
+      -
+        type: ssh
+        avaliable: pelican
+        port: 22
+      -
+        type: app_comm
+        avaliable: pelican
+      -
+        type: log
+        avaliable: pelican
+      -
+        type: manager
+        avaliable: pelican
