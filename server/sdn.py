@@ -40,7 +40,7 @@ def ftunnel(*args):
             cmd = "ssh -NL {0}:{1}:{2} {3}@{4} -p {5} >/dev/null 2>&1".format(
                 args[0], args[1], args[2], client.username, client.host,
                 client.port)
-            logging.info(cmd)
+            logging.DEBUG(cmd)
             ret = subprocess.call(cmd, shell=True)
             logging.warning("[connection][{}]return {},restarting...".format(
                 client.uuid, ret))
@@ -56,7 +56,7 @@ def rftunnel(*args):
             cmd = "ssh -NR {0}:{1}:{2} {3}@{4} -p {5} >/dev/null 2>&1".format(
                 args[0], args[1], args[2], client.username, client.host,
                 client.port)
-            logging.info(cmd)
+            logging.DEBUG(cmd)
             ret = subprocess.call(cmd, shell=True)
             logging.warning("[connection][{}]return {},restarting...".format(
                 client.uuid, ret))
