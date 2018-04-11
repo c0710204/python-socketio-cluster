@@ -12,7 +12,7 @@ def pre_process(args):
       #EVALUATION_SCALES = [0.15, 0.25, 0.5]  # must be all floats!
   #fit test:
   img = misc.imread(args.input_path)
-  img = misc.imresize(img, 10)
+  #img = misc.imresize(img, 10)
   pspnet={}
   pspnet['input_shape']=(473, 473)
   pspnet['model.outputs[0].shape[3]']=150
@@ -20,9 +20,9 @@ def pre_process(args):
     if len(inp)==7:
       filename, ext = splitext(args.output_path)
       np.save("{0}_-_{5}_-_{1}_-_{2}_-_{3}_-_{4}_-_.npy".format(filename,inp[2],inp[3],inp[4],inp[5],inp[6]), inp[0])
-    
+
   class_scores = pre_process_func.predict_multi_scale(funchandler, img, pspnet, EVALUATION_SCALES, args.sliding, args.flip)
-  
+
 if __name__=='__main__':
   remote_uuid="{0}{1}".format(uuid.uuid4(),"_imagecombine")
   socketIO=SocketIO('localhost', 30001, LoggingNamespace)

@@ -55,12 +55,7 @@ mutex_ssh = multiprocessing.Lock()
 def sshdownload(data):
     global mutex_ssh
     mutex_ssh.acquire()
-    #start tunnel
-    # tunnel_p = multiprocessing.Process(
-    #     target=ftunnel,
-    #     args=(50033, data['ssh']['host'], data['ssh']['port'], data['proxy']))
-    # tunnel_p.start()
-    #do scp_download
+
     print("downloading {0}...".format(data['input_path']))
     sys.stdout.flush()
     scp_download(data['ssh']['port'], data['ssh']['username'], "127.0.0.1",
@@ -72,12 +67,6 @@ def sshdownload(data):
 def sshupload(data, path):
     global mutex_ssh
     mutex_ssh.acquire()
-    #start tunnel
-    # tunnel_p = multiprocessing.Process(
-    #     target=ftunnel,
-    #     args=(50033, data['ssh']['host'], data['ssh']['port'], data['proxy']))
-    # tunnel_p.start()
-    #do scp_download
     print("uploading {0}...".format(data['input_path']))
     sys.stdout.flush()
     scp_upload(data['ssh']['port'], data['ssh']['username'], "127.0.0.1",
@@ -130,10 +119,12 @@ def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
 
     print("upload...")
     sys.stdout.flush()
-    sshupload(data, panid + "_seg_blended" + ext)
+
+    sshupload(data, "{0}.npy".format(panid))
+    l=np.read("{0}_classify.npy".format(panid))
     print("garbage cleaning")
     sys.stdout.flush()
-    return "success";
+    return {'panid':panid,"percent":json.dump(l),'id':data['id']};
 
 class pspnet_app_client(app_client):
     def mainthread(self):
