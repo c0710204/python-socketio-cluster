@@ -20,8 +20,9 @@ def package(input_path, output_pathg,id):
 
 class pspnet_app_server(app_server):
     def __init__(self,*args):
-        conf=confloader.load('service')
-        self.db=pymysql.connect("localhost",conf['services']['mysql']['port'],"guxi","dHtFkI6g","gsv_file_list")
+        conf=confloader()
+        conf.load('service')
+        self.db=pymysql.connect("localhost",conf['services']['services']['mysql']['port'],"guxi","dHtFkI6g","gsv_file_list")
         app_server.__init__(self,*args)
         self.max_task_node=2
     def handle_error(self,err,arg):
