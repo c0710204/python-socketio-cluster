@@ -3,8 +3,8 @@ import time
 import sys
 import pymysql
 import os
-from src.libs.cond.cond import conf as confloader
-def package(input_path, output_path,id):
+from src.libs.cond.conf import conf as confloader
+def package(input_path, output_pathg,id):
     return {
         "ssh": {
             "host": "127.0.0.1",
