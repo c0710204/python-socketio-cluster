@@ -3,7 +3,7 @@ import time
 import sys
 import pymysql
 import os
-from src.libs.conf.conf import conf as confloader
+from src.libs.conf.conf import conf
 def package(input_path, output_pathg,id):
     return {
         "ssh": {
@@ -20,9 +20,9 @@ def package(input_path, output_pathg,id):
 
 class pspnet_app_server(app_server):
     def __init__(self,*args):
-        conf=confloader()
-        conf.load('service')
-        self.db=pymysql.connect("localhost",conf['services']['services']['mysql']['port'],"guxi","dHtFkI6g","gsv_file_list")
+        confloader=conf()
+        confloader.load('service')
+        self.db=pymysql.connect("localhost",confloader['services']['services']['mysql']['port'],"guxi","dHtFkI6g","gsv_file_list")
         app_server.__init__(self,*args)
         self.max_task_node=2
     def handle_error(self,err,arg):
