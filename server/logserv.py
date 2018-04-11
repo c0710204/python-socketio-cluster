@@ -7,8 +7,6 @@ import time
 #client = MongoClient('mongodb://root:dHtFkI6g@ds012578.mlab.com:12578/pspnet')
 sio = socketio.Server(async_mode='eventlet')
 app = socketio.Middleware(sio)
-db = {}
-collection = db['log']
 
 @sio.on('connect')
 def connect(sid, environ):
