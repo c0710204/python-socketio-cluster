@@ -22,7 +22,11 @@ class pspnet_app_server(app_server):
     def __init__(self,*args):
         confloader=conf()
         confloader.load('service')
+        print("[{1}]connecting db...".format(info['pid'],time.asctime( time.localtime(time.time()) )))
+        sys.stdout.flush()
         self.db=pymysql.connect(host="127.0.0.1",port=confloader.service['services']['mysql']['port'], user="guxi",passwd="dHtFkI6g",db="gsv_file_list")
+        print("[{1}]db connection ok".format(info['pid'],time.asctime( time.localtime(time.time()) )))
+        sys.stdout.flush()
         app_server.__init__(self,*args)
         self.max_task_node=2
     def handle_error(self,err,arg):
