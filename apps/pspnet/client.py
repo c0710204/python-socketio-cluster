@@ -148,6 +148,7 @@ class pspnet_app_client(app_client):
             task.prepare()
         p=multiprocessing.Process(target=self.mainthread)
         p.start()
+        print("client ready...")
         self.is_ready.acquire()
         self.run_ready.release()
     def run(self,args):
