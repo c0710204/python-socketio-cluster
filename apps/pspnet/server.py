@@ -34,6 +34,7 @@ class pspnet_app_server(app_server):
         cursor = self.db.cursor()
         rnd=os.getpid()
         print("[{1}]getting info from db".format(info['pid'],time.asctime( time.localtime(time.time()) )))
+        sys.stdout.flush()
         sql1='update tasks set status="loaded" , locker="{0}" where status="wait" limit 1'.format(rnd)
         sql2='select tasks.id as id pid,path,resultpath from files,tasks where tasks.loader="{0}" tasks.pid=files.pid  and tasks.status="loaded" limit 1'.format(rnd)
         cursor.execute(sql1);
