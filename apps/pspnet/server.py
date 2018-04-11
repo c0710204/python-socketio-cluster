@@ -3,7 +3,7 @@ import time
 import sys
 import pymysql
 import os
-from src.libs.cond.conf import conf as confloader
+from src.libs.conf.conf import conf as confloader
 def package(input_path, output_pathg,id):
     return {
         "ssh": {
