@@ -11,6 +11,7 @@ import uuid
 import multiprocessing
 import logging
 import sys
+import json
 class pre(task):
 
     handler_type = "Process"
