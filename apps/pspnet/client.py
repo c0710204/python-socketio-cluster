@@ -129,7 +129,7 @@ def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
     os.remove("{0}.jpg".format(panid))
     sys.stdout.flush()
     import json
-    return {'panid':panid,"percent":json.dumps(l),'id':data['id']};
+    return {'panid':panid,"percent":json.dumps(l),'id':data['taskid']};
 
 class pspnet_app_client(app_client):
     def mainthread(self):
