@@ -16,7 +16,7 @@ def img_combine2(args):
     #fit test:
     EVALUATION_SCALES.reverse()
     img = misc.imread(args.input_path)
-    img = misc.imresize(img, 10)
+    #img = misc.imresize(img, 10)
     img_shape = img.shape
     pspnet = {}
     pspnet['input_shape'] = (473, 473)

@@ -13,7 +13,7 @@ def img_combine(args):
       #EVALUATION_SCALES = [0.15, 0.25, 0.5]  # must be all floats!
   #fit test:
   img = misc.imread(args.input_path)
-  img = misc.imresize(img, 10)
+  #img = misc.imresize(img, 10)
   img_shape=img.shape
   pspnet={}
   pspnet['input_shape']=(473, 473)
@@ -22,9 +22,9 @@ def img_combine(args):
     if len(inp)==7:
       filename, ext = splitext(args.input_path2)
       return np.load("{0}_{5}_{1}_{2}_{3}_{4}_.npy".format(filename,inp[2],inp[3],inp[4],inp[5],inp[6]))
-    
+
   return img_combine_func.predict_multi_scale(funchandler, img_shape, pspnet, EVALUATION_SCALES, args.sliding, args.flip)
-  
+
 if __name__=='__main__':
 
   remote_uuid="{0}{1}".format(uuid.uuid4(),"_imagecombine")
