@@ -3,13 +3,11 @@ import socketio
 import os
 import sys
 import time
-from pymongo import MongoClient
-client = MongoClient('mongodb://root:dHtFkI6g@ds012578.mlab.com:12578/pspnet')
+#from pymongo import MongoClient
+#client = MongoClient('mongodb://root:dHtFkI6g@ds012578.mlab.com:12578/pspnet')
 sio = socketio.Server(async_mode='eventlet')
 app = socketio.Middleware(sio)
-db = {}
-collection = db['log']
-
+db={}
 @sio.on('connect')
 def connect(sid, environ):
     print('logserv - connect ', sid)

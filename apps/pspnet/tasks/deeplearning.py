@@ -4,15 +4,15 @@ from task import task
 import time
 import numpy as np
 from scipy import misc, ndimage
-from ..pkg.pspnet import deeplearning
-from ..pkg.pspnet.psp_tf.pspnet import PSPNet50
+from apps.pspnet.pkg.pspnet import deeplearning as dpl
+from apps.pspnet.pkg.pspnet.psp_tf.pspnet import PSPNet50
 from collections import namedtuple
-from ..pkg.pspnet import utils
+from apps.pspnet.pkg.pspnet import utils
 import uuid
 import multiprocessing
 import logging
 import sys
-
+import json
 class deeplearning(task):
     mainthread = True
     handler_type = 'Queue'
@@ -59,6 +59,6 @@ class deeplearning(task):
         args_d['remote_uuid'] = self.remote_uuid
         args_d['socketIO'] = self.socketIO
         global_arg = namedtuple('Struct', args_d.keys())(*args_d.values())
-        deeplearning.deep_process(global_arg)
+        dpl.deep_process(global_arg)
         self.responseQueue.put(args_d['local_id'])
         time.sleep(1)

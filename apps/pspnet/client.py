@@ -55,15 +55,10 @@ mutex_ssh = multiprocessing.Lock()
 def sshdownload(data):
     global mutex_ssh
     mutex_ssh.acquire()
-    #start tunnel
-    # tunnel_p = multiprocessing.Process(
-    #     target=ftunnel,
-    #     args=(50033, data['ssh']['host'], data['ssh']['port'], data['proxy']))
-    # tunnel_p.start()
-    #do scp_download
+
     print("downloading {0}...".format(data['input_path']))
     sys.stdout.flush()
-    scp_download(data['ssh']['port'], data['ssh']['username'], "127.0.0.1",
+    scp_download(data['ssh']['port'], data['ssh']['username'], data['ssh']['host'],
                  data['input_path'])
     # p.terminate()
     mutex_ssh.release()
@@ -72,15 +67,9 @@ def sshdownload(data):
 def sshupload(data, path):
     global mutex_ssh
     mutex_ssh.acquire()
-    #start tunnel
-    # tunnel_p = multiprocessing.Process(
-    #     target=ftunnel,
-    #     args=(50033, data['ssh']['host'], data['ssh']['port'], data['proxy']))
-    # tunnel_p.start()
-    #do scp_download
     print("uploading {0}...".format(data['input_path']))
     sys.stdout.flush()
-    scp_upload(data['ssh']['port'], data['ssh']['username'], "127.0.0.1",
+    scp_upload(data['ssh']['port'], data['ssh']['username'], data['ssh']['host'],
                data["output_path"], path)
     # p.terminate()
     mutex_ssh.release()
@@ -130,10 +119,17 @@ def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
 
     print("upload...")
     sys.stdout.flush()
-    sshupload(data, panid + "_seg_blended" + ext)
+    import numpy as np
+    import os
+    sshupload(data, "{0}.npy".format(panid))
+    l=np.load("{0}_classify.npy".format(panid)).tolist()
     print("garbage cleaning")
+    os.remove("{0}.npy".format(panid))
+    os.remove("{0}_classify.npy".format(panid))
+    os.remove("{0}.jpg".format(panid))
     sys.stdout.flush()
-    return "success";
+    import json
+    return {'panid':panid,"percent":json.dumps(l),'id':data['taskid']};
 
 class pspnet_app_client(app_client):
     def mainthread(self):
@@ -157,6 +153,7 @@ class pspnet_app_client(app_client):
             task.prepare()
         p=multiprocessing.Process(target=self.mainthread)
         p.start()
+        print("client ready...")
         self.is_ready.acquire()
         self.run_ready.release()
     def run(self,args):

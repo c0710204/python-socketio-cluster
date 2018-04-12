@@ -3,7 +3,7 @@ services:
     port: 30031
     type: sio
   log:
-    port: 30011
+    port: 30001
     type: sio
   app_comm:
     port: 30021
@@ -13,4 +13,3 @@ services:
     type: tcp
   mysql:
     port: 33060
-    
