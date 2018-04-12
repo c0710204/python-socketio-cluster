@@ -49,7 +49,7 @@ class pspnet_app_server(app_server):
             self.db.commit()
             info = cursor.fetchone()
             print(info)
-            img_local=info[2]
+            img_local=info[2].rstrip()
             print("[{1}]sending request : {0} image".format(info[1],time.asctime( time.localtime(time.time()) )))
             sys.stdout.flush()
         except Exception as e:

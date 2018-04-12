@@ -124,6 +124,7 @@ def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
     l=np.read("{0}_classify.npy".format(panid))
     print("garbage cleaning")
     sys.stdout.flush()
+    import json
     return {'panid':panid,"percent":json.dump(l),'id':data['id']};
 
 class pspnet_app_client(app_client):
