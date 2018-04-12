@@ -68,7 +68,7 @@ class pspnet_app_server(app_server):
         self.db.commit()
         sql2='INSERT INTO result_percent(panid,info)VALUES("{0}","{1}");'.format(
             ret['panid'],
-            ret['info']
+            ret['percent']
         )
         cursor.execute(sql2)
         self.db.commit()
