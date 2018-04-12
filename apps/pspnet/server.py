@@ -4,7 +4,7 @@ import sys
 import pymysql
 import os
 from src.libs.conf.conf import conf
-def package(input_path, output_pathg,id):
+def package(input_path, output_path,id):
     return {
         "ssh": {
             "host": "127.0.0.1",
