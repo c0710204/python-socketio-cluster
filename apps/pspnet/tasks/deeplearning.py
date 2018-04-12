@@ -4,10 +4,10 @@ from task import task
 import time
 import numpy as np
 from scipy import misc, ndimage
-from ..pkg.pspnet import deeplearning
-from ..pkg.pspnet.psp_tf.pspnet import PSPNet50
+from apps.pspnet.pkg.pspnet import deeplearning
+from apps.pspnet.pkg.pspnet.psp_tf.pspnet import PSPNet50
 from collections import namedtuple
-from ..pkg.pspnet import utils
+from apps.pspnet.pkg.pspnet import utils
 import uuid
 import multiprocessing
 import logging
