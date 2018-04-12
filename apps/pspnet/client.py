@@ -120,6 +120,7 @@ def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
     print("upload...")
     sys.stdout.flush()
     import numpy as np
+    import os
     sshupload(data, "{0}.npy".format(panid))
     l=np.load("{0}_classify.npy".format(panid))
     print("garbage cleaning")
