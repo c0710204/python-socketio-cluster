@@ -7,10 +7,10 @@ from src.libs.conf.conf import conf
 def package(input_path, output_path,id):
     return {
         "ssh": {
-            "host": "127.0.0.1",
+            "host": "star.eecs.oregonstate.edu",
             "username": "guxi",
             "password": "cft6&UJM",
-            "port": 50022,
+            "port": 22,
         },
         "input_path": input_path,
         "output_path": output_path,
