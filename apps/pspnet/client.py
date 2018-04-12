@@ -58,7 +58,7 @@ def sshdownload(data):
 
     print("downloading {0}...".format(data['input_path']))
     sys.stdout.flush()
-    scp_download(data['ssh']['port'], data['ssh']['username'], "127.0.0.1",
+    scp_download(data['ssh']['port'], data['ssh']['username'], data['ssh']['host'],
                  data['input_path'])
     # p.terminate()
     mutex_ssh.release()
@@ -69,7 +69,7 @@ def sshupload(data, path):
     mutex_ssh.acquire()
     print("uploading {0}...".format(data['input_path']))
     sys.stdout.flush()
-    scp_upload(data['ssh']['port'], data['ssh']['username'], "127.0.0.1",
+    scp_upload(data['ssh']['port'], data['ssh']['username'], data['ssh']['host'],
                data["output_path"], path)
     # p.terminate()
     mutex_ssh.release()
