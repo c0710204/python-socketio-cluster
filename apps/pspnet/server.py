@@ -48,14 +48,15 @@ class pspnet_app_server(app_server):
             cursor.execute(sql2);
             self.db.commit()
             info = cursor.fetchone()
-            img_local=info['path']
-            print("[{1}]sending request : {0} image".format(info['pid'],time.asctime( time.localtime(time.time()) )))
+            print(info)
+            img_local=info[2]
+            print("[{1}]sending request : {0} image".format(info[1],time.asctime( time.localtime(time.time()) )))
             sys.stdout.flush()
         except Exception as e:
             print(e)
 
             return None
-        return package(img_local, info['resultpath'],info['id'])
+        return package(img_local, info[3],info[0])
 
     def process_result(self,ret):
         """
