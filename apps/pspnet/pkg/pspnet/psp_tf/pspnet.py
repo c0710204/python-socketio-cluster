@@ -79,7 +79,7 @@ class PSPNet(object):
         GPU_timer -= time.time()
         #print("start gpu")
         #try:
-            regular_prediction = self.model.predict(input_data)
+        regular_prediction = self.model.predict(input_data)
         #except  e:
         #    print(e)
         #print("end gpu")
