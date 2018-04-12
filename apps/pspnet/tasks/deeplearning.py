@@ -12,7 +12,7 @@ import uuid
 import multiprocessing
 import logging
 import sys
-
+import json
 class deeplearning(task):
     mainthread = True
     handler_type = 'Queue'
