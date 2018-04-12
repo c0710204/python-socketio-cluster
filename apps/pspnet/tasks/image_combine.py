@@ -36,6 +36,7 @@ class image_combine(task):
         p.join()
 
     def run(self, args_s=""):
+        import numpy as np
         args_d = json.loads(args_s)
         iname = args_d['panid']
         ext = args_d['ext']
@@ -46,7 +47,7 @@ class image_combine(task):
             namedtuple('Struct', args_d.keys())(*args_d.values()))
 
         print("blended...")
-        img = misc.imread("./{0}{1}".format(panid, ext))
+        #img = misc.imread("./{0}{1}".format(iname, ext))
         # img = misc.imresize(img, 10)
 
         class_image = np.argmax(class_scores, axis=2)
