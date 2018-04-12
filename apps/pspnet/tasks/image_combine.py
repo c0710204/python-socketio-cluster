@@ -39,6 +39,7 @@ class image_combine(task):
         import numpy as np
         args_d = json.loads(args_s)
         iname = args_d['panid']
+        panid=iname
         ext = args_d['ext']
         filename = args_d['filename']
         self.socketIO.emit('update', {'id': iname, "phase": 3, 'val': -1, 'max': -1})
