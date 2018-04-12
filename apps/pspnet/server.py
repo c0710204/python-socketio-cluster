@@ -35,8 +35,8 @@ class pspnet_app_server(app_server):
         """
         :param args all needed data from server
         """
-        print("[{1}]getting info from db".format(info['pid'],time.asctime( time.localtime(time.time()) )))
-        sys.stdout.flush()        
+        print("[{1}]getting info from db".format(0,time.asctime( time.localtime(time.time()) )))
+        sys.stdout.flush()
         cursor = self.db.cursor()
         rnd=os.getpid()
 
