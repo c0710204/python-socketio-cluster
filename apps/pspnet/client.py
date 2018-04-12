@@ -119,10 +119,13 @@ def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
 
     print("upload...")
     sys.stdout.flush()
-
+    import numpy as np
     sshupload(data, "{0}.npy".format(panid))
     l=np.read("{0}_classify.npy".format(panid))
     print("garbage cleaning")
+    os.remove("{0}.npy".format(panid))
+    os.remove("{0}_classify.npy".format(panid))
+    os.remove("{0}.jpg".format(panid))
     sys.stdout.flush()
     import json
     return {'panid':panid,"percent":json.dump(l),'id':data['id']};
