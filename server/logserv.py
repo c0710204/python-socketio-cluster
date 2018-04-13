@@ -47,12 +47,7 @@ def update(sid, data):
         cur.execute(sql2)
         mysqldb.commit()
         lines=cur.fetchall()
-<<<<<<< HEAD
         sio.emit('progress_upgrade_server',lines)
-=======
-        db= {l['panid']: l for l in lines}
-        sio.emit('progress_upgrade_server',data=db.values())
->>>>>>> 5560a3ecc7226645f169cac3b9517756fcfd714b
     else:
         if data['id'] in db:
             if (data['max']):
