@@ -3,11 +3,22 @@ import socketio
 import os
 import sys
 import time
+from src.libs.conf.conf import conf
 #from pymongo import MongoClient
-#client = MongoClient('mongodb://root:dHtFkI6g@ds012578.mlab.com:12578/pspnet')
 sio = socketio.Server(async_mode='eventlet')
 app = socketio.Middleware(sio)
 db={}
+enable_mysql=True
+try:
+    confloader=conf()
+    confloader.load('service')
+    print("[{1}]connecting db...".format(0,time.asctime( time.localtime(time.time()) )))
+    sys.stdout.flush()
+    mysqldb=pymysql.connect(host="127.0.0.1",port=confloader.service['services']['mysql']['port'], user="guxi",passwd="dHtFkI6g",db="gsv_file_list")
+    print("[{1}]db connection ok".format(0,time.asctime( time.localtime(time.time()) )))
+except Exception as e:
+    print(e)
+    enable_mysql=False
 @sio.on('connect')
 def connect(sid, environ):
     print('logserv - connect ', sid)
@@ -17,7 +28,19 @@ def connect(sid, environ):
 @sio.on('update')
 def update(sid, data):
     global db
+    global mysqldb
     print(data)
+    if enable_mysql:
+        sql2='INSERT INTO psplog(panid,phase,val,max)VALUES("{0}","{1}","{2}","{3}");'.format(
+            data['id'],
+            data['phase'],
+            data['val'],
+            data['max']
+        )
+        cur=mysqldb.cursor()
+        cur.execute(sql2)
+        mysqldb.commit()
+
     if data['id'] in db:
         if (data['max']):
             db[data['id']]['max'] = data['max']
