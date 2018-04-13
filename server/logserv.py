@@ -3,6 +3,7 @@ import socketio
 import os
 import sys
 import time
+import pymysql
 from src.libs.conf.conf import conf
 #from pymongo import MongoClient
 sio = socketio.Server(async_mode='eventlet')
