@@ -47,7 +47,7 @@ def update(sid, data):
         cur.execute(sql2)
         mysqldb.commit()
         lines=cur.fetchall()
-        sio.emit('progress_upgrade_server',lines)
+        sio.emit('progress_upgrade_server',data=lines)
     else:
         if data['id'] in db:
             if (data['max']):
