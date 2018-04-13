@@ -64,7 +64,12 @@ def deep_process(args):
     cache=[]
     image_cache=[]
     ind=0
-    iname=onlyfiles[0].split('_-_')[0]
+    for a in onlyfiles:
+        try:
+            iname=a.split('_-_')[0]
+            break
+        except Exception as e:
+            pass
 
     if args.input_path_filter:
         onlyfiles1=onlyfiles
