@@ -35,10 +35,11 @@ class pspnet_app_server(app_server):
         """
         :param args all needed data from server
         """
+        import random
         print("[{1}]getting info from db".format(0,time.asctime( time.localtime(time.time()) )))
         sys.stdout.flush()
         cursor = self.db.cursor()
-        rnd=os.getpid()
+        rnd=random.randint(0,65000)
 
         sql1='update tasks set status="loaded" , locker="{0}" where status="wait" limit 1'.format(rnd)
         sql2='select tasks.id as id, tasks.pid,path,resultpath from files,tasks where tasks.locker="{0}" and tasks.pid=files.pid  and tasks.`status`="loaded" limit 1'.format(rnd)
