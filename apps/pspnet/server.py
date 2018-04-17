@@ -55,7 +55,7 @@ class pspnet_app_server(app_server):
 
         sql1='update tasks set status="loaded" , locker="{0}" where status="wait" limit 1'.format(rnd)
         sql2='select tasks.id as id, tasks.pid,path,resultpath from files,tasks where tasks.locker="{0}" and tasks.pid=files.pid  and tasks.`status`="loaded" limit 1'.format(rnd)
-        while Ture:
+        while True:
             try:
                 cursor = self.db.cursor()
                 cursor.execute(sql1);
