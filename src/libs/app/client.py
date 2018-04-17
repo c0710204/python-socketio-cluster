@@ -17,9 +17,9 @@ class app_client(BaseNamespace):
         self.run_ready.release()
         pass
     def on_ask_init(self,*args):
-        self.emit("free", None)
-    def on_connect(self, *args):
         self.emit("client_free", None)
+    def on_connect(self, *args):
+        #self.emit("client_free", None)
         pass
     def on_task(self, *args):
         p = multiprocessing.Process(target=self.run_mp, args=(args[0],))
