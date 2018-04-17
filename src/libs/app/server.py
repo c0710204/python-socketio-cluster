@@ -15,13 +15,14 @@ class app_server(socketio.Namespace):
         if noti=='free':
             pkg=self.get_task()
             if pkg!=None:
+                print(sid,"acquire")
                 self.tasking[sid].acquire()
                 self.emit('task',pkg,room=sid)
     def on_client_free(self,sid,data):
         pass
         self.event('free',data)
     def on_result(self,sid,data):
-        #print(data)
+        print(sid,"release")
         self.tasking[sid].release()
         if data['status']>0:
             self.process_result(data['arg'])
