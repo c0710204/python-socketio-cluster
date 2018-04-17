@@ -20,7 +20,7 @@ class app_server(socketio.Namespace):
                 self.emit('task',pkg,room=sid)
     def on_client_free(self,sid,data):
         pass
-        self.event('free',data)
+        self.event('free',sid)
     def on_result(self,sid,data):
         print(sid,"release")
         self.tasking[sid].release()
