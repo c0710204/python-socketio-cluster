@@ -9,6 +9,7 @@ class app_server(socketio.Namespace):
         self.tasking=defaultdict(lambda :multiprocessing.Semaphore(self.max_task_node))
 
     def on_connect(self, sid, environ):
+        print(sid,"connect")
         for i in range(self.max_task_node):
             self.emit("ask_init",room=sid)
     def event(self,noti,sid):
