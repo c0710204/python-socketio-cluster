@@ -1,5 +1,5 @@
 
-import eventlet
+import gevent
 import socketio
 import os
 import sys
@@ -7,7 +7,8 @@ import sshtunnel
 import time
 import argparse
 import importlib
-sio = socketio.Server(async_mode='eventlet')
+from gevent import pywsgi
+sio = socketio.Server(async_mode='gevent')
 app = socketio.Middleware(sio)
 
 #temp
@@ -24,4 +25,4 @@ if __name__ == '__main__':
     port = 30021
     print("starting at local port {0}...".format(port))
     sio.register_namespace(srv_handle('/task'))
-    eventlet.wsgi.server(eventlet.listen(('', port)), app)
+    pywsgi.WSGIServer(('', port), app).serve_forever()
