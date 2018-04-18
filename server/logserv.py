@@ -31,25 +31,25 @@ def update(sid, data):
     #print(data)
     if enable_mysql:
         try:
-            mysqldb=conn_db()
-            sql2='INSERT INTO psplog(panid,phase,val,max)VALUES("{0}","{1}","{2}","{3}");'.format(
-                data['id'],
-                data['phase'],
-                data['val'],
-                data['max']
-            )
-            cur=mysqldb.cursor()
-            cur.execute(sql2)
-            mysqldb.commit()
-            sql="select * from psplog where time in (SELECT max(time) FROM gsv_file_list.psplog group by panid) order by time"
+            with conn_db() as mysqldb:
+                with mysqldb.cursor() as cur:
+                    sql2='INSERT INTO psplog(panid,phase,val,max)VALUES("{0}","{1}","{2}","{3}");'.format(
+                        data['id'],
+                        data['phase'],
+                        data['val'],
+                        data['max']
+                    )
+                    cur.execute(sql2)
+                    mysqldb.commit()
+                    sql="select * from psplog where time in (SELECT max(time) FROM gsv_file_list.psplog group by panid) order by time"
 
-            cur=mysqldb.cursor()
-            cur.execute(sql)
-            mysqldb.commit()
-            lines=cur.fetchall()
-            lines=[{'id':l[2],'phase':l[3],'val':l[4],'max':l[5]} for l in lines]
-            mysqldb.close()
-            sio.emit('progress_upgrade_server',data=lines)
+                    cur=mysqldb.cursor()
+                    cur.execute(sql)
+                    mysqldb.commit()
+                    lines=cur.fetchall()
+                    lines=[{'id':l[2],'phase':l[3],'val':l[4],'max':l[5]} for l in lines]
+
+                    sio.emit('progress_upgrade_server',data=lines)
         except Exception as e:
             print(e)
 
