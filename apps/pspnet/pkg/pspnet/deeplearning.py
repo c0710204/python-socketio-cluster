@@ -64,12 +64,7 @@ def deep_process(args):
     cache=[]
     image_cache=[]
     ind=0
-    for a in onlyfiles:
-        try:
-            iname=a.split('_-_')[0]
-            break
-        except Exception as e:
-            pass
+
 
     if args.input_path_filter:
         onlyfiles1=onlyfiles
@@ -77,6 +72,12 @@ def deep_process(args):
         for fpath in onlyfiles1:
             if fpath.find(args.input_path_filter)>=0:
                 onlyfiles.append(fpath)
+    for a in onlyfiles:
+        try:
+            iname=a.split('_-_')[0]
+            break
+        except Exception as e:
+            pass                
     args.socketIO.emit('update',{'id':iname,"phase":2,'val':0,'max':len(onlyfiles)})
     args.socketIO.wait(seconds=1)
     for fpath in tqdm.tqdm(onlyfiles):
