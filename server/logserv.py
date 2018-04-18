@@ -1,12 +1,13 @@
-import eventlet
+import gevent
 import socketio
 import os
 import sys
 import time
 import pymysql
 from src.libs.conf.conf import conf
+from gevent import pywsgi
 #from pymongo import MongoClient
-sio = socketio.Server(async_mode='eventlet')
+sio = socketio.Server(async_mode='gevent')
 app = socketio.Middleware(sio)
 db={}
 enable_mysql=True
@@ -94,5 +95,5 @@ if __name__ == '__main__':
 
 
     print("starting at local port {0}...".format(port))
-
-    eventlet.wsgi.server(eventlet.listen(('', port)), app)
+    pywsgi.WSGIServer(('', port), app).serve_forever()
+    #eventlet.wsgi.server(eventlet.listen(('', port)), app)
