@@ -6,6 +6,7 @@ import time
 import pymysql
 from src.libs.conf.conf import conf
 from gevent import pywsgi
+from geventwebsocket.handler import WebSocketHandler
 #from pymongo import MongoClient
 sio = socketio.Server(async_mode='gevent')
 app = socketio.Middleware(sio)
@@ -95,5 +96,6 @@ if __name__ == '__main__':
 
 
     print("starting at local port {0}...".format(port))
-    pywsgi.WSGIServer(('', port), app).serve_forever()
+
+    pywsgi.WSGIServer(('', port), app,handler_class=WebSocketHandler).serve_forever()
     #eventlet.wsgi.server(eventlet.listen(('', port)), app)
