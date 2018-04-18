@@ -13,10 +13,10 @@ enable_mysql=True
 def conn_db():
     confloader=conf()
     confloader.load('service')
-    print("[{1}]connecting db...".format(0,time.asctime( time.localtime(time.time()) )))
+    #print("[{1}]connecting db...".format(0,time.asctime( time.localtime(time.time()) )))
     sys.stdout.flush()
     mysqldb=pymysql.connect(host="127.0.0.1",port=confloader.service['services']['mysql']['port'], user="guxi",passwd="dHtFkI6g",db="gsv_file_list")
-    print("[{1}]db connection ok".format(0,time.asctime( time.localtime(time.time()) )))
+    #print("[{1}]db connection ok".format(0,time.asctime( time.localtime(time.time()) )))
     return mysqldb
 @sio.on('connect')
 def connect(sid, environ):
@@ -28,7 +28,7 @@ def connect(sid, environ):
 def update(sid, data):
     global db
     #global mysqldb
-    print(data)
+    #print(data)
     if enable_mysql:
         try:
             mysqldb=conn_db()
