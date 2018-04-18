@@ -43,7 +43,6 @@ def update(sid, data):
                     mysqldb.commit()
                     sql="select * from psplog where time in (SELECT max(time) FROM gsv_file_list.psplog group by panid) order by time"
 
-                    cur=mysqldb.cursor()
                     cur.execute(sql)
                     mysqldb.commit()
                     lines=cur.fetchall()
