@@ -10,16 +10,14 @@ sio = socketio.Server(async_mode='eventlet')
 app = socketio.Middleware(sio)
 db={}
 enable_mysql=True
-try:
+def conn_db():
     confloader=conf()
     confloader.load('service')
     print("[{1}]connecting db...".format(0,time.asctime( time.localtime(time.time()) )))
     sys.stdout.flush()
     mysqldb=pymysql.connect(host="127.0.0.1",port=confloader.service['services']['mysql']['port'], user="guxi",passwd="dHtFkI6g",db="gsv_file_list")
     print("[{1}]db connection ok".format(0,time.asctime( time.localtime(time.time()) )))
-except Exception as e:
-    print(e)
-    enable_mysql=False
+    return mysqldb
 @sio.on('connect')
 def connect(sid, environ):
     print('logserv - connect ', sid)
@@ -29,10 +27,11 @@ def connect(sid, environ):
 @sio.on('update')
 def update(sid, data):
     global db
-    global mysqldb
+    #global mysqldb
     print(data)
     if enable_mysql:
         try:
+            mysqldb=conn_db()
             sql2='INSERT INTO psplog(panid,phase,val,max)VALUES("{0}","{1}","{2}","{3}");'.format(
                 data['id'],
                 data['phase'],
@@ -49,10 +48,11 @@ def update(sid, data):
             mysqldb.commit()
             lines=cur.fetchall()
             lines=[{'id':l[2],'phase':l[3],'val':l[4],'max':l[5]} for l in lines]
+            mysqldb.close()
             sio.emit('progress_upgrade_server',data=lines)
         except Exception as e:
             print(e)
-            
+
 
     else:
         if data['id'] in db:
@@ -80,7 +80,9 @@ def disconnect(sid):
 
 
 if __name__ == '__main__':
-    port = 30001
+    confloader=conf()
+    confloader.load('service')
+    port = confloader.service['services']['log']['port']
     if len(sys.argv) >= 2:
         port = int(sys.argv[1])
     print("creating remote port forward...")
