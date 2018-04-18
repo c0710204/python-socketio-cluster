@@ -31,8 +31,8 @@ def update(sid, data):
     #print(data)
     if enable_mysql:
         try:
-            with conn_db() as mysqldb:
-                with mysqldb.cursor() as cur:
+            with conn_db() as cur:
+                #with mysqldb.cursor() as cur:
                     sql2='INSERT INTO psplog(panid,phase,val,max)VALUES("{0}","{1}","{2}","{3}");'.format(
                         data['id'],
                         data['phase'],
