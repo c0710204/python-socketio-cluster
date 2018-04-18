@@ -31,30 +31,33 @@ def update(sid, data):
     #print(data)
     if enable_mysql:
         try:
-            with conn_db() as mysqldb:
-                with mysqldb.cursor() as cur:
-                    sql2='INSERT INTO psplog(panid,phase,val,max)VALUES("{0}","{1}","{2}","{3}");'.format(
-                        data['id'],
-                        data['phase'],
-                        data['val'],
-                        data['max']
-                    )
-                    cur.execute(sql2)
-                    mysqldb.commit()
-                    sql="select * from psplog where time in (SELECT max(time) FROM gsv_file_list.psplog group by panid) order by time"
+            mysqldb=conn_db()
+            with mysqldb.cursor() as cur:
+                sql2='INSERT INTO psplog(panid,phase,val,max)VALUES("{0}","{1}","{2}","{3}");'.format(
+                    data['id'],
+                    data['phase'],
+                    data['val'],
+                    data['max']
+                )
+                cur.execute(sql2)
+                mysqldb.commit()
+                sql="select * from psplog where time in (SELECT max(time) FROM gsv_file_list.psplog group by panid) order by time"
 
-                    cur.execute(sql)
-                    mysqldb.commit()
-                    lines=cur.fetchall()
-                    lines=[{'id':l[2],'phase':l[3],'val':l[4],'max':l[5]} for l in lines]
+                cur.execute(sql)
+                mysqldb.commit()
+                lines=cur.fetchall()
+                lines=[{'id':l[2],'phase':l[3],'val':l[4],'max':l[5]} for l in lines]
 
-                    sio.emit('progress_upgrade_server',data=lines)
+                sio.emit('progress_upgrade_server',data=lines)
         except Exception as e:
             print(e)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
-
+        finally:
+            if mysqldb:
+                mysqldb.close()
+                del mysqldb
 
     else:
         if data['id'] in db:
