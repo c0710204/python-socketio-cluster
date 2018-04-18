@@ -31,6 +31,7 @@ class pspnet_app_server(app_server):
                 sleep(10)
 
 
+
     def __init__(self,*args):
         confloader=conf()
         confloader.load('service')
@@ -67,8 +68,9 @@ class pspnet_app_server(app_server):
                 print("[{1}]sending request : {0} image".format(info[1],time.asctime( time.localtime(time.time()) )))
                 sys.stdout.flush()
                 break
-            except OperationalError as e:
+            except pymysql.err.OperationalError as e:
                 #lose connect
+                print(e)
                 self.reconn_db()
             except Exception as e:
                 print(e)
