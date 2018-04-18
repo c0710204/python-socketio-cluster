@@ -36,8 +36,9 @@ class pre(task):
     def run(self, args_s):
         args_d = json.loads(args_s)
         iname = args_d['panid']
-        self.socketIO.emit('update', {'id': iname, "phase": 1, 'val': -1, 'max': -1})
-        self.socketIO.wait(seconds=1)
+        self.sio_auto(self.socketIO,'update', {'id': iname, "phase": 1, 'val': -1, 'max': -1})
+
+
         print("{0} start pre".format(args_d['local_id']))
         pre_process.pre_process(
             namedtuple('Struct', args_d.keys())(*args_d.values()))

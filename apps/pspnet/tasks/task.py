@@ -17,7 +17,12 @@ class task():
     """
     mainthread = False
     handler_type = 'None'
-
+    def sio_auto(self,sio,a,b):
+        try:
+            sio.emit(a,b)
+            sio.wait(seconds=1)
+        except Exception as e:
+            print(e)
     def prepare(self):
         """
         using to init before running code
