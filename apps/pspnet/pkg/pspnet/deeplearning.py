@@ -15,6 +15,12 @@ import tensorflow as tf
 import uuid
 from socketIO_client import SocketIO, LoggingNamespace
 pspnet_keep=None
+def sio_auto(sio,a,b):
+        try:
+            sio.emit(a,b)
+            sio.wait(seconds=1)
+        except Exception as e:
+            print(e)
 def deep_process(args):
     global pspnet_keep
     from os import listdir
@@ -77,7 +83,7 @@ def deep_process(args):
             iname=a.split('_-_')[0]
             break
         except Exception as e:
-            pass                
+            pass
     args.socketIO.emit('update',{'id':iname,"phase":2,'val':0,'max':len(onlyfiles)})
     args.socketIO.wait(seconds=1)
     for fpath in tqdm.tqdm(onlyfiles):
@@ -101,7 +107,7 @@ def deep_process(args):
         scale,y1,y2,x1,x2,fpath,iname=cache[i]
         prediction = padded_prediction[i,0:y2-y1, 0:x2-x1, :]
         np.save(args.output_path+'/'+fpath,prediction)
-      args.socketIO.emit('update',{'id':iname,"phase":2,'val':ind,'max':len(onlyfiles)})
+      sio_auto(args.socketIO,'update',{'id':iname,"phase":2,'val':ind,'max':len(onlyfiles)})
       #args.socketIO.wait(seconds=1)
       cache=[]
       image_cache=[]
@@ -121,7 +127,7 @@ def deep_process(args):
         cache=[]
         image_cache=[]
         filename=fpath.split('_-_')
-        args.socketIO.emit('update',{'id':iname,"phase":2,'val':ind,'max':len(onlyfiles)})
+        sio_auto(args.socketIO,'update',{'id':iname,"phase":2,'val':ind,'max':len(onlyfiles)})
         #args.socketIO.wait(seconds=1)
 
 if __name__=='__main__':
