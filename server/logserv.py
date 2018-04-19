@@ -28,7 +28,7 @@ def connect(sid, environ):
 
 @sio.on('update')
 def update(sid, data):
-    global db
+    #global db
     #global mysqldb
     #print(data)
     if enable_mysql:
@@ -43,7 +43,7 @@ def update(sid, data):
                 )
                 cur.execute(sql2)
                 mysqldb.commit()
-                sql="select * from psplog where time in (SELECT max(time) FROM gsv_file_list.psplog group by panid) order by time"
+                sql="select * from psplog where time in (SELECT max(time) FROM gsv_file_list.psplog group by panid) order by time limit 300"
 
                 cur.execute(sql)
                 mysqldb.commit()
@@ -61,25 +61,6 @@ def update(sid, data):
                 mysqldb.close()
                 del mysqldb
 
-    else:
-        if data['id'] in db:
-            if (data['max']):
-                db[data['id']]['max'] = data['max']
-
-            if (data['val']):
-                db[data['id']]['val'] = data['val']
-
-            if (data['phase']):
-                db[data['id']]['phase'] = data['phase']
-        else:
-            data['label']=data['id']
-            db[data['id']]=data
-        try:
-            collection.insert_one(data)
-        except Exception as e:
-            pass
-        sio.emit('progress_upgrade_server',data=db.values())
-        pass
 
 @sio.on('disconnect')
 def disconnect(sid):
