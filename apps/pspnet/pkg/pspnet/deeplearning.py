@@ -84,8 +84,8 @@ def deep_process(args):
             break
         except Exception as e:
             pass
-    args.socketIO.emit('update',{'id':iname,"phase":2,'val':0,'max':len(onlyfiles)})
-    args.socketIO.wait(seconds=1)
+
+    sio_auto(args.socketIO,'update',{'id':iname,"phase":2,'val':0,'max':len(onlyfiles)})
     for fpath in tqdm.tqdm(onlyfiles):
       #read
       ind+=1
