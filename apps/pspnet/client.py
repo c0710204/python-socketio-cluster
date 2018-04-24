@@ -65,6 +65,9 @@ def sshdownload(data):
 
 
 def sshupload(data, path):
+    import os
+    if not os.path.exists(path):
+        raise FileNotFoundError("{0} not exists".format(path))
     global mutex_ssh
     mutex_ssh.acquire()
     print("uploading {0}...".format(data['input_path']))

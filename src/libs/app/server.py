@@ -29,7 +29,6 @@ class app_server(socketio.Namespace):
             self.process_result(data['arg'])
         else:
             self.handle_error(data['err'],data['arg'])
-
         self.event('free',sid)
     def handle_error(self,args):
         raise NotImplementedError()
