@@ -67,6 +67,5 @@ class image_combine(task):
         #             os.remove(filename)
         #         except Exception:
         #             pass
-        self.socketIO.emit('update', {'id': iname, "phase": 3, 'val': 1, 'max': 1})
-        self.socketIO.wait(seconds=1)
+        self.sio_auto(self.socketIO,'update', {'id': iname, "phase": 3, 'val': 1, 'max': 1})
         self.responseQueue.put(args_d['local_id'])
