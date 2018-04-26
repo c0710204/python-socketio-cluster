@@ -93,7 +93,7 @@ class pspnet_app_server(app_server):
                 cursor.execute(sql1)
                 self.db.commit()
                 break
-            except OperationalError as e:
+            except pymysql.err.OperationalError as e:
                 #lose connect
                 self.reconn_db()
 
@@ -107,7 +107,7 @@ class pspnet_app_server(app_server):
                 cursor.execute(sql2)
                 self.db.commit()
                 break
-            except OperationalError as e:
+            except pymysql.err.OperationalError as e:
                 #lose connect
                 self.reconn_db()
             except Exception as e:

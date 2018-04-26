@@ -32,6 +32,7 @@ def update(sid, data):
     #global mysqldb
     #print(data)
     if enable_mysql:
+        mysqldb=None
         try:
             mysqldb=conn_db()
             with mysqldb.cursor() as cur:
