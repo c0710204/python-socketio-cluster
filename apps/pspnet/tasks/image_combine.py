@@ -68,4 +68,4 @@ class image_combine(task):
         #         except Exception:
         #             pass
         self.sio_auto(self.socketIO,'update', {'id': iname, "phase": 3, 'val': 1, 'max': 1})
-        self.responseQueue.put(args_d['local_id'])
+        #self.responseQueue.put(args_d['local_id'])
