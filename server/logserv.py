@@ -85,7 +85,7 @@ if __name__ == '__main__':
             print("starting at local port {0}...".format(port))
             ge_server.start()
             gevent.sleep(300)
-            print("starting at local port {0}...".format(port))
+            print("stopping at local port {0}...".format(port))
             ge_server.stop(10)
         except Exception as e:
             print(e)
