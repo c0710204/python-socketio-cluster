@@ -79,5 +79,16 @@ if __name__ == '__main__':
 
     print("starting at local port {0}...".format(port))
 
-    pywsgi.WSGIServer(('', port), app,handler_class=WebSocketHandler).serve_forever()
+    ge_server=pywsgi.WSGIServer(('', port), app,handler_class=WebSocketHandler)
+    while True:
+        try:
+            ge_server.start()
+            time.sleep(300)
+            ge_server.stop(10)
+        except Exception as e:
+            print(e)
+            ge_server.stop(10)
+            break
+
+
     #eventlet.wsgi.server(eventlet.listen(('', port)), app)
