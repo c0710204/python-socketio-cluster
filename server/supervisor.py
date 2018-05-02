@@ -1,10 +1,10 @@
 import sys
 import subprocess
 def main():
-    if len(sys.argv>1):
+    if len(sys.argv)>1:
         target=sys.argv[1]
         autorestart=9999999
-        if len(sys.argv>2):
+        if len(sys.argv)>2:
             autorestart=sys.argv[2]
         while (True):
             try:
