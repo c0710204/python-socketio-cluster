@@ -18,7 +18,7 @@ pspnet_keep=None
 def sio_auto(sio,a,b):
         try:
             sio.emit(a,b)
-            sio.wait(seconds=1)
+            #sio.wait(seconds=1)
         except Exception as e:
             print(e)
 def deep_process(args):
