@@ -33,6 +33,11 @@ client:
   host: localhost
   port: 50022
   <<: *account_02
+ -
+  name: guxi_jp
+  host: guxiang.net.cn
+  port: 22
+  <<: *account_02
 # -
 #  name: star_gpu_local
 #  host: localhost
@@ -45,7 +50,7 @@ client_type:
     - pelican03
     - pelican04
   db:
-    - star_gpu_on_star_lab
+    - guxi_jp
   core:
 #    - star_gpu_on_star_lab
 #    - star_gpu_local
