@@ -91,7 +91,7 @@ def deep_process(args):
       #read
       ind+=1
       padded_img=np.load(args.input_path+'/'+fpath)
-      iname,scale,y1,y2,x1,x2,_=fpath.split('_-_')
+      iname,scale,y1,y2,x1,x2,_=fpath.split('_-123-_')
       y1=int(y1)
       y2=int(y2)
       x1=int(x1)
