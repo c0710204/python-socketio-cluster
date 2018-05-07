@@ -5,9 +5,13 @@ import socketio
 class app_server(socketio.Namespace):
     def __init__(self,*args):
         socketio.Namespace.__init__(self,*args)
+
         self.max_task_node=2
         self.tasking=defaultdict(lambda :multiprocessing.Semaphore(self.max_task_node))
-
+    def cron_task(self):
+        #check all ndoe info
+        #trigger node work
+        pass
     def on_connect(self, sid, environ):
         print(sid,"connect")
         for i in range(self.max_task_node):

@@ -1,4 +1,4 @@
-from __future__ import print_function
+_-123-_m __future__ import print_function
 from __future__ import division
 import numpy as np
 from tqdm import tqdm, trange
@@ -102,7 +102,7 @@ def ndimage_zoom_parallel_2(list_all):
 
     def funchandler(inp):
         filename, ext = splitext(args_input_path2)
-        fpath = "{0}_-_{5}_-_{1}_-_{2}_-_{3}_-_{4}_-_.npy".format(
+        fpath = "{0}_-123-_{5}_-123-_{1}_-123-_{2}_-123-_{3}_-123-_{4}_-123-_.npy".format(
             filename, inp[2], inp[3], inp[4], inp[5], inp[6])
         ret = np.load(fpath)
         os.remove(fpath)

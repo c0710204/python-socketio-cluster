@@ -73,6 +73,7 @@ def deep_process(args):
 
 
     if args.input_path_filter:
+        iname=args.input_path_filter
         onlyfiles1=onlyfiles
         onlyfiles=[]
         for fpath in onlyfiles1:
@@ -80,7 +81,7 @@ def deep_process(args):
                 onlyfiles.append(fpath)
     for a in onlyfiles:
         try:
-            iname=a.split('_-_')[0]
+            iname=a.split('_-123-_')[0]
             break
         except Exception as e:
             pass
@@ -126,7 +127,7 @@ def deep_process(args):
           np.save(args.output_path+'/'+fpath,prediction)
         cache=[]
         image_cache=[]
-        filename=fpath.split('_-_')
+        filename=fpath.split('_-123-_')
         sio_auto(args.socketIO,'update',{'id':iname,"phase":2,'val':ind,'max':len(onlyfiles)})
         #args.socketIO.wait(seconds=1)
 

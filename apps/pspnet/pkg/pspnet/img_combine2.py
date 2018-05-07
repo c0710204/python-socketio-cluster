@@ -25,7 +25,7 @@ def img_combine2(args):
     def funchandler(inp):
         if len(inp) == 7:
             filename, ext = splitext(args.input_path2)
-            return np.load("{0}_-_{5}_-_{1}_-_{2}_-_{3}_-_{4}_-_.npy".format(
+            return np.load("{0}_-123-_{5}_-123-_{1}_-123-_{2}_-123-_{3}_-123-_{4}_-123-_.npy".format(
                 filename, inp[2], inp[3], inp[4], inp[5], inp[6]))
 
     return img_combine_func2.predict_multi_scale(funchandler, img_shape,
