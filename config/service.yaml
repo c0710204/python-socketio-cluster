@@ -3,7 +3,7 @@ services:
     port: 30031
     type: sio
   log:
-    port: 30001
+    port: 30091
     type: sio
   app_comm:
     port: 30041
