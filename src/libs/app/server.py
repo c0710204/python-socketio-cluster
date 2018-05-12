@@ -12,8 +12,14 @@ class app_server(socketio.Namespace):
         #check all ndoe info
         #trigger node work
         pass
+    def on_client_init(self,sid,data):
+        #registe client to the server
+        #registe task thread to server
+        #init task thread
+        pass
     def on_connect(self, sid, environ):
         print(sid,"connect")
+
         for i in range(self.max_task_node):
             self.emit("ask_init",room=sid)
     def event(self,noti,sid):

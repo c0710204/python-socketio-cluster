@@ -61,7 +61,7 @@ class task():
         using to init before running code
         """
         self.remote_uuid = "{0}{1}".format(uuid.uuid4(), "_deeplearning")
-        self.socketIO = SocketIO('localhost', 30001, LoggingNamespace)
+        self.socketIO = SocketIO('localhost', 30091, LoggingNamespace)
 
 
 class pspnet_pre(task):
@@ -335,7 +335,7 @@ def main():
 
     for task in tasks:
         task.prepare()
-    asio = async_socketIO(SocketIO('localhost', 30021))
+    asio = async_socketIO(SocketIO('localhost', 30041))
 
     sio_pspent_info = asio.socketIO.define(Pspnet_namespace, '/pspnet')
 

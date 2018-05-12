@@ -28,4 +28,4 @@ class task():
         using to init before running code
         """
         self.remote_uuid = "{0}{1}".format(uuid.uuid4(), "_deeplearning")
-        self.socketIO = SocketIO('localhost', 30001, LoggingNamespace)
+        self.socketIO = SocketIO('localhost', 30091, LoggingNamespace)

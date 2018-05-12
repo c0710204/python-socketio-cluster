@@ -23,7 +23,7 @@ srv_handle=srv.handler()
 node_thread_number =4
 
 if __name__ == '__main__':
-    port = 30021
+    port = 30041
     print("starting at local port {0}...".format(port))
     sio.register_namespace(srv_handle('/task'))
     pywsgi.WSGIServer(('', port), app,handler_class=WebSocketHandler).serve_forever()

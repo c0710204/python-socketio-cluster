@@ -134,7 +134,7 @@ def deep_process(args):
 if __name__=='__main__':
 
   remote_uuid="{0}{1}".format(uuid.uuid4(),"_deeplearning")
-  socketIO=SocketIO('localhost', 30001, LoggingNamespace)
+  socketIO=SocketIO('localhost', 30091, LoggingNamespace)
   parser = argparse.ArgumentParser()
   parser.add_argument('-m', '--model', type=str, default='pspnet50_ade20k',
                       help='Model/Weights to use',

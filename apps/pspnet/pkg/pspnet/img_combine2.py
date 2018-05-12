@@ -35,7 +35,7 @@ def img_combine2(args):
 
 if __name__ == '__main__':
     remote_uuid = "{0}{1}".format(uuid.uuid4(), "_imagecombine")
-    socketIO = SocketIO('localhost', 30001, LoggingNamespace)
+    socketIO = SocketIO('localhost', 30091, LoggingNamespace)
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-m',

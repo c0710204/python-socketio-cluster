@@ -186,13 +186,13 @@ if __name__ == "__main__":
 
     #create tunnel to remote server
 
-    asio = async_socketIO(SocketIO('localhost', 30021))
+    asio = async_socketIO(SocketIO('localhost', 30041))
 
     sio_pspent_info = asio.socketIO.define(Pspnet_namespace, '/pspnet')
     asio.background()
 
     remote_uuid = "{0}{1}".format(uuid.uuid4(), "_deeplearning")
-    socketIO = SocketIO('localhost', 30001, LoggingNamespace)
+    socketIO = SocketIO('localhost', 30091, LoggingNamespace)
 
     while (1):
         #print("waiting for task")

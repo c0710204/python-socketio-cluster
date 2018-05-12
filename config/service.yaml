@@ -6,7 +6,7 @@ services:
     port: 30001
     type: sio
   app_comm:
-    port: 30021
+    port: 30041
     type: sio
   ssh:
     port: 50022

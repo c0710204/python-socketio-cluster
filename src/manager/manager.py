@@ -13,7 +13,7 @@ def main():
     args=parser.parse_args()
     cli=importlib.import_module("apps.{0}.client".format(args.app))
     cli_handle=cli.handler()
-    asio = async_socketIO(SocketIO('localhost', 30021))
+    asio = async_socketIO(SocketIO('localhost', 30041))
     sio_pspent_info = asio.socketIO.define(cli_handle, '/task')
     print("ready to receive order")
     asio.background()
