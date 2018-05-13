@@ -18,6 +18,8 @@ class task():
     mainthread = False
     handler_type = 'None'
     def sio_auto(self,sio,a,b):
+        if sio is None:
+            return
         try:
             sio.emit(a,b)
             #sio.wait(seconds=1)
@@ -28,4 +30,7 @@ class task():
         using to init before running code
         """
         self.remote_uuid = "{0}{1}".format(uuid.uuid4(), "_deeplearning")
-        self.socketIO = SocketIO('localhost', 30091, LoggingNamespace)
+        try:
+            self.socketIO = SocketIO('localhost', 30091, LoggingNamespace)
+        except Exception as e:
+            self.socketIO=None

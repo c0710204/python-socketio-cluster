@@ -16,6 +16,8 @@ import uuid
 from socketIO_client import SocketIO, LoggingNamespace
 pspnet_keep=None
 def sio_auto(sio,a,b):
+        if sio is None:
+            return
         try:
             sio.emit(a,b)
             #sio.wait(seconds=1)
