@@ -31,6 +31,6 @@ class task():
         """
         self.remote_uuid = "{0}{1}".format(uuid.uuid4(), "_deeplearning")
         try:
-            self.socketIO = SocketIO('localhost', 30091, LoggingNamespace)
+            self.socketIO = SocketIO('localhost', 30091, LoggingNamespace,wait_for_connection=False)
         except Exception as e:
             self.socketIO=None
