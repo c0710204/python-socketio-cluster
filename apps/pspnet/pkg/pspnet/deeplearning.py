@@ -93,8 +93,14 @@ def deep_process(args):
       #read
       ind+=1
       padded_img=np.load(args.input_path+'/'+fpath)
-      print(fpath,fpath.split('_-123-_'))
-      iname,scale,y1,y2,x1,x2,_=fpath.split('_-123-_')
+      #print(fpath,fpath.split('_-123-_'))
+      try:
+          iname,scale,y1,y2,x1,x2,_=fpath.split('_-123-_')
+      except Exception as e:
+          try:
+              iname,scale,y1,y2,x1,x2,_=fpath.split('_-_')
+          except Exception as e:
+              raise e
       y1=int(y1)
       y2=int(y2)
       x1=int(x1)
