@@ -1,11 +1,14 @@
-import gevent
-import socketio
 import os
 import sys
 import time
+
+import gevent
 import pymysql
-from src.libs.conf.conf import conf
+import socketio
 from gevent import pywsgi
+
+from src.libs.conf.conf import conf
+
 #from geventwebsocket.handler import WebSocketHandler
 #from pymongo import MongoClient
 sio = socketio.Server(async_mode='gevent')
