@@ -37,34 +37,34 @@ class client():
 def ftunnel(*args):
     while (1):
         try:
-            client = args[-1]
+            client_loc = args[-1]
             cmd = "ssh -NL {0}:{1}:{2} {3}@{4} -p {5} >/dev/null 2>&1".format(
-                args[0], args[1], args[2], client.username, client.host,
-                client.port)
+                args[0], args[1], args[2], client_loc.username, client_loc.host,
+                client_loc.port)
             logging.debug(cmd)
             ret = subprocess.call(cmd, shell=True)
             logging.warning("[connection][{}]return {},restarting...".format(
-                client.uuid, ret))
+                client_loc.uuid, ret))
             time.sleep(3)
         except Exception as e:
-            logging.warning("[connection][{}]{}".format(client.uuid, e))
+            logging.warning("[connection][{}]{}".format(client_loc.uuid, e))
 
 
 def rftunnel(*args):
     while (1):
         try:
-            client = args[-1]
+            client_loc = args[-1]
             cmd = "ssh -NR {0}:{1}:{2} {3}@{4} -p {5} >/dev/null 2>&1".format(
-                args[0], args[1], args[2], client.username, client.host,
-                client.port)
+                args[0], args[1], args[2], client_loc.username, client_loc.host,
+                client_loc.port)
             logging.debug(cmd)
             ret = subprocess.call(cmd, shell=True)
             logging.warning("[connection][{}]return {},restarting...".format(
-                client.uuid, ret))
+                client_loc.uuid, ret))
             time.sleep(3)
         except Exception as e:
             # raise e
-            logging.warning("[connection][{}]{}".format(client.uuid, e))
+            logging.warning("[connection][{}]{}".format(client_loc.uuid, e))
 
 
 if __name__ == "__main__":
