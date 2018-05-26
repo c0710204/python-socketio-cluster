@@ -34,6 +34,11 @@ client:
   port: 50022
   <<: *account_02
  -
+  name: guxi_us_2gb
+  host: 23.95.18.57
+  port: 22
+  <<: *account_02
+ -
   name: guxi_jp
   host: guxiang.net.cn
   port: 22
@@ -55,7 +60,7 @@ client_type:
     - pelican03
     - pelican04
   db:
-    - guxi_jp
+    - guxi_us_2gb
 #    - hystad_mysql    
   core:
 #    - star_gpu_on_star_lab
