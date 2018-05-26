@@ -8,7 +8,9 @@ import time
 import argparse
 import importlib
 from gevent import pywsgi
-from geventwebsocket.handler import WebSocketHandler
+
+from src.libs.conf.conf import conf
+#from geventwebsocket.handler import WebSocketHandler
 sio = socketio.Server(async_mode='gevent')
 app = socketio.Middleware(sio)
 
@@ -23,7 +25,10 @@ srv_handle=srv.handler()
 node_thread_number =4
 
 if __name__ == '__main__':
-    port = 30041
+    confloader = conf()
+    confloader.load("service")
+    port = confloader.service['services']['app_comm']['port']
     print("starting at local port {0}...".format(port))
     sio.register_namespace(srv_handle('/task'))
-    pywsgi.WSGIServer(('', port), app,handler_class=WebSocketHandler).serve_forever()
+    #pywsgi.WSGIServer(('', port), app,handler_class=WebSocketHandler).serve_forever()
+    pywsgi.WSGIServer(('', port), app).serve_forever()

@@ -1,7 +1,9 @@
 account_01: &account_01
+ type: ssh
  username: guxi
  password: cft6&UJM
 account_02: &account_02
+ type: ssh
  username: guxi
  password: dHtFkI6g
 
@@ -39,6 +41,13 @@ client:
   port: 22
   <<: *account_02
  -
+  name: star_local
+  host: star.eece.oregonstate.edu
+  port: 22
+  type: local
+  username: guxi
+  password: cft6&UJM  
+ -
   name: hystad_mysql
   host: 10.215.3.15
   port: 22
@@ -60,7 +69,8 @@ client_type:
   core:
 #    - star_gpu_on_star_lab
 #    - star_gpu_local
-    - local
+    - star_local
+#    - local
 proxy:
   service:
     db:

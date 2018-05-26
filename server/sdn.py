@@ -101,6 +101,10 @@ if __name__ == "__main__":
 
                 for node_client in client_list:
                     for node_server in config['client_type'][server_node_type]:
+                        if len([x for x in config['client']if x['name']==node_server and x['type']=='local'])>0:
+                            node_server='local'
+                        if len([x for x in config['client']if x['name']==node_client and x['type']=='local'])>0:
+                            node_client='local'
                         config_connection.append(
                             {
                                 'from': {'server': node_client, 'port': client_port},
@@ -109,7 +113,8 @@ if __name__ == "__main__":
                         )
 
     for c in config['client']:
-        clients[c['name']] = client(c['host'], c['username'], c['password'],
+        if c['type']=='ssh':
+            clients[c['name']] = client(c['host'], c['username'], c['password'],
                                     c['port'], c['name'])
     inner_base = 43000
     for conn in config_connection:  # config['connection']:
