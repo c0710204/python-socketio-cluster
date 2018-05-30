@@ -22,7 +22,7 @@ sql={
 }
 
 #run inserts
-with mysqldb.cursor() as cur:
+with db.cursor() as cur:
     for fp in tqdm.tqdm(f):
         panid=os.path.basename(fp)[:-4]
         print("|{0}|{1}|\n".format(fp,panid))
