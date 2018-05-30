@@ -1,7 +1,7 @@
 #load ignore list
 
 #scan local files
-# scan_path='.'
+# scan_path='../'
 scan_path="/scratch/guxi/googlestreeview_download/temp/DownloadedImages/"
 from os import walk
 import os
@@ -12,7 +12,7 @@ import pymysql
 for (dirpath, dirnames, filenames) in walk(scan_path):
     for fn in tqdm.tqdm(filenames):
         if os.path.splitext(fn)[1]==".jpg":
-            f.append(os.path.abspath(scan_path+'/'+dirpath+'/'+fn))
+            f.append(os.path.abspath(dirpath+'/'+fn))
 # print(f)
 # exit()
 #init connect
