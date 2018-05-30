@@ -6,8 +6,10 @@ from os import walk
 import os
 
 f = []
+import tqdm
+import pymysql
 for (dirpath, dirnames, filenames) in walk(scan_path):
-    for fn in filenames:
+    for fn in tqdm.tqdm(filenames):
         if os.path.splitext(fn)[1]==".jpg":
             f.append(os.path.relpath(scan_path+'/'+dirpath+'/'+fn))
 print(len(f))
@@ -18,7 +20,12 @@ sql={
     "tasks":"INSERT INTO `gsv_file_list`.`tasks`(`pid`,`status`,`locker`,`info`)VALUES(\"{0}\",\"init\",\"\",\"\");",
     "files":"INSERT INTO `gsv_file_list`.`files`(`pid`,`path`,`resultpath`)VALUES(\"{0}\",\"{1}\",\"{2}\");"
 }
-import tqdm
+
 #run inserts
-for fp in tqdm.tqdm(f):
-    pass
+with mysqldb.cursor() as cur:
+    for fp in tqdm.tqdm(f):
+        panid=os.path.basename(fp)[:-4]
+        print("|{0}|{1}|\n".format(fp,panid))
+        exit()
+        #cur.execute(sql['files'].format(,fp,"/scratch/guxi/googlestreeview_download/result/"))
+        #mysqldb.commit()
