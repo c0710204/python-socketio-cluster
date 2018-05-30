@@ -17,7 +17,7 @@ print(len(f))
 db=pymysql.connect(host="10.215.3.15",port=3306, user="guxi",passwd="dHtFkI6g",db="gsv_file_list")
 
 sql={
-    "tasks":"INSERT INTO `gsv_file_list`.`tasks`(`pid`,`status`,`locker`,`info`)VALUES(\"{0}\",\"init\",\"\",\"\");",
+    "tasks":"INSERT INTO `gsv_file_list`.`tasks`(`pid`,`status`,`locker`,`info`)VALUES(\"{0}\",\"init\",\"-1\",\"\");",
     "files":"INSERT INTO `gsv_file_list`.`files`(`pid`,`path`,`resultpath`)VALUES(\"{0}\",\"{1}\",\"{2}\");"
 }
 
@@ -27,6 +27,9 @@ with db.cursor() as cur:
         panid=os.path.basename(fp)[:-4]
         # print("|{0}|{1}|\n".format(fp,panid))
         # exit()
-        cur.execute(sql['files'].format(panid,fp,"/scratch/guxi/googlestreeview_download/result/"))
-        cur.execute(sql['tasks'].format(panid))
-        db.commit()
+        try:    
+            cur.execute(sql['files'].format(panid,fp,"/scratch/guxi/googlestreeview_download/result/"))
+            cur.execute(sql['tasks'].format(panid))
+            db.commit()
+        except:
+            pass
