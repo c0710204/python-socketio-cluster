@@ -29,4 +29,4 @@ with db.cursor() as cur:
         # exit()
         cur.execute(sql['files'].format(panid,fp,"/scratch/guxi/googlestreeview_download/result/"))
         cur.execute(sql['tasks'].format(panid))
-        mysqldb.commit()
+        db.commit()
