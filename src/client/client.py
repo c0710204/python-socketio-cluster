@@ -1,7 +1,8 @@
+from __future__ import absolute_import
 import importlib
 import time
 from socketIO_client import SocketIO, LoggingNamespace, BaseNamespace
-from src.libs.network.async_socketIO import async_socketIO
+from ..libs.network.async_socketIO import async_socketIO
 import argparse
 def main():
 
