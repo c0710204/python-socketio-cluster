@@ -1,19 +1,27 @@
 from __future__ import print_function
 from __future__ import division
-from task import task
+
 import time
 import numpy as np
 from scipy import misc, ndimage
-from ..pkg.pspnet import pre_process
 from collections import namedtuple
-from ..pkg.pspnet import utils
 import uuid
 import multiprocessing
 import logging
 import sys
 import json
-class pre(task):
+try:
+    from task import task 
+    from ..pkg.pspnet import pre_process
+    from ..pkg.pspnet import utils
+except Exception as e:
+    print(__file__,e)
+    from . import task 
+    from ..pkg.pspnet import pre_process
+    from ..pkg.pspnet import utils
 
+class pre(task):
+    
     handler_type = "Process"
     handle = ""
     mainthread = False

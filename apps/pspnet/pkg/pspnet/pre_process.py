@@ -2,7 +2,10 @@
 import argparse
 import numpy as np
 from scipy import misc, ndimage
-import pre_process_func
+try:
+    from pre_process_func import predict_multi_scale
+except:
+    from .pre_process_func import predict_multi_scale
 from os.path import splitext, join, isfile,basename
 from socketIO_client import SocketIO, LoggingNamespace
 import uuid
@@ -21,7 +24,7 @@ def pre_process(args):
       filename, ext = splitext(args.output_path)
       np.save("{0}_-123-_{5}_-123-_{1}_-123-_{2}_-123-_{3}_-123-_{4}_-123-_.npy".format(filename,inp[2],inp[3],inp[4],inp[5],inp[6]), inp[0])
 
-  class_scores = pre_process_func.predict_multi_scale(funchandler, img, pspnet, EVALUATION_SCALES, args.sliding, args.flip)
+  class_scores = predict_multi_scale(funchandler, img, pspnet, EVALUATION_SCALES, args.sliding, args.flip)
 
 if __name__=='__main__':
   remote_uuid="{0}{1}".format(uuid.uuid4(),"_imagecombine")

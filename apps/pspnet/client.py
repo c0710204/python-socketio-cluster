@@ -1,8 +1,3 @@
-import apps.streetdownloader.pkg.streetview as streetview
-from src.libs.app.client import app_client
-from tasks.pre import pre
-from tasks.deeplearning import deeplearning
-from tasks.image_combine import image_combine
 import multiprocessing
 import sys
 from os.path import splitext, join, isfile, basename
@@ -11,6 +6,19 @@ from math import ceil
 import subprocess
 import logging
 import json
+
+from src.libs.app.client import app_client
+
+try: 
+    from tasks.pre import pre
+    from tasks.deeplearning import deeplearning
+    from tasks.image_combine import image_combine
+except Exception as e:
+    print(__file__,e)
+    from .tasks.pre import pre
+    from .tasks.deeplearning import deeplearning
+    from .tasks.image_combine import image_combine
+
 # config
 config_p1_folder = '/dev/shm/guxi/p1'
 config_p2_folder = '/dev/shm/guxi/p2'

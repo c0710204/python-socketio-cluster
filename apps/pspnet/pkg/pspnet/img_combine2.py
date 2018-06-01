@@ -1,6 +1,10 @@
 import argparse
 import numpy as np
 from scipy import misc, ndimage
+try:
+    from scipy.misc import imread 
+except:
+    from imageio import imread
 import img_combine_func2
 from os.path import splitext, join, isfile, basename
 import utils

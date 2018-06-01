@@ -2,7 +2,9 @@ from __future__ import absolute_import
 import importlib
 import time
 from socketIO_client import SocketIO, LoggingNamespace, BaseNamespace
-from ..libs.network import async_socketIO
+import sys
+sys.path.append('.')
+from src.libs.network.async_socketIO import async_socketIO
 import argparse
 def main():
 
@@ -11,7 +13,7 @@ def main():
     args=parser.parse_args()
     cli=importlib.import_module("apps.{0}.client".format(args.app))
     cli_handle=cli.handler()
-    asio = async_socketIO.async_socketIO(SocketIO('localhost', 30041))
+    asio = async_socketIO(SocketIO('star.eecs.oregonstate.edu', 30041))
     sio_pspent_info = asio.socketIO.define(cli_handle, '/task')
     print("ready to receive order")
     asio.background()
