@@ -39,7 +39,8 @@ class deeplearning(task):
     main Thread only
     """
     def prepare_mainthread(self):
-        assert(multiprocessing.current_process()=="MainProcess")
+        print("|{0}|\n".format(multiprocessing.current_process().name))
+        assert(multiprocessing.current_process().name=="Process-1")
         # init tensorflow
         from keras.backend.tensorflow_backend import set_session
         from keras import backend as K
@@ -56,7 +57,7 @@ class deeplearning(task):
             path="./pspnet/weights")
     
     def run(self):
-        assert(multiprocessing.current_process()=="MainProcess")
+        assert(multiprocessing.current_process().name=="Process-1")
         # print("waiting for task")
         # try:
         args_d = self.requestQueue.get()
