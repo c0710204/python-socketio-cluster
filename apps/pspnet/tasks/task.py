@@ -1,6 +1,6 @@
 import uuid
 from socketIO_client import SocketIO, LoggingNamespace, BaseNamespace
-class task():
+class task(object):
     """
     mainthread:
 
@@ -25,6 +25,8 @@ class task():
             #sio.wait(seconds=1)
         except Exception as e:
             print(e)
+    def ask_and_wait(self,args_d):
+        raise NotImplemented
     def prepare(self):
         """
         using to init before running code

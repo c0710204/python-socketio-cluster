@@ -30,7 +30,7 @@ def deep_process(args):
 
     onlyfiles = [f for f in listdir(args.input_path) if isfile(join(args.input_path, f))]
     import tqdm
-    batch_size=4
+    batch_size=16
     #***************************
     if (args.sess):
       print('try to use exists sess...')

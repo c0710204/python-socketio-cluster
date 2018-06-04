@@ -1,9 +1,14 @@
 from __future__ import print_function
 import colorsys
 import numpy as np
-from psp_tf.cityscapes_labels import trainId2label
-from psp_tf.ade20k_labels import ade20k_id2label
-from psp_tf.pascal_voc_labels import voc_id2label
+try:
+    from psp_tf.cityscapes_labels import trainId2label
+    from psp_tf.ade20k_labels import ade20k_id2label
+    from psp_tf.pascal_voc_labels import voc_id2label
+except:
+    from .psp_tf.cityscapes_labels import trainId2label
+    from .psp_tf.ade20k_labels import ade20k_id2label
+    from .psp_tf.pascal_voc_labels import voc_id2label
 
 def class_image_to_image(class_id_image, class_id_to_rgb_map):
     """Map the class image to a rgb-color image."""

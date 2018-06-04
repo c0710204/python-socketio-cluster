@@ -1,6 +1,9 @@
+from __future__ import absolute_import
 import importlib
 import time
 from socketIO_client import SocketIO, LoggingNamespace, BaseNamespace
+import sys
+sys.path.append('.')
 from src.libs.network.async_socketIO import async_socketIO
 import argparse
 import os
@@ -41,8 +44,9 @@ def main():
     cli_handle=cli.handler()
     #try get dns from remote
     
-    h=check_direct_access('app_comm')
-    asio = async_socketIO(SocketIO(h.host,h.port))
+#    h=check_direct_access('app_comm')
+#    asio = async_socketIO(SocketIO(h.host,h.port))
+    asio = async_socketIO(SocketIO('star.eecs.oregonstate.edu', 30041))
     sio_pspent_info = asio.socketIO.define(cli_handle, '/task')
     print("ready to receive order")
     asio.background()

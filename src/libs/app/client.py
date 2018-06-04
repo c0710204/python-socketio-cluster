@@ -7,6 +7,7 @@ from socketIO_client import SocketIO, LoggingNamespace, BaseNamespace
 class app_client(BaseNamespace):
     def __init__(self,*args):
         BaseNamespace.__init__(self,*args)
+        
         self.run_ready=multiprocessing.Lock()
         self.run_ready.acquire()
         self.prepare()
@@ -14,9 +15,12 @@ class app_client(BaseNamespace):
         """
         run on the start and init all
         """
+        self.metadata={}
         self.run_ready.release()
         pass
     def on_ask_init(self,*args):
+        info_pack=args[0]
+        self.metadata=info_pack
         self.emit("client_free", None)
     def on_connect(self, *args):
         #self.emit("client_free", None)
@@ -26,9 +30,9 @@ class app_client(BaseNamespace):
         p.start()
         return
     def run_mp(self,arg):
-        ret={"status":-1,"arg":arg,"err":""}
+        ret={'metadata':self.metadata,"status":-1,"arg":arg,"err":""}
         try:
-            ret={"status":1,"arg":self.run(arg)}
+            ret={'metadata':self.metadata,"status":1,"arg":self.run(arg)}
         except Exception as e:
             ret['err']="{0}".format(sys.exc_info())
             #raise e
