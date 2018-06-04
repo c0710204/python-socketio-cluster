@@ -30,16 +30,18 @@ class deeplearning(task):
         local_id = "{0}".format(uuid.uuid4())
         args_d['local_id'] = local_id
         self.requestQueue.put(args_d)
+        p={}
         while (1):
             p = self.responseQueue.get()
-            if p == local_id:
+            if p['id'] == local_id:
                 break
             self.responseQueue.put(p)
+        return p['tensor']
     """
     main Thread only
     """
     def prepare_mainthread(self):
-        print("|{0}|\n".format(multiprocessing.current_process().name))
+        #print("|{0}|\n".format(multiprocessing.current_process().name))
         assert(multiprocessing.current_process().name=="Process-1")
         # init tensorflow
         from keras.backend.tensorflow_backend import set_session
@@ -66,6 +68,6 @@ class deeplearning(task):
         args_d['remote_uuid'] = self.remote_uuid
         args_d['socketIO'] = self.socketIO
         global_arg = namedtuple('Struct', args_d.keys())(*args_d.values())
-        dpl.deep_process(global_arg)
-        self.responseQueue.put(args_d['local_id'])
+        ret=dpl.deep_process(global_arg)
+        self.responseQueue.put({'id':args_d['local_id'],'tensor':ret})
         time.sleep(1)

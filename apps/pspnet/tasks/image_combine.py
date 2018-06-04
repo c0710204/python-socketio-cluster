@@ -42,6 +42,9 @@ class image_combine(task):
         panid=iname
         ext = args_d['ext']
         filename = args_d['filename']
+
+        
+
         self.sio_auto(self.socketIO,'update', {'id': iname, "phase": 3, 'val': -1, 'max': -1})
         class_scores = img_combine2.img_combine2(
             namedtuple('Struct', args_d.keys())(*args_d.values()))

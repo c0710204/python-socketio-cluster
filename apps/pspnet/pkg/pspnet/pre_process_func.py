@@ -45,7 +45,7 @@ def predict_sliding(funchandler,full_image, net, flip_evaluation,scale):
       #socketIO.emit('update',{id:remote_uuid,val:rc,max:tile_rows*tile_cols})
       #socketIO.wait(seconds=1)
       pbar.set_description("Predicting tile {0}-{1}".format(row,col))
-      funchandler((padded_img, flip_evaluation,y1,y2,x1,x2,scale))
+      funchandler({"scale":scale,"col":col,"row":row,"flip_evaluation":flip_evaluation,"x1":x1,"x2":x2,"y1":y1,"y2":y2},padded_img)
   return 0
 
 
@@ -61,5 +61,6 @@ def predict_multi_scale(funchandler,full_image, net, scales, sliding_evaluation,
         if sliding_evaluation:
             predict_sliding(funchandler,scaled_img, net, flip_evaluation,scale)
         else:
+            raise NotImplemented
             funchandler((scaled_img, flip_evaluation))
   return 0

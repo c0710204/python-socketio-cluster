@@ -13,8 +13,10 @@ from keras import backend as K
 from psp_tf.pspnet import *
 import tensorflow as tf
 import uuid
+import cPickle as pkl
 from socketIO_client import SocketIO, LoggingNamespace
 pspnet_keep=None
+
 def sio_auto(sio,a,b):
         if sio is None:
             return
@@ -47,20 +49,8 @@ def deep_process(args):
         pspnet=args.model_ok
     else:
         if "pspnet50" in args.model:
-            #if pspnet_keep:
-                #pspnet=pspnet_keep
-            #else:
-                pspnet = PSPNet50(nb_classes=150, input_shape=(473, 473),
-                              weights=args.model)
-                #pspnet_keep=pspnet
-    #elif "pspnet101" in args.model:
-    #    if "cityscapes" in args.model:
-    #        pspnet = PSPNet101(nb_classes=19, input_shape=(713, 713),
-    #                           weights=args.model)
-    # #   if "voc2012" in args.model:
-    #        pspnet = PSPNet101(nb_classes=21, input_shape=(473, 473),
-    #                           weights=args.model)
-
+            pspnet = PSPNet50(nb_classes=150, input_shape=(473, 473),
+                            weights=args.model)
         else:
             print("Network architecture not implemented.")
     print('try to use exists sess... success')
@@ -72,73 +62,85 @@ def deep_process(args):
     cache=[]
     image_cache=[]
     ind=0
+    metadata=[]
 
 
-    if args.input_path_filter:
-        iname=args.input_path_filter
-        onlyfiles1=onlyfiles
-        onlyfiles=[]
-        for fpath in onlyfiles1:
-            if fpath.find(args.input_path_filter)>=0:
-                onlyfiles.append(fpath)
-    for a in onlyfiles:
-        try:
-            iname=a.split('_-123-_')[0]
-            break
-        except Exception as e:
-            pass
+    input_tensor=args.input
+    
+    data_npy=np.load(input_tensor['npy'])
 
-    sio_auto(args.socketIO,'update',{'id':iname,"phase":2,'val':0,'max':len(onlyfiles)})
-    for fpath in tqdm.tqdm(onlyfiles):
-      #read
-      ind+=1
-      padded_img=np.load(args.input_path+'/'+fpath)
-      #print(fpath,fpath.split('_-123-_'))
-      try:
-          iname,scale,y1,y2,x1,x2,_=fpath.split('_-123-_')
-      except Exception as e:
-          try:
-              iname,scale,y1,y2,x1,x2,_=fpath.split('_-_')
-          except Exception as e:
-              raise e
-      y1=int(y1)
-      y2=int(y2)
-      x1=int(x1)
-      x2=int(x2)
-      cache.append((scale,y1,y2,x1,x2,fpath,iname))
-      image_cache.append(padded_img)
-      #run
-      if len(cache)<batch_size:
-        continue
-      #print("dispath..")
-      padded_prediction=pspnet.predict(np.array(image_cache),  args.flip)
-      iname=""
-      for i in range(len(cache)):
-        scale,y1,y2,x1,x2,fpath,iname=cache[i]
-        prediction = padded_prediction[i,0:y2-y1, 0:x2-x1, :]
-        np.save(args.output_path+'/'+fpath,prediction)
-      sio_auto(args.socketIO,'update',{'id':iname,"phase":2,'val':ind,'max':len(onlyfiles)})
-      #args.socketIO.wait(seconds=1)
-      cache=[]
-      image_cache=[]
-      padded_prediction=[]
-    for fpath in onlyfiles:
-        try:
-            os.remove(args.input_path+'/'+fpath)
-        except Exception as e:
-                pass
-        pass
-    if len(image_cache)>0:
-        padded_prediction=pspnet.predict(np.array(image_cache),  args.flip)
-        for i in range(len(cache)):
-          scale,y1,y2,x1,x2,fpath,iname=cache[i]
-          prediction = padded_prediction[i,0:y2-y1, 0:x2-x1, :]
-          np.save(args.output_path+'/'+fpath,prediction)
-        cache=[]
-        image_cache=[]
-        filename=fpath.split('_-123-_')
-        sio_auto(args.socketIO,'update',{'id':iname,"phase":2,'val':ind,'max':len(onlyfiles)})
-        #args.socketIO.wait(seconds=1)
+    with open(input_tensor['pkl']) as f:
+        metadata = pkl.load(f)
+    filename, ext = splitext(input_tensor['npy'])
+    panid=os.path.basename(filename)
+
+
+    padded_prediction=np.zeros(data_npy.shape[:-1]+(150,))
+    print("{0} load ok...\n".format(input_tensor['npy']))
+    #sio_auto(args.socketIO,'update',{'id':iname,"phase":2,'val':0,'max':len(onlyfiles)})
+    for i_start in tqdm.trange(0,len(metadata),batch_size):
+        i_end=i_start+batch_size
+        if i_end>len(metadata):
+            i_end=len(metadata)
+        padded_prediction[i_start:i_end]=pspnet.predict(data_npy[i_start:i_end],  args.flip)
+
+    package={}
+    
+    for e in tqdm.tqdm(EVALUATION_SCALES):
+        index_list=[x for x,y in zip(range(len(metadata)),metadata) if y['scale']==e]
+        metadata_e=[y for x,y in zip(range(len(metadata)),metadata) if y['scale']==e]
+        p_npy="{0}/{1}_{2}.npy".format(args.output_path,panid,e)
+        p_pkl="{0}/{1}_{2}.pkl".format(args.output_path,panid,e)
+        package['{0}'.format(e)]={'pkl':p_pkl,'npy':p_npy}
+        print(index_list)
+        np.save(p_npy,padded_prediction[np.array(index_list)])
+        with open(p_pkl, "wb") as f:
+            pkl.dump(metadata_e, f)
+    #package={'pkl':"{0}/_{1}_metadata.pkl".format(args.output_path,panid),'npy':"{0}/_{1}_data.npy".format(args.output_path,panid)}
+
+    os.remove(input_tensor['npy'])
+    os.remove(input_tensor['pkl'])
+
+    return package
+
+    # for fpath in trange(len(metadata)):
+    #   #read
+    #   ind+=1
+    #   padded_img=data_npy[ind]
+    #   cache.append((scale,y1,y2,x1,x2,fpath,iname))
+    #   image_cache.append(padded_img)
+    #   #run
+    #   if len(cache)<batch_size:
+    #     continue
+    #   #print("dispath..")
+    #   padded_prediction=pspnet.predict(np.array(image_cache),  args.flip)
+    #   iname=""
+    #   for i in range(len(cache)):
+    #     scale,y1,y2,x1,x2,fpath,iname=cache[i]
+    #     prediction = padded_prediction[i,0:y2-y1, 0:x2-x1, :]
+    #     np.save(args.output_path+'/'+fpath,prediction)
+    #   #sio_auto(args.socketIO,'update',{'id':iname,"phase":2,'val':ind,'max':len(onlyfiles)})
+    #   #args.socketIO.wait(seconds=1)
+    #   cache=[]
+    #   image_cache=[]
+    #   padded_prediction=[]
+    # for fpath in onlyfiles:
+    #     try:
+    #         os.remove(args.input_path+'/'+fpath)
+    #     except Exception as e:
+    #             pass
+    #     pass
+    # if len(image_cache)>0:
+    #     padded_prediction=pspnet.predict(np.array(image_cache),  args.flip)
+    #     for i in range(len(cache)):
+    #       scale,y1,y2,x1,x2,fpath,iname=cache[i]
+    #       prediction = padded_prediction[i,0:y2-y1, 0:x2-x1, :]
+    #       np.save(args.output_path+'/'+fpath,prediction)
+    #     cache=[]
+    #     image_cache=[]
+    #     filename=fpath.split('_-123-_')
+    #     #sio_auto(args.socketIO,'update',{'id':iname,"phase":2,'val':ind,'max':len(onlyfiles)})
+    #     #args.socketIO.wait(seconds=1)
 
 if __name__=='__main__':
 

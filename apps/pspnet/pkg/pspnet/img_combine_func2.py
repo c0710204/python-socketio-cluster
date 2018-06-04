@@ -94,18 +94,26 @@ def ndimage_zoom_parallel(image, zoom, order, prefilter):
     ret = ret.reshape(ret.shape[0:-2] + (-1, ))
     return ret
 
-
+"""
+inside is process safe, variables could be used between functions
+"""
 def ndimage_zoom_parallel_2(list_all):
     from os.path import splitext, join, isfile
-    args_input_path2, scale, h_ori, w_ori, flip_evaluation, net, target_file, full_image_shape, sliding_evaluation = list_all
+    args_input_path2, scale, h_ori, w_ori, flip_evaluation, net, target_file, full_image_shape, sliding_evaluation,args = list_all
+
+    local_tensor=args.input['{0}'.format(scale)]
+    data_npy=np.load(local_tensor['npy'])
+    data_metadata=[]
+    with open(local_tensor['pkl']) as f:
+        data_metadata = pkl.load(f)
 
     def funchandler(inp):
-        filename, ext = splitext(args_input_path2)
-        fpath = "{0}_-123-_{5}_-123-_{1}_-123-_{2}_-123-_{3}_-123-_{4}_-123-_.npy".format(
-            filename, inp[2], inp[3], inp[4], inp[5], inp[6])
-        ret = np.load(fpath)
-        os.remove(fpath)
-        return ret
+        #found id in metadata and return numpy[id]
+        _,flip_evaluation, y1, y2, x1, x2,scale=inp
+        id_list=[x for x,y in zip(range(len(data_metadata)),data_metadata) if (y['x1']==x1 and y['x2']==x2 and y['y1']==y1 and y['y2']==y2)]
+        assert(len(id_list)==1)
+        id=id_list[0]
+        return data_npy[id].reshape(data_npy.shape[1:])
 
     full_image_shape2 = [
         int(h_ori * scale),
@@ -118,6 +126,9 @@ def ndimage_zoom_parallel_2(list_all):
         scaled_probs = funchandler((scaled_img, flip_evaluation))
     h, w = scaled_probs.shape[:2]
 
+    os.remove(local_tensor['npy'])
+    os.remove(local_tensor['pkl'])
+    
     probs = ndimage.zoom(
         scaled_probs, (1. * h_ori / h, 1. * w_ori / w, 1.),
         order=1,
@@ -140,7 +151,7 @@ def predict_multi_scale(funchandler, full_image_shape, net, scales,
             n = "/dev/shm/guxi/tmp/" + str(uuid.uuid4()) + '.npy'
             probs_inp.append(
                 (args.input_path2, scale, h_ori, w_ori, flip_evaluation, net,
-                 n, full_image_shape, sliding_evaluation))
+                 n, full_image_shape, sliding_evaluation,args.input))
 
         pool = Pool(processes=8)
         ret = pool.map(ndimage_zoom_parallel_2, probs_inp)

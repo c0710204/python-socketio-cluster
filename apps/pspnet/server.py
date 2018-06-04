@@ -42,7 +42,7 @@ class pspnet_app_server(app_server):
         print("[{1}]db connection ok".format(0,time.asctime( time.localtime(time.time()) )))
         sys.stdout.flush()
         app_server.__init__(self,*args)
-        self.max_task_node=2
+        self.max_task_node=4
     def handle_error(self,err,arg):
         print(err)
     def get_task(self):

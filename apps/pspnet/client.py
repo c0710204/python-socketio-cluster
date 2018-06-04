@@ -115,18 +115,20 @@ def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
     args_d['input_path'] = "./{0}{1}".format(panid, ext)
     args_d['output_path'] = "{2}/{0}{1}".format(panid, ext, config_p1_folder)
 
-    pspnet_pre_in.ask_and_wait(args_d=args_d)
+    result_pre=pspnet_pre_in.ask_and_wait(args_d=args_d)
     print("phase 2...")
     sys.stdout.flush()
     # args_d['sess']=sess
     # args_d['model_ok']=pspnet
+    args_d['input']=result_pre
     args_d['input_path'] = config_p1_folder + '/'
     args_d['input_path_filter'] = panid
     args_d['output_path'] = config_p2_folder + '/'
-    pspnet_dl_in.ask_and_wait(args_d)
+    result_dl=pspnet_dl_in.ask_and_wait(args_d)
 
     print("phase 3...")
     sys.stdout.flush()
+    args_d['input']=result_dl
     args_d['input_path'] = "./{0}{1}".format(panid, ext)
     args_d['input_path2'] = "{2}/{0}{1}".format(panid, ext, config_p2_folder)
     args_d['output_path'] = "{2}/{0}{1}".format(panid, ext, config_p3_folder)

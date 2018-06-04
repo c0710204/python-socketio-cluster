@@ -3,7 +3,6 @@ from collections import defaultdict
 import multiprocessing
 import socketio
 import logging
-logging.setLevel(DEBUG)
 class app_server(socketio.Namespace):
     def __init__(self,*args):
         socketio.Namespace.__init__(self,*args)
