@@ -39,10 +39,10 @@ class app_server(socketio.Namespace):
         print(sid,"release")
         self.tasking[sid].release()
         if data['status']>0:
-            logging.info("[{0}][{1}] arrive success".format(data['metadata']['sid'],data['metadata']['thread_id']))
+            print("[{0}][{1}] arrive success".format(data['metadata']['sid'],data['metadata']['thread_id']))
             self.process_result(data['arg'])
         else:
-            logging.info("[{0}][{1}] arrive err".format(data['metadata']['sid'],data['metadata']['thread_id']))
+            print("[{0}][{1}] arrive err".format(data['metadata']['sid'],data['metadata']['thread_id']))
             self.handle_error(data['err'],data['arg'])
         self.event('free',sid)
     def handle_error(self,args):
