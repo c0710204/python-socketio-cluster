@@ -2,11 +2,12 @@ import client as cli
 from collections import defaultdict
 import multiprocessing
 import socketio
+import logging
 class app_server(socketio.Namespace):
     def __init__(self,*args):
         socketio.Namespace.__init__(self,*args)
 
-        self.max_task_node=2
+        self.max_task_node=4
         self.tasking=defaultdict(lambda :multiprocessing.Semaphore(self.max_task_node))
     def cron_task(self):
         #check all ndoe info
@@ -21,7 +22,8 @@ class app_server(socketio.Namespace):
         print(sid,"connect")
 
         for i in range(self.max_task_node):
-            self.emit("ask_init",room=sid)
+            info_pkg={'sid':sid,'thread_id':i}
+            self.emit("ask_init",info_pkg,room=sid)
     def event(self,noti,sid):
         if noti=='free':
             pkg=self.get_task()
@@ -36,8 +38,10 @@ class app_server(socketio.Namespace):
         print(sid,"release")
         self.tasking[sid].release()
         if data['status']>0:
+            logging.info("[{0}][{1}] arrive success".format(data['metadata']['sid'],data['metadata']['thread_id']))
             self.process_result(data['arg'])
         else:
+            logging.info("[{0}][{1}] arrive err".format(data['metadata']['sid'],data['metadata']['thread_id']))
             self.handle_error(data['err'],data['arg'])
         self.event('free',sid)
     def handle_error(self,args):

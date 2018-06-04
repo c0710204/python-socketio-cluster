@@ -46,13 +46,17 @@ def ftunnel(*args):
 
 
 def scp_download(port, user, host, path):
+    
     cmd = "scp -P {0} {1}@{2}:{3} ./".format(port, user, host, path)
+    print(cmd)
     logging.info(cmd)
     ret = subprocess.call(cmd, shell=True)
 
 
 def scp_upload(port, user, host, path, file):
-    cmd = "scp -P {0} ./{4} {1}@{2}:{3} ".format(port, user, host, path, file)
+    
+    cmd = "scp -P {0} ./{4} {1}@{2}:{3}/{4} ".format(port, user, host, path, file)
+    print(cmd)
     logging.info(cmd)
     ret = subprocess.call(cmd, shell=True)
 
@@ -64,7 +68,7 @@ def sshdownload(data):
     global mutex_ssh
     mutex_ssh.acquire()
 
-    print("downloading {0}...".format(data['input_path']))
+    print("downloading ...".format())
     sys.stdout.flush()
     scp_download(data['ssh']['port'], data['ssh']['username'], data['ssh']['host'],
                  data['input_path'])
@@ -78,7 +82,7 @@ def sshupload(data, path):
         raise FileNotFoundError("{0} not exists".format(path))
     global mutex_ssh
     mutex_ssh.acquire()
-    print("uploading {0}...".format(data['input_path']))
+    print("uploading {0}...".format(path))
     sys.stdout.flush()
     scp_upload(data['ssh']['port'], data['ssh']['username'], data['ssh']['host'],
                data["output_path"], path)
@@ -92,7 +96,7 @@ def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
     filename, ext = splitext(data['input_path'])
     panid = basename(filename)
     # download file from upper server
-    print("download...")
+    print("download... {0}".format(panid))
     sys.stdout.flush()
     sshdownload(data)
     args_d = {}

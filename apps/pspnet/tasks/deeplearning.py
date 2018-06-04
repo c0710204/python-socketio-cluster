@@ -17,23 +17,9 @@ class deeplearning(task):
     mainthread = True
     handler_type = 'Queue'
     handler = ""
-
-    def prepare_mainthread(self):
-        # init tensorflow
-        from keras.backend.tensorflow_backend import set_session
-        from keras import backend as K
-        import tensorflow as tf
-        config = tf.ConfigProto()
-        # config.gpu_options.allow_growth = True
-        # config.gpu_options.per_process_gpu_memory_fraction = 0.4
-        self.sess = tf.Session(config=config)
-        set_session(self.sess)
-        self.pspnet = PSPNet50(
-            nb_classes=150,
-            input_shape=(473, 473),
-            weights="pspnet50_ade20k",
-            path="./pspnet/weights")
-
+    """
+    all thread avaliable
+    """
     def prepare(self):
         task.prepare(self)
         self.requestQueue = multiprocessing.Queue()
@@ -49,8 +35,28 @@ class deeplearning(task):
             if p == local_id:
                 break
             self.responseQueue.put(p)
-
+    """
+    main Thread only
+    """
+    def prepare_mainthread(self):
+        assert(multiprocessing.current_process()=="MainProcess")
+        # init tensorflow
+        from keras.backend.tensorflow_backend import set_session
+        from keras import backend as K
+        import tensorflow as tf
+        config = tf.ConfigProto()
+        # config.gpu_options.allow_growth = True
+        # config.gpu_options.per_process_gpu_memory_fraction = 0.4
+        self.sess = tf.Session(config=config)
+        set_session(self.sess)
+        self.pspnet = PSPNet50(
+            nb_classes=150,
+            input_shape=(473, 473),
+            weights="pspnet50_ade20k",
+            path="./pspnet/weights")
+    
     def run(self):
+        assert(multiprocessing.current_process()=="MainProcess")
         # print("waiting for task")
         # try:
         args_d = self.requestQueue.get()
