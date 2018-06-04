@@ -36,32 +36,3 @@ def pre_process(args):
     pkl.dump(res_metadata, f)
   np.save(npy_name,np.array(res_data))
   return {"pkl":pkl_name,'npy':npy_name}
-
-if __name__=='__main__':
-  remote_uuid="{0}{1}".format(uuid.uuid4(),"_imagecombine")
-  socketIO=SocketIO('localhost', 30091, LoggingNamespace)
-  parser = argparse.ArgumentParser()
-  parser.add_argument('-m', '--model', type=str, default='pspnet50_ade20k',
-                      help='Model/Weights to use',
-                      choices=['pspnet50_ade20k',
-                               'pspnet101_cityscapes',
-                               'pspnet101_voc2012'])
-  parser.add_argument('-i', '--input_path', type=str, default='example_images/ade20k.jpg',
-                      help='Path the input image')
-  parser.add_argument('-o', '--output_path', type=str, default='p1/',
-                      help='Path to output')
-  parser.add_argument('--id', default="0")
-  parser.add_argument('-s', '--sliding', action='store_true',
-                      help="Whether the network should be slided over the original image for prediction.")
-  parser.add_argument('-f', '--flip', action='store_true',
-                      help="Whether the network should predict on both image and flipped image.")
-  parser.add_argument('-ms', '--multi_scale', action='store_true',
-                      help="Whether the network should predict on multiple scales.")
-  args = parser.parse_args()
-  filename, ext = splitext(args.output_path)
-  iname = basename(filename)
-  socketIO.emit('update',{'id':iname,"phase":1,'val':-1,'max':-1})
-  socketIO.wait(seconds=1)
-  pre_process(args)
-  socketIO.emit('update',{'id':iname,"phase":1,'val':1,'max':1})
-  socketIO.wait(seconds=1)

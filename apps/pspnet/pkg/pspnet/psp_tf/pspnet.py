@@ -15,10 +15,11 @@ from scipy import misc, ndimage
 from keras.backend.tensorflow_backend import set_session
 from keras import backend as K
 import sys
-from keras.models import model_from_json
+from keras.models import model_from_json,Model
 import tensorflow as tf
 import layers_builder as layers
 import utils
+import time
 from tqdm import *
 
 #from keras.backend.tensorflow_backend import set_session
@@ -44,6 +45,14 @@ class PSPNet(object):
         path=realpath(split(realpath(__file__))[0]+"/../weights/")
         print(path)
         sys.stdout.flush()
+        print("build extra model for speedup")
+
+        inp=K.placeholder(shape=(None,473, 473,150),name='a')
+        inp2=K.placeholder(shape=(None,473, 473,150),name='a_flip')
+        inp_flip=K.reverse(inp2,axes=2)
+        cmb=(inp+inp_flip)/2
+        self.M_comb=[cmb,inp,inp2]
+
         json_path = join(path, "keras", weights + ".json")
         h5_path = join(path, "keras", weights + ".h5")
         if isfile(json_path) and isfile(h5_path):
@@ -57,56 +66,89 @@ class PSPNet(object):
             self.model = layers.build_pspnet(nb_classes=nb_classes,
                                              resnet_layers=resnet_layers,
                                              input_shape=self.input_shape)
+
             self.set_npy_weights(weights)
 
-    def predict(self, img, flip_evaluation):
+    def predict(self, img, flip_evaluation,sess=None):
         """
         Predict segementation for an image.
 
         Arguments:
             img: must be rowsxcolsx3
         """
-        global GPU_timer
+        #global GPU_timer
         global GPU_count
+        import time
         h_ori, w_ori = img.shape[1:3]
         if img.shape[1:3] != self.input_shape:
             print("Input %s not fitting for network size %s, resizing. You may want to try sliding prediction for better results." % (
                 img.shape[0:2], self.input_shape))
+                
             img = misc.imresize(img, self.input_shape)
-        input_data = self.preprocess_image(img)
+        ts=time.time()
+        float_img = img.astype('float16')
+        # print('-------------------------------------------------------')
+        # print(time.time()-ts)
+        centered_image = float_img - DATA_MEAN
+        # print(time.time()-ts)
+        bgr_image = centered_image[:, :, :, ::-1]  # RGB => BGR
+        # print(time.time()-ts)
+        input_data = bgr_image
+
+
         # utils.debug(self.model, input_data)
         import time
-        GPU_timer -= time.time()
+        GPU_timer=0
+        
         #print("start gpu")
         #try:
-        regular_prediction = self.model.predict(input_data)
-        #except  e:
-        #    print(e)
-        #print("end gpu")
+        # print(time.time()-ts)
+        input_data_x=np.concatenate((input_data,np.flip(input_data, axis=2)), axis=0)
+        GPU_timer -= time.time()
+        all_prediction = self.model.predict(input_data_x)
         GPU_timer += time.time()
-        GPU_count += 1
-        if flip_evaluation:
-            #print("Predict flipped")
-            GPU_timer -= time.time()
-            flipped_prediction = np.flip(self.model.predict(np.flip(input_data, axis=2)), axis=2)
-            GPU_timer += time.time()
-            GPU_count += 1
-            prediction = (regular_prediction + flipped_prediction) / 2.0
-        else:
-            prediction = regular_prediction
+
+        x=np.array_split(all_prediction, 2)
+        regular_prediction=x[0]
+        flipped_prediction=x[1]
+        GPU_timer -= time.time()
+
+        sess=K.get_session()
+        prediction=sess.run(self.M_comb[0],feed_dict={self.M_comb[1]:regular_prediction,self.M_comb[2]:flipped_prediction})
+        GPU_timer += time.time()
+
+        #flipped_prediction=np.flip(flipped_prediction, axis=2)
+        #prediction = (regular_prediction + flipped_prediction) / 2.0
+        # # print(time.time()-ts)
+        # #except  e:
+        # #    print(e)
+        # #print("end gpu")
+        
+        # GPU_count += 1
+        # if flip_evaluation:
+        #     #print("Predict flipped")
+        #     GPU_timer -= time.time()
+
+        #     flipped_prediction = np.flip(self.model.predict(np.flip(input_data, axis=2)), axis=2)
+        #     # print(time.time()-ts)
+        #     GPU_timer += time.time()
+        #     GPU_count += 1
+        #     prediction = (regular_prediction + flipped_prediction) / 2.0
+        #     # print(time.time()-ts)
+        # else:
+        #     prediction = regular_prediction
+        # print(time.time()-ts)
         if img.shape[1:3] != self.input_shape:  # upscale prediction if necessary
             h, w = prediction.shape[1:3]
             print("upscale triggered!")
             prediction = ndimage.zoom(prediction, (1, 1.*h_ori/h, 1.*w_ori/w, 1.),
                                       order=1, prefilter=False)
-        return prediction
+        # print(time.time()-ts)
+        return prediction,GPU_timer
 
     def preprocess_image(self, img):
         """Preprocess an image as input."""
-        float_img = img.astype('float16')
-        centered_image = float_img - DATA_MEAN
-        bgr_image = centered_image[:, :, :, ::-1]  # RGB => BGR
-        input_data = bgr_image
+
         return input_data
 
     def set_npy_weights(self, weights_path):

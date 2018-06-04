@@ -14,6 +14,7 @@ from psp_tf.pspnet import *
 import tensorflow as tf
 import uuid
 import cPickle as pkl
+import time
 from socketIO_client import SocketIO, LoggingNamespace
 pspnet_keep=None
 
@@ -30,12 +31,11 @@ def deep_process(args):
     from os import listdir
     from os.path import isfile, join
 
-    onlyfiles = [f for f in listdir(args.input_path) if isfile(join(args.input_path, f))]
     import tqdm
-    batch_size=16
+    batch_size=8
     #***************************
     if (args.sess):
-      print('try to use exists sess...')
+    #   print('try to use exists sess...')
       sess=args.sess
     else:
       config = tf.ConfigProto()
@@ -53,7 +53,7 @@ def deep_process(args):
                             weights=args.model)
         else:
             print("Network architecture not implemented.")
-    print('try to use exists sess... success')
+    # print('try to use exists sess... success')
     if args.multi_scale:
       EVALUATION_SCALES = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75]  # must be all floats!
       #EVALUATION_SCALES = [0.15, 0.25, 0.5]  # must be all floats!
@@ -76,23 +76,28 @@ def deep_process(args):
 
 
     padded_prediction=np.zeros(data_npy.shape[:-1]+(150,))
-    print("{0} load ok...\n".format(input_tensor['npy']))
+    # print("{0} load ok...\n".format(input_tensor['npy']))
     #sio_auto(args.socketIO,'update',{'id':iname,"phase":2,'val':0,'max':len(onlyfiles)})
-    for i_start in tqdm.trange(0,len(metadata),batch_size):
+    core_time=0
+    GPU_timer_t=0
+    for i_start in range(0,len(metadata),batch_size):
         i_end=i_start+batch_size
         if i_end>len(metadata):
             i_end=len(metadata)
-        padded_prediction[i_start:i_end]=pspnet.predict(data_npy[i_start:i_end],  args.flip)
-
+        t_st=time.time()
+        padded_prediction[i_start:i_end],GPU_timer=pspnet.predict(data_npy[i_start:i_end],  args.flip)
+        GPU_timer_t=GPU_timer_t+GPU_timer
+        core_time=core_time+time.time()-t_st
+    print("gpu time cost:{0} {1}".format(core_time,GPU_timer_t))
     package={}
     
-    for e in tqdm.tqdm(EVALUATION_SCALES):
+    for e in EVALUATION_SCALES:
         index_list=[x for x,y in zip(range(len(metadata)),metadata) if y['scale']==e]
         metadata_e=[y for x,y in zip(range(len(metadata)),metadata) if y['scale']==e]
         p_npy="{0}/{1}_{2}.npy".format(args.output_path,panid,e)
         p_pkl="{0}/{1}_{2}.pkl".format(args.output_path,panid,e)
         package['{0}'.format(e)]={'pkl':p_pkl,'npy':p_npy}
-        print(index_list)
+        # print(index_list)
         np.save(p_npy,padded_prediction[np.array(index_list)])
         with open(p_pkl, "wb") as f:
             pkl.dump(metadata_e, f)

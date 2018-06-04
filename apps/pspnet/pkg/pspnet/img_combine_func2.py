@@ -7,7 +7,7 @@ from scipy import misc, ndimage
 import multiprocessing as mp
 from multiprocessing import Pool
 from math import ceil
-
+import cPickle as pkl
 
 def pad_image(img, target_size):
     """Pad an image up to the target size."""
@@ -33,27 +33,27 @@ def predict_sliding(funchandler, full_image_shape, net, flip_evaluation,
     count_predictions = np.zeros((full_image_shape[0], full_image_shape[1],
                                   classes))
     tile_counter = 0
-    with trange(tile_rows * tile_cols) as pbar:
-        for rc in pbar:
-            row = int(rc / tile_cols)
-            col = rc % tile_cols
-            x1 = int(col * stride)
-            y1 = int(row * stride)
-            x2 = min(x1 + tile_size[1], full_image_shape[1])
-            y2 = min(y1 + tile_size[0], full_image_shape[0])
-            x1 = max(int(x2 - tile_size[1]),
-                     0)  # for portrait images the x1 underflows sometimes
-            y1 = max(int(y2 - tile_size[0]),
-                     0)  # for very few rows y1 underflows
-            tile_counter += 1
-            pbar.set_description("Predicting tile {0}-{1}".format(row, col))
-            prediction = funchandler(([], flip_evaluation, y1, y2, x1, x2,
-                                      scale))
-            count_predictions[y1:y2, x1:x2] += 1
-            full_probs[
-                y1:y2, x1:
-                x2] += prediction  # accumulate the predictions also in the overlapping regions
-            del prediction
+    pbar= range(tile_rows * tile_cols) 
+    for rc in pbar:
+        row = int(rc / tile_cols)
+        col = rc % tile_cols
+        x1 = int(col * stride)
+        y1 = int(row * stride)
+        x2 = min(x1 + tile_size[1], full_image_shape[1])
+        y2 = min(y1 + tile_size[0], full_image_shape[0])
+        x1 = max(int(x2 - tile_size[1]),
+                    0)  # for portrait images the x1 underflows sometimes
+        y1 = max(int(y2 - tile_size[0]),
+                    0)  # for very few rows y1 underflows
+        tile_counter += 1
+        # pbar.set_description("Predicting tile {0}-{1}".format(row, col))
+        
+        prediction = funchandler(([], flip_evaluation, y1, y2, x1, x2,
+                                    scale))
+        # print(prediction.shape)
+        count_predictions[y1:y2, x1:x2] += 1
+        full_probs[y1:y2, x1:x2] += prediction[0:y2-y1, 0:x2-x1, :]  # accumulate the predictions also in the overlapping regions
+        del prediction
     full_probs /= count_predictions
     return full_probs
 
@@ -100,13 +100,13 @@ inside is process safe, variables could be used between functions
 def ndimage_zoom_parallel_2(list_all):
     from os.path import splitext, join, isfile
     args_input_path2, scale, h_ori, w_ori, flip_evaluation, net, target_file, full_image_shape, sliding_evaluation,args = list_all
-
-    local_tensor=args.input['{0}'.format(scale)]
+    
+    local_tensor=args['{0}'.format(scale)]
     data_npy=np.load(local_tensor['npy'])
     data_metadata=[]
     with open(local_tensor['pkl']) as f:
         data_metadata = pkl.load(f)
-
+    # print(data_npy)
     def funchandler(inp):
         #found id in metadata and return numpy[id]
         _,flip_evaluation, y1, y2, x1, x2,scale=inp
@@ -144,23 +144,30 @@ def predict_multi_scale(funchandler, full_image_shape, net, scales,
     full_probs = np.zeros((full_image_shape[0], full_image_shape[1], classes))
     h_ori, w_ori = full_image_shape[:2]
     import uuid
-    with tqdm(scales) as pbar:
-        probs_inp = []
-        for scale in pbar:
-            pbar.set_description("Predicting image scaled by %f" % scale)
-            n = "/dev/shm/guxi/tmp/" + str(uuid.uuid4()) + '.npy'
-            probs_inp.append(
-                (args.input_path2, scale, h_ori, w_ori, flip_evaluation, net,
-                 n, full_image_shape, sliding_evaluation,args.input))
+    pbar= (scales) 
+    probs_inp = []
+    for scale in pbar:
+        #pbar.set_description("Predicting image scaled by %f" % scale)
+        n = "/dev/shm/guxi/tmp/" + str(uuid.uuid4()) + '.npy'
+        probs_inp.append(
+            (args.input_path2, scale, h_ori, w_ori, flip_evaluation, net,
+                n, full_image_shape, sliding_evaluation,args.input))
 
-        pool = Pool(processes=8)
-        ret = pool.map(ndimage_zoom_parallel_2, probs_inp)
-        pool.close()
-        pool.join()
-        for f in ret:
-            probs = np.load(f)
-            full_probs += probs
-            os.remove(f)
-        #full_probs=ndimage_zoom_parallel_2(probs)
+    pool = Pool(processes=8)
+    ret = pool.map(ndimage_zoom_parallel_2, probs_inp)
+    pool.close()
+    pool.join()
+    # debug mode
+    #ret=[]
+    # for item in probs_inp:
+    #     ret.append(ndimage_zoom_parallel_2( item))
+    for f in ret:
+        probs = np.load(f)
+        #print(np.average(probs))
+        #print(probs.shape)
+        full_probs += probs
+        os.remove(f)
+    #full_probs=ndimage_zoom_parallel_2(probs)
+    #print(np.average(full_probs))
     full_probs /= len(scales)
     return full_probs

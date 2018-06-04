@@ -25,7 +25,8 @@ class pre(task):
     handler_type = "Process"
     handle = ""
     mainthread = False
-
+    def uptime(self):
+        return self.upcount
     def prepare(self):
         
         task.prepare(self)
@@ -37,6 +38,7 @@ class pre(task):
         pass
         
     def ask_and_wait(self, args_d):
+        self.upcount+=1
         local_id = "{0}".format(uuid.uuid4())
         args_d['local_id'] = local_id
         #self.requestQueue.put(args_d)
@@ -50,6 +52,7 @@ class pre(task):
             if ret['id'] == local_id:
                 break
             self.responseQueue.put(ret)
+        self.upcount-=1
         return ret['tensor']
 
     def run(self, args_s):
@@ -58,7 +61,7 @@ class pre(task):
         self.sio_auto(self.socketIO,'update', {'id': iname, "phase": 1, 'val': -1, 'max': -1})
 
 
-        print("{0} start pre".format(args_d['local_id']))
+        # print("{0} start pre".format(args_d['local_id']))
         ret=pre_process.pre_process(
             namedtuple('Struct', args_d.keys())(*args_d.values()))
         self.responseQueue.put({'id':args_d['local_id'],'tensor':ret})

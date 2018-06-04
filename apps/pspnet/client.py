@@ -6,7 +6,7 @@ from math import ceil
 import subprocess
 import logging
 import json
-
+import time
 from src.libs.app.client import app_client
 
 try: 
@@ -47,16 +47,16 @@ def ftunnel(*args):
 
 def scp_download(port, user, host, path):
     
-    cmd = "scp -P {0} {1}@{2}:{3} ./".format(port, user, host, path)
-    print(cmd)
+    cmd = "scp -P {0} {1}@{2}:{3} ./ > /dev/null".format(port, user, host, path)
+    # print(cmd)
     logging.info(cmd)
     ret = subprocess.call(cmd, shell=True)
 
 
 def scp_upload(port, user, host, path, file):
     
-    cmd = "scp -P {0} ./{4} {1}@{2}:{3}/{4} ".format(port, user, host, path, file)
-    print(cmd)
+    cmd = "scp -P {0} ./{4} {1}@{2}:{3}/{4} > /dev/null".format(port, user, host, path, file)
+    # print(cmd)
     logging.info(cmd)
     ret = subprocess.call(cmd, shell=True)
 
@@ -68,7 +68,7 @@ def sshdownload(data):
     global mutex_ssh
     mutex_ssh.acquire()
 
-    print("downloading ...".format())
+    # print("downloading ...".format())
     sys.stdout.flush()
     scp_download(data['ssh']['port'], data['ssh']['username'], data['ssh']['host'],
                  data['input_path'])
@@ -82,7 +82,7 @@ def sshupload(data, path):
         raise FileNotFoundError("{0} not exists".format(path))
     global mutex_ssh
     mutex_ssh.acquire()
-    print("uploading {0}...".format(path))
+    # print("uploading {0}...".format(path))
     sys.stdout.flush()
     scp_upload(data['ssh']['port'], data['ssh']['username'], data['ssh']['host'],
                data["output_path"], path)
@@ -91,12 +91,12 @@ def sshupload(data, path):
 
 
 def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
-    print("got request")
+    # print("got request")
     data = args[0]
     filename, ext = splitext(data['input_path'])
     panid = basename(filename)
     # download file from upper server
-    print("download... {0}".format(panid))
+    # print("download... {0}".format(panid))
     sys.stdout.flush()
     sshdownload(data)
     args_d = {}
@@ -110,13 +110,13 @@ def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
     args_d['flip'] = True
     args_d['multi_scale'] = True
 
-    print("phase 1...")
+    # print("phase 1...")
     sys.stdout.flush()
     args_d['input_path'] = "./{0}{1}".format(panid, ext)
     args_d['output_path'] = "{2}/{0}{1}".format(panid, ext, config_p1_folder)
 
     result_pre=pspnet_pre_in.ask_and_wait(args_d=args_d)
-    print("phase 2...")
+    # print("phase 2...")
     sys.stdout.flush()
     # args_d['sess']=sess
     # args_d['model_ok']=pspnet
@@ -126,7 +126,7 @@ def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
     args_d['output_path'] = config_p2_folder + '/'
     result_dl=pspnet_dl_in.ask_and_wait(args_d)
 
-    print("phase 3...")
+    # print("phase 3...")
     sys.stdout.flush()
     args_d['input']=result_dl
     args_d['input_path'] = "./{0}{1}".format(panid, ext)
@@ -134,13 +134,13 @@ def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
     args_d['output_path'] = "{2}/{0}{1}".format(panid, ext, config_p3_folder)
     pspnet_img_combine_in.ask_and_wait(args_d)
 
-    print("upload...")
+    # print("upload...")
     sys.stdout.flush()
     import numpy as np
     import os
     sshupload(data, "{0}.npy".format(panid))
     l=np.load("{0}_classify.npy".format(panid)).tolist()
-    print("garbage cleaning")
+    # print("garbage cleaning")
     os.remove("{0}.npy".format(panid))
     os.remove("{0}_classify.npy".format(panid))
     os.remove("{0}.jpg".format(panid))
@@ -150,6 +150,7 @@ def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
 
 class pspnet_app_client(app_client):
     def mainthread(self):
+        
         print("pspnet.app.client mainthread start...")
         sys.stdout.flush()
         for task in self.tasks:
@@ -159,9 +160,13 @@ class pspnet_app_client(app_client):
         sys.stdout.flush()
         self.is_ready.release()
         while (1):
+            
+            t=time.time()
             for task in self.tasks:
                 if task.mainthread:
                     task.run()
+            t=time.time()-t
+            print("{3}|task uptime : {0}|{1}|{2}".format(self.tasks[0].uptime(),self.tasks[1].uptime(),self.tasks[2].uptime(),t))
     def prepare(self):
         self.is_ready=multiprocessing.Lock()
         self.is_ready.acquire()

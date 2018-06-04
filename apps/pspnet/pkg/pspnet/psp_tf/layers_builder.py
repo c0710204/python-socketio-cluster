@@ -6,10 +6,12 @@ from keras.layers.merge import Concatenate, Add
 from keras.models import Model
 from keras.optimizers import SGD
 import tensorflow as tf
+import keras.backend as K
 learning_rate = 1e-3  # Layer specific learning rate
 # Weight decay not implemented
 
-
+def listapply(layer):
+    return lambda x: [layer(item) for item in x]
 def BN(name=""):
     return BatchNormalization(momentum=0.95, name=name, epsilon=1e-5)
 
@@ -17,8 +19,9 @@ def BN(name=""):
 def Interp(x, shape):
     from keras.backend import tf as ktf
     new_height, new_width = shape
-    resized = ktf.image.resize_images(x, [new_height, new_width],
-                                      align_corners=True)
+    
+    resized = [ktf.image.resize_images(x0, [new_height, new_width],
+                                      align_corners=True) for x0 in x]
     return resized
 
 
@@ -32,24 +35,24 @@ def residual_conv(prev, level, pad=1, lvl=1, sub_lvl=1, modify_stride=False):
              "conv"+lvl+"_" + sub_lvl + "_1x1_increase",
              "conv"+lvl+"_" + sub_lvl + "_1x1_increase_bn"]
     if modify_stride is False:
-        prev = Conv2D(64 * level, (1, 1), strides=(1, 1), name=names[0],
-                      use_bias=False)(prev)
+        prev = listapply(Conv2D(64 * level, (1, 1), strides=(1, 1), name=names[0],
+                      use_bias=False))(prev)
     elif modify_stride is True:
-        prev = Conv2D(64 * level, (1, 1), strides=(2, 2), name=names[0],
-                      use_bias=False)(prev)
+        prev = listapply(Conv2D(64 * level, (1, 1), strides=(2, 2), name=names[0],
+                      use_bias=False))(prev)
 
-    prev = BN(name=names[1])(prev)
-    prev = Activation('relu')(prev)
+    prev = listapply(BN(name=names[1]))(prev)
+    prev = listapply(Activation('relu'))(prev)
 
-    prev = ZeroPadding2D(padding=(pad, pad))(prev)
-    prev = Conv2D(64 * level, (3, 3), strides=(1, 1), dilation_rate=pad,
-                  name=names[2], use_bias=False)(prev)
+    prev = listapply(ZeroPadding2D(padding=(pad, pad)))(prev)
+    prev = listapply(Conv2D(64 * level, (3, 3), strides=(1, 1), dilation_rate=pad,
+                  name=names[2], use_bias=False))(prev)
 
-    prev = BN(name=names[3])(prev)
-    prev = Activation('relu')(prev)
-    prev = Conv2D(256 * level, (1, 1), strides=(1, 1), name=names[4],
-                  use_bias=False)(prev)
-    prev = BN(name=names[5])(prev)
+    prev = listapply(BN(name=names[3]))(prev)
+    prev = listapply(Activation('relu'))(prev)
+    prev = listapply(Conv2D(256 * level, (1, 1), strides=(1, 1), name=names[4],
+                  use_bias=False))(prev)
+    prev = listapply(BN(name=names[5]))(prev)
     return prev
 
 
@@ -60,13 +63,13 @@ def short_convolution_branch(prev, level, lvl=1, sub_lvl=1, modify_stride=False)
              "conv" + lvl+"_" + sub_lvl + "_1x1_proj_bn"]
 
     if modify_stride is False:
-        prev = Conv2D(256 * level, (1, 1), strides=(1, 1), name=names[0],
-                      use_bias=False)(prev)
+        prev = listapply(Conv2D(256 * level, (1, 1), strides=(1, 1), name=names[0],
+                      use_bias=False))(prev)
     elif modify_stride is True:
-        prev = Conv2D(256 * level, (1, 1), strides=(2, 2), name=names[0],
-                      use_bias=False)(prev)
+        prev = listapply(Conv2D(256 * level, (1, 1), strides=(2, 2), name=names[0],
+                      use_bias=False))(prev)
 
-    prev = BN(name=names[1])(prev)
+    prev = listapply(BN(name=names[1]))(prev)
     return prev
 
 
@@ -75,7 +78,7 @@ def empty_branch(prev):
 
 
 def residual_short(prev_layer, level, pad=1, lvl=1, sub_lvl=1, modify_stride=False):
-    prev_layer = Activation('relu')(prev_layer)
+    prev_layer = listapply(Activation('relu'))(prev_layer)
     block_1 = residual_conv(prev_layer, level,
                             pad=pad, lvl=lvl, sub_lvl=sub_lvl,
                             modify_stride=modify_stride)
@@ -83,17 +86,18 @@ def residual_short(prev_layer, level, pad=1, lvl=1, sub_lvl=1, modify_stride=Fal
     block_2 = short_convolution_branch(prev_layer, level,
                                        lvl=lvl, sub_lvl=sub_lvl,
                                        modify_stride=modify_stride)
-    added = Add()([block_1, block_2])
+
+    added = [Add()([a,b]) for a,b in zip(block_1, block_2)]
     return added
 
 
 def residual_empty(prev_layer, level, pad=1, lvl=1, sub_lvl=1):
-    prev_layer = Activation('relu')(prev_layer)
+    prev_layer = listapply(Activation('relu'))(prev_layer)
 
     block_1 = residual_conv(prev_layer, level, pad=pad,
                             lvl=lvl, sub_lvl=sub_lvl)
     block_2 = empty_branch(prev_layer)
-    added = Add()([block_1, block_2])
+    added = [Add()([a,b]) for a,b in zip(block_1, block_2)]
     return added
 
 
@@ -107,24 +111,23 @@ def ResNet(inp, layers):
              "conv1_3_3x3_bn"]
 
     # Short branch(only start of network)
+    cnv1 = listapply(Conv2D(64, (3, 3), strides=(2, 2), padding='same', name=names[0],
+                  use_bias=False))(inp)  # "conv1_1_3x3_s2"
+    bn1 = listapply(BN(name=names[1]))(cnv1)  # "conv1_1_3x3_s2/bn"
+    relu1 = listapply(Activation('relu'))(bn1)  # "conv1_1_3x3_s2/relu"
 
-    cnv1 = Conv2D(64, (3, 3), strides=(2, 2), padding='same', name=names[0],
-                  use_bias=False)(inp)  # "conv1_1_3x3_s2"
-    bn1 = BN(name=names[1])(cnv1)  # "conv1_1_3x3_s2/bn"
-    relu1 = Activation('relu')(bn1)  # "conv1_1_3x3_s2/relu"
+    cnv1 = listapply(Conv2D(64, (3, 3), strides=(1, 1), padding='same', name=names[2],
+                  use_bias=False))(relu1)  # "conv1_2_3x3"
+    bn1 = listapply(BN(name=names[3]))(cnv1)  # "conv1_2_3x3/bn"
+    relu1 = listapply(Activation('relu'))(bn1)  # "conv1_2_3x3/relu"
 
-    cnv1 = Conv2D(64, (3, 3), strides=(1, 1), padding='same', name=names[2],
-                  use_bias=False)(relu1)  # "conv1_2_3x3"
-    bn1 = BN(name=names[3])(cnv1)  # "conv1_2_3x3/bn"
-    relu1 = Activation('relu')(bn1)  # "conv1_2_3x3/relu"
+    cnv1 = listapply(Conv2D(128, (3, 3), strides=(1, 1), padding='same', name=names[4],
+                  use_bias=False))(relu1)  # "conv1_3_3x3"
+    bn1 = listapply(BN(name=names[5]))(cnv1)  # "conv1_3_3x3/bn"
+    relu1 = listapply(Activation('relu'))(bn1)  # "conv1_3_3x3/relu"
 
-    cnv1 = Conv2D(128, (3, 3), strides=(1, 1), padding='same', name=names[4],
-                  use_bias=False)(relu1)  # "conv1_3_3x3"
-    bn1 = BN(name=names[5])(cnv1)  # "conv1_3_3x3/bn"
-    relu1 = Activation('relu')(bn1)  # "conv1_3_3x3/relu"
-
-    res = MaxPooling2D(pool_size=(3, 3), padding='same',
-                       strides=(2, 2))(relu1)  # "pool1_3x3_s2"
+    res = listapply(MaxPooling2D(pool_size=(3, 3), padding='same',
+                       strides=(2, 2)))(relu1)  # "pool1_3x3_s2"
 
     # ---Residual layers(body of network)
 
@@ -160,7 +163,7 @@ def ResNet(inp, layers):
     for i in range(2):
         res = residual_empty(res, 8, pad=4, lvl=5, sub_lvl=i+2)
 
-    res = Activation('relu')(res)
+    res = listapply(Activation('relu'))(res)
     return res
 
 
@@ -174,12 +177,12 @@ def interp_block(prev_layer, level, feature_map_shape, str_lvl=1, ):
 
     kernel = (10*level, 10*level)
     strides = (10*level, 10*level)
-    prev_layer = AveragePooling2D(kernel, strides=strides)(prev_layer)
-    prev_layer = Conv2D(512, (1, 1), strides=(1, 1), name=names[0],
-                        use_bias=False)(prev_layer)
-    prev_layer = BN(name=names[1])(prev_layer)
-    prev_layer = Activation('relu')(prev_layer)
-    prev_layer = Lambda(Interp, arguments={'shape': feature_map_shape})(prev_layer)
+    prev_layer = listapply(AveragePooling2D(kernel, strides=strides))(prev_layer)
+    prev_layer = listapply(Conv2D(512, (1, 1), strides=(1, 1), name=names[0],
+                        use_bias=False))(prev_layer)
+    prev_layer = listapply(BN(name=names[1]))(prev_layer)
+    prev_layer = listapply(Activation('relu'))(prev_layer)
+    prev_layer = listapply(Lambda(Interp, arguments={'shape': feature_map_shape}))(prev_layer)
     return prev_layer
 
 
@@ -195,11 +198,11 @@ def build_pyramid_pooling_module(res, input_shape):
     interp_block6 = interp_block(res, 1, feature_map_size, str_lvl=6)
 
     # concat all these layers. resulted shape=(1,feature_map_size_x,feature_map_size_y,4096)
-    res = Concatenate()([res,
+    res = [Concatenate()([a,b,c,d,e]) for a,b,c,d,e in zip(res,
                          interp_block6,
                          interp_block3,
                          interp_block2,
-                         interp_block1])
+                         interp_block1)]
     return res
 
 
@@ -208,19 +211,27 @@ def build_pspnet(nb_classes, resnet_layers, input_shape, activation='softmax'):
     print("Building a PSPNet based on ResNet %i expecting inputs of shape %s predicting %i classes" % (resnet_layers, input_shape, nb_classes))
 
     inp = Input((input_shape[0], input_shape[1], 3))
-    res = ResNet(inp, layers=resnet_layers)
+
+    inp_flip= K.reverse(inp,axes=2)
+
+    res = ResNet([inp,inp_flip], layers=resnet_layers)
     psp = build_pyramid_pooling_module(res, input_shape)
 
-    x = Conv2D(512, (3, 3), strides=(1, 1), padding="same", name="conv5_4",
-               use_bias=False)(psp)
-    x = BN(name="conv5_4_bn")(x)
-    x = Activation('relu')(x)
-    x = Dropout(0.1)(x)
 
-    x = Conv2D(nb_classes, (1, 1), strides=(1, 1), name="conv6")(x)
-    x = Lambda(Interp, arguments={'shape': (input_shape[0], input_shape[1])})(x)
-    x = Activation('softmax')(x)
-    x = tf.image.resize_bilinear(x,x.shape[1:2])
+    x = listapply(Conv2D(512, (3, 3), strides=(1, 1), padding="same", name="conv5_4",
+               use_bias=False))(psp)
+    x = listapply(BN(name="conv5_4_bn"))(x)
+    x = listapply(Activation('relu'))(x)
+    x = listapply(Dropout(0.1))(x)
+
+    x = listapply(Conv2D(nb_classes, (1, 1), strides=(1, 1), name="conv6"))(x)
+    x = listapply(Lambda(Interp, arguments={'shape': (input_shape[0], input_shape[1])}))(x)
+    x = listapply(Activation('softmax'))(x)
+    x = [tf.image.resize_bilinear(x0,x0.shape[1:2]) for x0 in x]
+    x,x_flip=x
+    x_flip=K.reverse(x_flip,axes=2)
+    x=x+x_flip
+    x = x / 2.0
     model = Model(inputs=inp, outputs=x)
 
     # Solver

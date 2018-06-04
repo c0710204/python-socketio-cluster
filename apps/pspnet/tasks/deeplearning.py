@@ -20,13 +20,17 @@ class deeplearning(task):
     """
     all thread avaliable
     """
+    def uptime(self):
+        return self.upcount
     def prepare(self):
         task.prepare(self)
         self.requestQueue = multiprocessing.Queue()
         self.responseQueue = multiprocessing.Queue()
         self.mutex = multiprocessing.Lock()
+        self.upcount=0
 
     def ask_and_wait(self, args_d):
+        self.upcount+=1
         local_id = "{0}".format(uuid.uuid4())
         args_d['local_id'] = local_id
         self.requestQueue.put(args_d)
@@ -36,6 +40,7 @@ class deeplearning(task):
             if p['id'] == local_id:
                 break
             self.responseQueue.put(p)
+        self.upcount-=1
         return p['tensor']
     """
     main Thread only
@@ -48,8 +53,8 @@ class deeplearning(task):
         from keras import backend as K
         import tensorflow as tf
         config = tf.ConfigProto()
-        # config.gpu_options.allow_growth = True
-        # config.gpu_options.per_process_gpu_memory_fraction = 0.4
+        config.gpu_options.allow_growth = True
+        #config.gpu_options.per_process_gpu_memory_fraction = 0.5
         self.sess = tf.Session(config=config)
         set_session(self.sess)
         self.pspnet = PSPNet50(
@@ -59,7 +64,11 @@ class deeplearning(task):
             path="./pspnet/weights")
     
     def run(self):
+        
         assert(multiprocessing.current_process().name=="Process-1")
+        if self.requestQueue.empty():
+            time.sleep(1)
+            return
         # print("waiting for task")
         # try:
         args_d = self.requestQueue.get()

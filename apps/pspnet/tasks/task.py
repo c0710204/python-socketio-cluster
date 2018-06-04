@@ -17,6 +17,10 @@ class task(object):
     """
     mainthread = False
     handler_type = 'None'
+    def __init__(self):
+        self.upcount=0
+    def uptime(self):
+        raise NotImplemented
     def sio_auto(self,sio,a,b):
         if sio is None:
             return
@@ -33,6 +37,6 @@ class task(object):
         """
         self.remote_uuid = "{0}{1}".format(uuid.uuid4(), "_deeplearning")
         try:
-            self.socketIO = SocketIO('localhost', 30091, LoggingNamespace,wait_for_connection=False)
+            self.socketIO = SocketIO('star.eecs.oregonstate.edu', 30091, LoggingNamespace,wait_for_connection=False)
         except Exception as e:
             self.socketIO=None
