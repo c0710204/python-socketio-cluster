@@ -69,8 +69,8 @@ client_type:
     - pelican03
     - pelican04
   db:
-    - guxi_us_2gb
-#    - hystad_mysql    
+#    - guxi_us_2gb
+    - hystad_mysql    
   core:
 #    - star_gpu_on_star_lab
 #    - star_gpu_local
