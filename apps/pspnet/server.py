@@ -86,7 +86,7 @@ class pspnet_app_server(app_server):
         success=False
 
         sql1='update tasks set status="done"  where id="{0}"'.format(ret['id'])
-        sql2='insert into psplog(`panid`,`phase`,`val`,`max`) values("{0}","3","1","1") '.format(ret['id'])
+        sql2='insert into psplog(`panid`,`phase`,`val`,`max`) values("{0}","3","1","1") '.format(ret['panid'])
 
         while True:
             try:
@@ -100,7 +100,7 @@ class pspnet_app_server(app_server):
                 self.reconn_db()
 
 
-        sql2='INSERT INTO result_percent(panid,info)VALUES("{0}","{1}");'.format(
+        sql3='INSERT INTO result_percent(panid,info)VALUES("{0}","{1}");'.format(
             ret['panid'],
             ret['percent']
         )
