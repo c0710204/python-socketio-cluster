@@ -25,7 +25,7 @@ class pspnet_app_server(app_server):
         confloader.load('service')
         while True:
             try:
-                self.db=pymysql.connect(host="127.0.0.1",port=confloader.service['services']['mysql']['port'], user="guxi",passwd="dHtFkI6g",db="gsv_file_list")
+                self.db=pymysql.connect(host="10.215.3.15",port=3306, user="guxi",passwd="dHtFkI6g",db="gsv_file_list")
                 break
             except Exception as e:
                 print(e)
@@ -38,7 +38,7 @@ class pspnet_app_server(app_server):
         confloader.load('service')
         print("[{1}]connecting db...".format(0,time.asctime( time.localtime(time.time()) )))
         sys.stdout.flush()
-        self.db=pymysql.connect(host="127.0.0.1",port=confloader.service['services']['mysql']['port'], user="guxi",passwd="dHtFkI6g",db="gsv_file_list")
+        self.db=pymysql.connect(host="10.215.3.15",port=3306, user="guxi",passwd="dHtFkI6g",db="gsv_file_list")
         print("[{1}]db connection ok".format(0,time.asctime( time.localtime(time.time()) )))
         sys.stdout.flush()
         app_server.__init__(self,*args)
