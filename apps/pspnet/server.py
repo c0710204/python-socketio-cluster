@@ -86,11 +86,13 @@ class pspnet_app_server(app_server):
         success=False
 
         sql1='update tasks set status="done"  where id="{0}"'.format(ret['id'])
+        sql2='insert into psplog(`panid`,`phase`,`val`,`max`) values("{0}","3","1","1") '.format(ret['id'])
 
         while True:
             try:
                 cursor = self.db.cursor()
                 cursor.execute(sql1)
+                cursor.execute(sql2)
                 self.db.commit()
                 break
             except pymysql.err.OperationalError as e:
