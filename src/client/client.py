@@ -7,6 +7,7 @@ sys.path.append('.')
 from src.libs.network.async_socketIO import async_socketIO
 import argparse
 import os
+import multiprocessing
 #os.environ['TMPDIR']='/dev/shm'
 from src.libs.conf.conf import conf
 def ping(hostname):
@@ -48,14 +49,16 @@ def main():
 #    asio = async_socketIO(SocketIO(h.host,h.port))
     asio = async_socketIO(SocketIO('star.eecs.oregonstate.edu', 30041))
     sio_pspent_info = asio.socketIO.define(cli_handle, '/task')
+    print("\n\n\narrive here\n\n\n")
+    if asio.handler('/task').gui:
+        print("booting UI")
+        p_gui=multiprocessing.Process(target=asio.handler('/task').gui)
+        p_gui.start()
     print("ready to receive order")
     asio.background()
-    
-    if asio.handler('/task').gui:
-        asio.handler('/task').gui()
-    else:
-        while (1):
-            time.sleep(1)
+
+    while (1):
+        time.sleep(1)
     #mutex2.put("success",block=True)
     #except:
     #   pass

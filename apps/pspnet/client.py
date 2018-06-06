@@ -11,6 +11,7 @@ from src.libs.app.client import app_client
 from src.libs.app.terminfo import terminfo
 import time
 import tqdm
+import uuid
 try: 
     from tasks.pre import pre
     from tasks.deeplearning import deeplearning
@@ -172,18 +173,7 @@ class pspnet_app_client(app_client):
                     #raise e
                     pass
 
-                self.display()
-
-            # def create(self):
-                
-                
-            #     # self.add(npyscreen.TitleText, name = "Text:", value= "Hellow World!" )
-            #     self.wStatus2=self.add(npyscreen.TitleText, name = "task:", value= "",editable=False)
-                
-            #     local=self.add(BoxTitle, name = "log{0}".format(0), value= "",editable=False)
-            #     self.w_log=local
-                
-                
+                self.display()             
             def afterEditing(self):
                 self.parentApp.setNextForm(None)
         class MyTestApp(npyscreen.NPSAppManaged):
@@ -220,6 +210,9 @@ class pspnet_app_client(app_client):
         manager=multiprocessing.Manager()
         
         self.log=manager.Queue()
+        self.requestQueue = manager.Queue()
+        self.responseQueue = manager.Queue()
+        self.log=manager.Queue()
         self.is_ready=multiprocessing.Lock()
         self.is_ready.acquire()
         # local process safe stuff
@@ -233,17 +226,63 @@ class pspnet_app_client(app_client):
         p=multiprocessing.Process(target=self.mainthread)
         # print("\nThread info : {0} => func {1}".format(multiprocessing.current_process().name,__file__))
         p.start()
+
         
-        print("\nclient ready...")
+        
+        
         self.is_ready.acquire()
+        print("\nclient ready, booting thread_loop..")
+        self.boot_mp()
         self.run_ready.release()
+
+    def boot_mp(self,thread_num=4):
+        class appOUT(object):
+            def __init__(self,log_queue):
+                self.logger=log_queue
+            def flush(self):
+                pass
+            def write(self, s):
+                self.logger.put(s)
+                #sys.__stdout__.write(s)
+
+        self.p_list=[None for i in range(thread_num)]
+        self.p_list_pipe=[None for i in range(thread_num)]
+        for i in range(thread_num):
+            self.p_list[i]=multiprocessing.Process(target=self.thread_loop ,args=(i, appOUT(self.log)))
+            self.p_list[i].start()
+
+    def thread_loop(self,id,stdout=sys.__stdout__):
+        print("redirect stdout...")
+        sys.stdout=stdout
+        print("booting thread - {0}".format(id))
+        while True:
+            # print("\nThread info : {0} => func {1}".format(multiprocessing.current_process().name,__file__))
+            #assert(multiprocessing.current_process().name=="Process-1")
+            if self.requestQueue.empty():
+                print("[thread-{0}]waiting for task".format(id))
+                time.sleep(1)
+                continue
+            pkg = self.requestQueue.get()
+            args=pkg['args']
+            ret=task_process([args],self.tasks[0],self.tasks[1],self.tasks[2],self.log,id)
+            self.responseQueue.put({'id':pkg['local_id'],'tensor':ret})
+            time.sleep(1)
+        
     def run(self,args):
         """
         :param args all needed data from server
         """
-        #print("receive {0}".format(args))
-        sys.stdout.flush()
-        return task_process([args],self.tasks[0],self.tasks[1],self.tasks[2],self.log,args['metadata']['thread_id'])
+        local_id = "{0}".format(uuid.uuid4())
+        pkg={"args":args,'local_id':local_id}
+        
+        self.requestQueue.put(pkg)
+        p={}
+        while (1):
+            p = self.responseQueue.get()
+            if p['id'] == local_id:
+                break
+            self.responseQueue.put(p)
+        return p['tensor']
 
 
 def handler():
