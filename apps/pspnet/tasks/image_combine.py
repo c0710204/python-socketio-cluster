@@ -19,26 +19,28 @@ class image_combine(task):
     handle = ""
     mainthread = False
     def uptime(self):
-        return self.upcount
+        return self.upcount.value
     def prepare(self):
         task.prepare(self)
         self.requestQueue = multiprocessing.Queue()
         self.responseQueue = multiprocessing.Queue()
-
+        self.upcount=self.mg.Value('i', 0)
     def deploy(self):
         pass
 
     def ask_and_wait(self, args_d):
-        self.upcount+=1
+        self.upcount.value+=1
         local_id = "{0}".format(uuid.uuid4())
         args_d['local_id'] = local_id
         p = multiprocessing.Process(
             target=self.run, args=(json.dumps(args_d), ))
+        #print("Thread info : {0} => func {1}".format(p.name,__file__))
         p.start()
         p.join()
-        self.upcount-=1
+        self.upcount.value-=1
 
     def run(self, args_s=""):
+        # print("\nThread info : {0} => func {1}".format(multiprocessing.current_process().name,__file__))
         import numpy as np
         args_d = json.loads(args_s)
         iname = args_d['panid']

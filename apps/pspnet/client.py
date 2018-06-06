@@ -8,7 +8,9 @@ import logging
 import json
 import time
 from src.libs.app.client import app_client
-
+from src.libs.app.terminfo import terminfo
+import time
+import tqdm
 try: 
     from tasks.pre import pre
     from tasks.deeplearning import deeplearning
@@ -90,13 +92,13 @@ def sshupload(data, path):
     mutex_ssh.release()
 
 
-def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
+def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in,log,tid):
     # print("got request")
     data = args[0]
     filename, ext = splitext(data['input_path'])
     panid = basename(filename)
     # download file from upper server
-    # print("download... {0}".format(panid))
+    log.put("[{0}]download... {1}".format(tid,panid))
     sys.stdout.flush()
     sshdownload(data)
     args_d = {}
@@ -110,13 +112,13 @@ def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
     args_d['flip'] = True
     args_d['multi_scale'] = True
 
-    # print("phase 1...")
+    log.put("[{0}]phase 1...".format(tid,panid))
     sys.stdout.flush()
     args_d['input_path'] = "./{0}{1}".format(panid, ext)
     args_d['output_path'] = "{2}/{0}{1}".format(panid, ext, config_p1_folder)
 
     result_pre=pspnet_pre_in.ask_and_wait(args_d=args_d)
-    # print("phase 2...")
+    log.put("[{0}]phase 2...".format(tid,panid))
     sys.stdout.flush()
     # args_d['sess']=sess
     # args_d['model_ok']=pspnet
@@ -126,7 +128,7 @@ def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
     args_d['output_path'] = config_p2_folder + '/'
     result_dl=pspnet_dl_in.ask_and_wait(args_d)
 
-    # print("phase 3...")
+    log.put("[{0}]phase 3...".format(tid,panid))
     sys.stdout.flush()
     args_d['input']=result_dl
     args_d['input_path'] = "./{0}{1}".format(panid, ext)
@@ -134,13 +136,13 @@ def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
     args_d['output_path'] = "{2}/{0}{1}".format(panid, ext, config_p3_folder)
     pspnet_img_combine_in.ask_and_wait(args_d)
 
-    # print("upload...")
+    log.put("[{0}]upload...".format(tid,panid))
     sys.stdout.flush()
     import numpy as np
     import os
     sshupload(data, "{0}.npy".format(panid))
     l=np.load("{0}_classify.npy".format(panid)).tolist()
-    # print("garbage cleaning")
+    log.put("garbage cleaning")
     os.remove("{0}.npy".format(panid))
     os.remove("{0}_classify.npy".format(panid))
     os.remove("{0}.jpg".format(panid))
@@ -149,14 +151,59 @@ def task_process(args,pspnet_pre_in,pspnet_dl_in,pspnet_img_combine_in):
     return {'panid':panid,"percent":json.dumps(l),'id':data['taskid']};
 
 class pspnet_app_client(app_client):
+    
+    def gui(self):
+        import npyscreen
+        master_obj=self
+        class MainForm(npyscreen.FormMutt):
+            MAIN_WIDGET_CLASS = npyscreen.BufferPager
+            def while_waiting(self):
+                self.wStatus2.value="{0}|{1}|{2}".format(
+                        master_obj.tasks[0].uptime(),
+                        master_obj.tasks[1].uptime(),
+                        master_obj.tasks[2].uptime(), 
+                        time.asctime( time.localtime(time.time()) )
+                        )
+                try:   
+                    while True:
+                        obj=master_obj.log.get_nowait()
+                        self.wMain.buffer([obj,])
+                except Exception as e:
+                    #raise e
+                    pass
+
+                self.display()
+
+            # def create(self):
+                
+                
+            #     # self.add(npyscreen.TitleText, name = "Text:", value= "Hellow World!" )
+            #     self.wStatus2=self.add(npyscreen.TitleText, name = "task:", value= "",editable=False)
+                
+            #     local=self.add(BoxTitle, name = "log{0}".format(0), value= "",editable=False)
+            #     self.w_log=local
+                
+                
+            def afterEditing(self):
+                self.parentApp.setNextForm(None)
+        class MyTestApp(npyscreen.NPSAppManaged):
+            def onStart(self):
+                form=MainForm()
+                form.keypress_timeout=10
+                self.registerForm("MAIN",form ) 
+        TA = MyTestApp()
+        TA.run()       
+    
     def mainthread(self):
-        
-        print("pspnet.app.client mainthread start...")
+        """
+        mainthread only
+        """    
+        print("\npspnet.app.client mainthread start...")
         sys.stdout.flush()
         for task in self.tasks:
             if task.mainthread:
                 task.prepare_mainthread()
-        print("pspnet.app.client mainthread started...")
+        print("\npspnet.app.client mainthread started...")
         sys.stdout.flush()
         self.is_ready.release()
         while (1):
@@ -166,16 +213,28 @@ class pspnet_app_client(app_client):
                 if task.mainthread:
                     task.run()
             t=time.time()-t
-            print("{3}|task uptime : {0}|{1}|{2}".format(self.tasks[0].uptime(),self.tasks[1].uptime(),self.tasks[2].uptime(),t))
+            self.GPU_time=t
+    thread_count=8    
+    COL_MAX=4        
     def prepare(self):
+        manager=multiprocessing.Manager()
+        
+        self.log=manager.Queue()
         self.is_ready=multiprocessing.Lock()
         self.is_ready.acquire()
+        # local process safe stuff
+        self.GPU_time=manager.Value('i',0)
+        # start monitor
+        
+        #init ops
         self.tasks=[pre(),deeplearning(),image_combine()]
         for task in self.tasks:
             task.prepare()
         p=multiprocessing.Process(target=self.mainthread)
+        # print("\nThread info : {0} => func {1}".format(multiprocessing.current_process().name,__file__))
         p.start()
-        print("client ready...")
+        
+        print("\nclient ready...")
         self.is_ready.acquire()
         self.run_ready.release()
     def run(self,args):
@@ -184,7 +243,7 @@ class pspnet_app_client(app_client):
         """
         #print("receive {0}".format(args))
         sys.stdout.flush()
-        return task_process([args],self.tasks[0],self.tasks[1],self.tasks[2])
+        return task_process([args],self.tasks[0],self.tasks[1],self.tasks[2],self.log,args['metadata']['thread_id'])
 
 
 def handler():

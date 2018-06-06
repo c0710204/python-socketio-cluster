@@ -7,7 +7,7 @@ sys.path.append('.')
 from src.libs.network.async_socketIO import async_socketIO
 import argparse
 import os
-
+#os.environ['TMPDIR']='/dev/shm'
 from src.libs.conf.conf import conf
 def ping(hostname):
     response = os.system("ping -c 1 " + hostname)
@@ -50,9 +50,12 @@ def main():
     sio_pspent_info = asio.socketIO.define(cli_handle, '/task')
     print("ready to receive order")
     asio.background()
-
-    while (1):
-        time.sleep(1)
+    
+    if asio.handler('/task').gui:
+        asio.handler('/task').gui()
+    else:
+        while (1):
+            time.sleep(1)
     #mutex2.put("success",block=True)
     #except:
     #   pass

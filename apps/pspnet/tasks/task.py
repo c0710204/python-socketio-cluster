@@ -1,4 +1,5 @@
 import uuid
+import multiprocessing
 from socketIO_client import SocketIO, LoggingNamespace, BaseNamespace
 class task(object):
     """
@@ -35,6 +36,8 @@ class task(object):
         """
         using to init before running code
         """
+        
+        self.mg=multiprocessing.Manager()
         self.remote_uuid = "{0}{1}".format(uuid.uuid4(), "_deeplearning")
         try:
             self.socketIO = SocketIO('star.eecs.oregonstate.edu', 30091, LoggingNamespace,wait_for_connection=False)

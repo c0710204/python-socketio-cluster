@@ -15,6 +15,8 @@ class async_socketIO():
         while 1:
             if len(self.result)>0:
                 return self.result
+    def handler(self,path):
+        return self.socketIO._namespace_by_path[path]
     def receiver(*args):
         #print(args)
         args[0].result=args[1:]

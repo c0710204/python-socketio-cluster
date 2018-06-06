@@ -16,6 +16,8 @@ import uuid
 import cPickle as pkl
 import time
 from socketIO_client import SocketIO, LoggingNamespace
+
+from src.libs.app.terminfo import terminfo
 pspnet_keep=None
 
 def sio_auto(sio,a,b):
@@ -88,7 +90,8 @@ def deep_process(args):
         padded_prediction[i_start:i_end],GPU_timer=pspnet.predict(data_npy[i_start:i_end],  args.flip)
         GPU_timer_t=GPU_timer_t+GPU_timer
         core_time=core_time+time.time()-t_st
-    print("gpu time cost:{0} {1}".format(core_time,GPU_timer_t))
+    t=terminfo()
+    # print("\ngpu time cost:{0} {1}".format(core_time,GPU_timer_t))
     package={}
     
     for e in EVALUATION_SCALES:

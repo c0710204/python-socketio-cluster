@@ -98,44 +98,46 @@ def ndimage_zoom_parallel(image, zoom, order, prefilter):
 inside is process safe, variables could be used between functions
 """
 def ndimage_zoom_parallel_2(list_all):
-    from os.path import splitext, join, isfile
-    args_input_path2, scale, h_ori, w_ori, flip_evaluation, net, target_file, full_image_shape, sliding_evaluation,args = list_all
-    
-    local_tensor=args['{0}'.format(scale)]
-    data_npy=np.load(local_tensor['npy'])
-    data_metadata=[]
-    with open(local_tensor['pkl']) as f:
-        data_metadata = pkl.load(f)
-    # print(data_npy)
-    def funchandler(inp):
-        #found id in metadata and return numpy[id]
-        _,flip_evaluation, y1, y2, x1, x2,scale=inp
-        id_list=[x for x,y in zip(range(len(data_metadata)),data_metadata) if (y['x1']==x1 and y['x2']==x2 and y['y1']==y1 and y['y2']==y2)]
-        assert(len(id_list)==1)
-        id=id_list[0]
-        return data_npy[id].reshape(data_npy.shape[1:])
+    try:
+        from os.path import splitext, join, isfile
+        args_input_path2, scale, h_ori, w_ori, flip_evaluation, net, target_file, full_image_shape, sliding_evaluation,args = list_all
+        
+        local_tensor=args['{0}'.format(scale)]
+        data_npy=np.load(local_tensor['npy'])
+        data_metadata=[]
+        with open(local_tensor['pkl']) as f:
+            data_metadata = pkl.load(f)
+        # print(data_npy)
+        def funchandler(inp):
+            #found id in metadata and return numpy[id]
+            _,flip_evaluation, y1, y2, x1, x2,scale=inp
+            id_list=[x for x,y in zip(range(len(data_metadata)),data_metadata) if (y['x1']==x1 and y['x2']==x2 and y['y1']==y1 and y['y2']==y2)]
+            assert(len(id_list)==1)
+            id=id_list[0]
+            return data_npy[id].reshape(data_npy.shape[1:])
 
-    full_image_shape2 = [
-        int(h_ori * scale),
-        int(w_ori * scale), full_image_shape[2]
-    ]
-    if sliding_evaluation:
-        scaled_probs = predict_sliding(funchandler, full_image_shape2, net,
-                                       flip_evaluation, scale)
-    else:
-        scaled_probs = funchandler((scaled_img, flip_evaluation))
-    h, w = scaled_probs.shape[:2]
+        full_image_shape2 = [
+            int(h_ori * scale),
+            int(w_ori * scale), full_image_shape[2]
+        ]
+        if sliding_evaluation:
+            scaled_probs = predict_sliding(funchandler, full_image_shape2, net,
+                                        flip_evaluation, scale)
+        else:
+            scaled_probs = funchandler((scaled_img, flip_evaluation))
+        h, w = scaled_probs.shape[:2]
 
-    os.remove(local_tensor['npy'])
-    os.remove(local_tensor['pkl'])
-    
-    probs = ndimage.zoom(
-        scaled_probs, (1. * h_ori / h, 1. * w_ori / w, 1.),
-        order=1,
-        prefilter=False)
-    np.save(target_file, probs)
-    return target_file
-
+        os.remove(local_tensor['npy'])
+        os.remove(local_tensor['pkl'])
+        
+        probs = ndimage.zoom(
+            scaled_probs, (1. * h_ori / h, 1. * w_ori / w, 1.),
+            order=1,
+            prefilter=False)
+        np.save(target_file, probs)
+        return target_file
+    except KeyboardInterrupt:
+        pass
 
 def predict_multi_scale(funchandler, full_image_shape, net, scales,
                         sliding_evaluation, flip_evaluation, args):

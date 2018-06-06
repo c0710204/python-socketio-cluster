@@ -31,9 +31,10 @@ class app_client(BaseNamespace):
         p.start()
         return
     def run_mp(self,arg):
-        ret={'metadata':self.metadata,"status":-1,"arg":arg,"err":""}
+        #arg['metadata']=self.metadata
+        ret={'metadata':arg['metadata'],"status":-1,"arg":arg,"err":""}
         try:
-            ret={'metadata':self.metadata,"status":1,"arg":self.run(arg)}
+            ret={'metadata':arg['metadata'],"status":1,"arg":self.run(arg)}
         except Exception as e:
             ret['err']="{0}".format(sys.exc_info())
             #raise e

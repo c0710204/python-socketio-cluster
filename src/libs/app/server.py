@@ -24,9 +24,10 @@ class app_server(socketio.Namespace):
         for i in range(self.max_task_node):
             info_pkg={'sid':sid,'thread_id':i}
             self.emit("ask_init",info_pkg,room=sid)
-    def event(self,noti,sid):
+    def event(self,noti,sid,thread_id=0):
         if noti=='free':
             pkg=self.get_task()
+            pkg['metadata']={'sid':sid,'thread_id':thread_id}
             if pkg!=None:
                 print(sid,"acquire")
                 self.tasking[sid].acquire()
@@ -43,7 +44,7 @@ class app_server(socketio.Namespace):
         else:
             print("[{0}][{1}] arrive err".format(data['metadata']['sid'],data['metadata']['thread_id']))
             self.handle_error(data['err'],data['arg'])
-        self.event('free',sid)
+        self.event('free',sid,data['metadata']['thread_id'])
     def handle_error(self,args):
         raise NotImplementedError()
     def process_result(self,err,args):
