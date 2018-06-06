@@ -42,6 +42,7 @@ class app_server(socketio.Namespace):
         if data['status']>0:
             print("[{0}][{1}] arrive success".format(data['metadata']['sid'],data['metadata']['thread_id']))
             p=multiprocessing.Process(target=self.process_result,args=(data['arg'],))
+            p.start()
         else:
             print("[{0}][{1}] arrive err".format(data['metadata']['sid'],data['metadata']['thread_id']))
             self.handle_error(data['err'],data['arg'])
