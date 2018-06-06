@@ -3,12 +3,26 @@ from collections import defaultdict
 import multiprocessing
 import socketio
 import logging
+
 class app_server(socketio.Namespace):
     def __init__(self,*args):
         socketio.Namespace.__init__(self,*args)
 
         self.max_task_node=4
         self.tasking=defaultdict(lambda :multiprocessing.Semaphore(self.max_task_node))
+
+        # starting fetching process
+        manager=multiprocessing.Manager()
+        self.task_queue=manager.Queue(256)
+        self.fetcher=multiprocessing.Process(target=self.get_task_queue,self.task_queue)
+    def get_task_queue(self,queue_out):
+        while True:
+            if self.queue_out.full():
+                time.sleep(1)
+                continue
+            ret=self.get_task()
+            queue_out.put(ret)
+            time.sleep(1)
     def cron_task(self):
         #check all ndoe info
         #trigger node work
@@ -26,7 +40,7 @@ class app_server(socketio.Namespace):
             self.emit("ask_init",info_pkg,room=sid)
     def event(self,noti,sid,thread_id=0):
         if noti=='free':
-            pkg=self.get_task()
+            pkg=self.task_queue.get()
             
             if pkg!=None:
                 pkg['metadata']={'sid':sid,'thread_id':thread_id}
