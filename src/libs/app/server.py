@@ -27,14 +27,15 @@ class app_server(socketio.Namespace):
     def event(self,noti,sid,thread_id=0):
         if noti=='free':
             pkg=self.get_task()
-            pkg['metadata']={'sid':sid,'thread_id':thread_id}
+            
             if pkg!=None:
-                print(sid,"acquire")
+                pkg['metadata']={'sid':sid,'thread_id':thread_id}
+                print(sid,thread_id,"acquire")
                 self.tasking[sid].acquire()
                 self.emit('task',pkg,room=sid)
     def on_client_free(self,sid,data):
         pass
-        self.event('free',sid)
+        self.event('free',sid,data['thread_id'])
     def on_result(self,sid,data):
         print(sid,"release")
         self.tasking[sid].release()

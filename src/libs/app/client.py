@@ -22,7 +22,7 @@ class app_client(BaseNamespace):
         info_pack=args[0]
         self.metadata=info_pack
         # print("\n\n\ninfo:\nsid:{0}\nthread:{1}\n\n".format(self.metadata['sid'],self.metadata['thread_id']))
-        self.emit("client_free", None)
+        self.emit("client_free", info_pack)
     def on_connect(self, *args):
         #self.emit("client_free", None)
         pass
