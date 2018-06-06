@@ -16,7 +16,7 @@ for (dirpath, dirnames, filenames) in walk(scan_path):
 # print(f)
 # exit()
 #init connect
-db=pymysql.connect(host="10.215.3.15",port=3306, user="guxi",passwd="dHtFkI6g",db="gsv_file_list")
+db=pymysql.connect(host="127.0.0.1",port=33061, user="guxi",passwd="dHtFkI6g",db="gsv_file_list")
 
 sql={
     "tasks":"INSERT INTO `gsv_file_list`.`tasks`(`pid`,`status`,`locker`,`info`)VALUES(\"{0}\",\"init\",\"-1\",\"\");",
