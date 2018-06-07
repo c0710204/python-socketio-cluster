@@ -18,6 +18,7 @@ class app_server(socketio.Namespace):
     def get_task_queue(self,queue_out):
         while True:
             if self.queue_out.full():
+                print("queue full")
                 time.sleep(1)
                 continue
             ret=self.get_task()

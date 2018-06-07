@@ -31,4 +31,4 @@ if __name__ == '__main__':
     print("starting at local port {0}...".format(port))
     sio.register_namespace(srv_handle('/task'))
     #pywsgi.WSGIServer(('', port), app,handler_class=WebSocketHandler).serve_forever()
-    pywsgi.WSGIServer(('', port), app).serve_forever()
+    pywsgi.WSGIServer(('', port), app,spawn=gevent.spawn_raw(),log=None).serve_forever()

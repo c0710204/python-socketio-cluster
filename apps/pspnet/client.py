@@ -82,7 +82,7 @@ def sshdownload(data):
 def sshupload(data, path):
     import os
     if not os.path.exists(path):
-        raise FileNotFoundError("{0} not exists".format(path))
+        raise IOError
     global mutex_ssh
     mutex_ssh.acquire()
     # print("uploading {0}...".format(path))
@@ -264,8 +264,15 @@ class pspnet_app_client(app_client):
                 continue
             pkg = self.requestQueue.get()
             args=pkg['args']
-            ret=task_process([args],self.tasks[0],self.tasks[1],self.tasks[2],self.log,id)
-            self.responseQueue.put({'id':pkg['local_id'],'tensor':ret})
+            err=None
+            ret=None
+            try:
+                ret=task_process([args],self.tasks[0],self.tasks[1],self.tasks[2],self.log,id)
+            except Exception as e:
+                err=e
+            
+            
+            self.responseQueue.put({'id':pkg['local_id'],'tensor':ret,'err':err})
             time.sleep(1)
         
     def run(self,args):
@@ -282,6 +289,8 @@ class pspnet_app_client(app_client):
             if p['id'] == local_id:
                 break
             self.responseQueue.put(p)
+        if p['err']:
+            raise p['err']
         return p['tensor']
 
 

@@ -22,13 +22,10 @@ class manager_client(BaseNamespace):
         self.metadata=info_pack
         self.asio_list=[]
         # start processes
-        for i in range(self.metadata['max_thread']):
-            asio = async_socketIO(SocketIO(self.metadata['host'], self.metadata['port']))
-            sio_pspent_info = asio.socketIO.define(cli_handle, self.metadata['path'])
-            asio.handler(self.metadata['path']).thread_id=i
-            asio.handler(self.metadata['path']).log=self.log
-            asio.handler(self.metadata['path']).prepare()
-            print("ready to receive order")
-            asio.background()
-            self.asio_list.append(asio)
-    
+        self.asio = async_socketIO(SocketIO(self.metadata['host'], self.metadata['port']))
+        sio_pspent_info = self.asio.socketIO.define(cli_handle, self.metadata['path'])
+        self.asio.handler(self.metadata['path']).thread_id=i
+        self.asio.handler(self.metadata['path']).log=self.log
+        self.asio.handler(self.metadata['path']).prepare()
+        print("ready to receive order")
+        asio.background()
