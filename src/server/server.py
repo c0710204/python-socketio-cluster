@@ -7,11 +7,13 @@ import sshtunnel
 import time
 import argparse
 import importlib
-from gevent import pywsgi
-
+#from gevent import pywsgi
+import eventlet
 from src.libs.conf.conf import conf
+
 #from geventwebsocket.handler import WebSocketHandler
-sio = socketio.Server(async_mode='gevent')
+sio = socketio.Server(async_mode='eventlet')
+#sio = socketio.Server(async_mode='gevent')
 app = socketio.Middleware(sio)
 
 #temp
@@ -31,4 +33,5 @@ if __name__ == '__main__':
     print("starting at local port {0}...".format(port))
     sio.register_namespace(srv_handle('/task'))
     #pywsgi.WSGIServer(('', port), app,handler_class=WebSocketHandler).serve_forever()
-    pywsgi.WSGIServer(('', port), app,spawn=gevent.spawn_raw(),log=None).serve_forever()
+    #pywsgi.WSGIServer(('', port), app,spawn=gevent.spawn_raw  ,log=None).serve_forever()
+    eventlet.wsgi.server(eventlet.listen(('', port)), app,max_size =16)

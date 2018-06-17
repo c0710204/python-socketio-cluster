@@ -36,14 +36,11 @@ class app_client(BaseNamespace):
         self.metadata={}
         self.run_ready.release()
         pass
-    def thread_loop(self):
-        raise NotImplementedError()
-    
     def on_ask_init(self,*args):
         info_pack=args[0]
         self.metadata=info_pack
         # print("\n\n\ninfo:\nsid:{0}\nthread:{1}\n\n".format(self.metadata['sid'],self.metadata['thread_id']))
-        self.emit("client_free", info_pack)
+        self.emit("client_free", None)
     def on_connect(self, *args):
         #self.emit("client_free", None)
         pass
@@ -51,7 +48,6 @@ class app_client(BaseNamespace):
         p = multiprocessing.Process(target=self.run_mp, args=(args[0],))
         p.start()
         return
-        
     def run_mp(self,arg):
         #arg['metadata']=self.metadata
         ret={'metadata':arg['metadata'],"status":-1,"arg":arg,"err":""}
