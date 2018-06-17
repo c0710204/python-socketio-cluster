@@ -3,25 +3,40 @@ from collections import defaultdict
 import multiprocessing
 import socketio
 import logging
-
+import time
 class app_server(socketio.Namespace):
+    #def __del__(self):
+    #    for p in self.fetcher:
+    #        p.terminate()
+    #        p.join()
+         
     def __init__(self,*args):
         socketio.Namespace.__init__(self,*args)
 
-        self.max_task_node=4
+        self.max_task_node=10
         self.tasking=defaultdict(lambda :multiprocessing.Semaphore(self.max_task_node))
 
         # starting fetching process
         manager=multiprocessing.Manager()
-        self.task_queue=manager.Queue(256)
-        self.fetcher=multiprocessing.Process(target=self.get_task_queue,args=(self.task_queue,))
-    def get_task_queue(self,queue_out):
+        self.task_queue=manager.Queue(64)
+        if not self.fetcher_count:
+            self.fetcher_count=4
+        #todo: add for
+        self.fetcher=[None for i in range(self.fetcher_count)]
+        for i in range(self.fetcher_count):
+            self.fetcher[i]=multiprocessing.Process(target=self.get_task_queue,args=(self.task_queue,i))
+            self.fetcher[i].start()
+
+    def get_task_queue(self,queue_out,id):
         while True:
-            if self.queue_out.full():
+            if queue_out.full():
+                print("queue full")
                 time.sleep(1)
                 continue
-            ret=self.get_task()
-            queue_out.put(ret)
+            rets=self.get_task(id)
+
+            for ret in rets:
+                queue_out.put(ret)
             time.sleep(1)
     def cron_task(self):
         #check all ndoe info
