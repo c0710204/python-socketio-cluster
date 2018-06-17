@@ -20,8 +20,10 @@ class task(object):
     handler_type = 'None'
     def __init__(self):
         self.upcount=0
+    def avgtime(self):
+        raise NotImplementedError()
     def uptime(self):
-        raise NotImplemented
+        raise NotImplementedError()
     def sio_auto(self,sio,a,b):
         if sio is None:
             return
@@ -31,7 +33,7 @@ class task(object):
         except Exception as e:
             print(e)
     def ask_and_wait(self,args_d):
-        raise NotImplemented
+        raise NotImplementedError()
     def prepare(self):
         """
         using to init before running code

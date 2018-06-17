@@ -34,7 +34,7 @@ def deep_process(args):
     from os.path import isfile, join
 
     import tqdm
-    batch_size=8
+    batch_size=6
     #***************************
     if (args.sess):
     #   print('try to use exists sess...')
@@ -90,9 +90,11 @@ def deep_process(args):
         padded_prediction[i_start:i_end],GPU_timer=pspnet.predict(data_npy[i_start:i_end],  args.flip)
         GPU_timer_t=GPU_timer_t+GPU_timer
         core_time=core_time+time.time()-t_st
+
     t=terminfo()
-    # print("\ngpu time cost:{0} {1}".format(core_time,GPU_timer_t))
+    print("gpu time cost:{0} {1}".format(core_time,GPU_timer_t),end='')
     package={}
+    t=time.time()
     
     for e in EVALUATION_SCALES:
         index_list=[x for x,y in zip(range(len(metadata)),metadata) if y['scale']==e]
@@ -108,7 +110,8 @@ def deep_process(args):
 
     os.remove(input_tensor['npy'])
     os.remove(input_tensor['pkl'])
-
+    t=time.time()-t
+    print("store cost:{0}".format(t),end='')
     return package
 
     # for fpath in trange(len(metadata)):

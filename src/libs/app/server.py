@@ -13,7 +13,7 @@ class app_server(socketio.Namespace):
 
         # starting fetching process
         manager=multiprocessing.Manager()
-        self.task_queue=manager.Queue(256)
+        self.task_queue=manager.Queue(16)
         self.fetcher=multiprocessing.Process(target=self.get_task_queue,args=(self.task_queue,))
     def get_task_queue(self,queue_out):
         while True:

@@ -25,6 +25,10 @@ class pre(task):
     handler_type = "Process"
     handle = ""
     mainthread = False
+    def avgtime(self):
+        if self.avg_count.value==0:
+            return -1.0
+        return self.avg_time.value/self.avg_count.value        
     def uptime(self):
         return self.upcount.value
     def prepare(self):
@@ -32,6 +36,8 @@ class pre(task):
         task.prepare(self)
         self.requestQueue = multiprocessing.Queue()
         self.responseQueue = multiprocessing.Queue()
+        self.avg_time=self.mg.Value('f', 0)
+        self.avg_count=self.mg.Value('i', 0)        
         self.result={}
         self.upcount=self.mg.Value('i', 0)
     def deploy(self):
@@ -58,6 +64,7 @@ class pre(task):
 
     def run(self, args_s):
         # print("\nThread info : {0} => func {1}".format(multiprocessing.current_process().name,__file__))
+        t=time.time()
         args_d = json.loads(args_s)
         iname = args_d['panid']
         self.sio_auto(self.socketIO,'update', {'id': iname, "phase": 1, 'val': -1, 'max': -1})
@@ -66,4 +73,6 @@ class pre(task):
         # print("{0} start pre".format(args_d['local_id']))
         ret=pre_process.pre_process(
             namedtuple('Struct', args_d.keys())(*args_d.values()))
+        self.avg_time.value+=time.time()-t
+        self.avg_count.value+=1
         self.responseQueue.put({'id':args_d['local_id'],'tensor':ret})

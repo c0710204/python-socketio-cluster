@@ -15,6 +15,7 @@ from scipy import misc, ndimage
 from keras.backend.tensorflow_backend import set_session
 from keras import backend as K
 import sys
+import keras
 from keras.models import model_from_json,Model
 import tensorflow as tf
 import layers_builder as layers
@@ -59,6 +60,24 @@ class PSPNet(object):
             print("Keras model & weights found, loading...")
             with open(json_path, 'r') as file_handle:
                 self.model = model_from_json(file_handle.read())
+            
+        
+
+            # layer_flip = keras.layers.Lambda(lambda x: K.reverse(x,axes=2),name="extened_lda_rev")
+            # # layer_split_1=keras.layers.Lambda(lambda x: K.slice(x, [0,0,0,0], [K.shape(x)[0]/2,K.shape(x)[1],K.shape(x)[2],K.shape(x)[3]]))
+            # # layer_split_2=keras.layers.Lambda(lambda x: K.slice(x, [K.shape(x)[0]/2,0,0,0], [K.shape(x)[0]/2,K.shape(x)[1],K.shape(x)[2],K.shape(x)[3]]))
+
+            # layer_split_1= keras.layers.Lambda(lambda x: x[:K.shape(x)[0]//2,:,:,:], output_shape=lambda x:x ,name="extened_lda_s1")
+            # layer_split_2= keras.layers.Lambda(lambda x: x[K.shape(x)[0]//2:,:,:,:], output_shape=lambda x:x ,name="extened_lda_s2")
+            # layer_dev=keras.layers.Lambda(lambda x: x/2, output_shape=lambda x:x,name="extened_lda_dev" )
+            # model_in=self.model.get_layer(name="input_1").input
+            # model_out=self.model.get_layer(name="activation_58").output
+
+            # model_out_normal=layer_split_1(model_out)
+            # model_out_flip=layer_flip(layer_split_2(model_out))
+            # cmb_0=keras.layers.Add(name="extened_add")([model_out_normal,model_out_flip])
+            # cmb=layer_dev(cmb_0)
+            # self.model=Model(model_in,cmb)
             self.model.load_weights(h5_path)
             print("Keras model & weights found, loaded success")
         else:
@@ -68,6 +87,8 @@ class PSPNet(object):
                                              input_shape=self.input_shape)
 
             self.set_npy_weights(weights)
+        
+
 
     def predict(self, img, flip_evaluation,sess=None):
         """
@@ -115,8 +136,10 @@ class PSPNet(object):
 
         sess=K.get_session()
         prediction=sess.run(self.M_comb[0],feed_dict={self.M_comb[1]:regular_prediction,self.M_comb[2]:flipped_prediction})
+        
+        
         GPU_timer += time.time()
-
+        #prediction=all_prediction
         #flipped_prediction=np.flip(flipped_prediction, axis=2)
         #prediction = (regular_prediction + flipped_prediction) / 2.0
         # # print(time.time()-ts)

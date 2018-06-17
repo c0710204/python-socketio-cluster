@@ -106,7 +106,7 @@ class pspnet_app_server(app_server):
         )
         while True:
             try:
-                cursor.execute(sql2)
+                cursor.execute(sql3)
                 self.db.commit()
                 break
             except pymysql.err.OperationalError as e:

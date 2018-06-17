@@ -18,12 +18,19 @@ class image_combine(task):
     handler_type = "Queue"
     handle = ""
     mainthread = False
+    def avgtime(self):
+        if self.avg_count.value==0:
+            return -1.0
+        return self.avg_time.value/self.avg_count.value    
     def uptime(self):
         return self.upcount.value
     def prepare(self):
         task.prepare(self)
+
         self.requestQueue = multiprocessing.Queue()
         self.responseQueue = multiprocessing.Queue()
+        self.avg_time=self.mg.Value('f', 0)
+        self.avg_count=self.mg.Value('i', 0)        
         self.upcount=self.mg.Value('i', 0)
     def deploy(self):
         pass
@@ -38,8 +45,10 @@ class image_combine(task):
         p.start()
         p.join()
         self.upcount.value-=1
+        
 
     def run(self, args_s=""):
+        t=time.time()
         # print("\nThread info : {0} => func {1}".format(multiprocessing.current_process().name,__file__))
         import numpy as np
         args_d = json.loads(args_s)
@@ -77,3 +86,5 @@ class image_combine(task):
         #             pass
         self.sio_auto(self.socketIO,'update', {'id': iname, "phase": 3, 'val': 1, 'max': 1})
         #self.responseQueue.put(args_d['local_id'])
+        self.avg_time.value+=time.time()-t
+        self.avg_count.value+=1
