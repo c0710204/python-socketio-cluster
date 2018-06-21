@@ -34,9 +34,9 @@ class app_server(socketio.Namespace):
                 time.sleep(1)
                 continue
             rets=self.get_task(id)
-
-            for ret in rets:
-                queue_out.put(ret)
+            if len(rets)>0:
+                for ret in rets:
+                    queue_out.put(ret)
             time.sleep(1)
     def cron_task(self):
         #check all ndoe info

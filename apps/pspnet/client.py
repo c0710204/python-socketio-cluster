@@ -274,8 +274,8 @@ class pspnet_app_client(app_client):
     COL_MAX=4        
     def prepare(self):
         self.p_list=None
-        self.p_mainthread_count=2
-        self.p_mainthread_gpu_count=2
+        self.p_mainthread_count=1
+        self.p_mainthread_gpu_count=1
         self.is_ready=multiprocessing.Semaphore(self.p_mainthread_count*self.p_mainthread_gpu_count)
         manager=multiprocessing.Manager()
         for i in range(self.p_mainthread_count*self.p_mainthread_gpu_count):
@@ -301,7 +301,7 @@ class pspnet_app_client(app_client):
         
         self.is_ready.acquire()
         print("\nclient ready, booting pthread_loop..")
-        self.boot_mp(10)
+        self.boot_mp(1)
         self.run_ready.release()
 
 
@@ -315,9 +315,10 @@ class pspnet_app_client(app_client):
             # print("\nThread info : {0} => func {1}".format(multiprocessing.current_process().name,__file__))
             #assert(multiprocessing.current_process().name=="Process-1")
             if self.requestQueue.empty():
-                print("[thread-{0}]waiting for task".format(id))
+                #print("[thread-{0}]waiting for task".format(id))
                 time.sleep(1)
                 continue
+            print("[thread-{0}]processing".format(id))
             pkg = self.requestQueue.get()
             args=pkg['args']
             err=None
@@ -326,6 +327,7 @@ class pspnet_app_client(app_client):
                 ret=task_process([args],self.tasks[0],self.tasks[1],self.tasks[2],self.log,id)
             except Exception as e:
                 err=e
+                sys.stderr.write("{0}".format(err))
             self.responseQueue.put({'id':pkg['local_id'],'tensor':ret,'err':err})
             time.sleep(1)
 
