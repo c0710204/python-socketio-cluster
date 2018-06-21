@@ -64,6 +64,7 @@ class app_server(socketio.Namespace):
                 self.emit('task',pkg,room=sid)
     def on_client_free(self,sid,data):
         pass
+        print(data)
         self.event('free',sid,data['thread_id'])
     def on_result(self,sid,data):
         print(sid,"release")
