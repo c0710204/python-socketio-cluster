@@ -2,7 +2,7 @@
 
 #scan local files
 # scan_path='../'
-scan_path="/scratch/guxi/googlestreeview_download/temp/DownloadedImages/"
+scan_path="/home/ibm/guxi/2/"
 from os import walk
 import os
 
@@ -16,10 +16,10 @@ for (dirpath, dirnames, filenames) in walk(scan_path):
 # print(f)
 # exit()
 #init connect
-db=pymysql.connect(host="127.0.0.1",port=33061, user="guxi",passwd="dHtFkI6g",db="gsv_file_list")
+db=pymysql.connect(host="star.eecs.oregonstate.edu",port=33061, user="guxi",passwd="dHtFkI6g",db="gsv_file_list")
 
 sql={
-    "tasks":"INSERT INTO `gsv_file_list`.`tasks`(`pid`,`status`,`locker`,`info`)VALUES(\"{0}\",\"init\",\"-1\",\"\");",
+    "tasks":"INSERT INTO `gsv_file_list`.`tasks`(`pid`,`status`,`locker`)VALUES(\"{0}\",\"init\",\"-1\");",
     "files":"INSERT INTO `gsv_file_list`.`files`(`pid`,`path`,`resultpath`)VALUES(\"{0}\",\"{1}\",\"{2}\");"
 }
 
@@ -30,8 +30,8 @@ with db.cursor() as cur:
         # print("|{0}|{1}|\n".format(fp,panid))
         # exit()
         try:    
-            cur.execute(sql['files'].format(panid,fp,"/scratch/guxi/googlestreeview_download/result/"))
+            cur.execute(sql['files'].format(panid,fp,"/home/ibm/guxi/result/"))
             cur.execute(sql['tasks'].format(panid))
             db.commit()
-        except:
-            pass
+        except Exception as e:
+            raise e
