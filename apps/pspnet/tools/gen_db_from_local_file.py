@@ -2,14 +2,14 @@
 
 #scan local files
 # scan_path='../'
-scan_path="/home/ibm/guxi/2/"
+scan_path="/home/ibm/guxi/images/"
 from os import walk
 import os
 
 f = []
 import tqdm
 import pymysql
-for (dirpath, dirnames, filenames) in walk(scan_path):
+for (dirpath, dirnames, filenames) in tqdm.tqdm(walk(scan_path)):
     for fn in tqdm.tqdm(filenames):
         if os.path.splitext(fn)[1]==".jpg":
             f.append(os.path.abspath(dirpath+'/'+fn))
@@ -31,7 +31,11 @@ with db.cursor() as cur:
         # exit()
         try:    
             cur.execute(sql['files'].format(panid,fp,"/home/ibm/guxi/result/"))
+            db.commit()
+        except Exception as e:
+            tqdm.tqdm.write("{0}".format(e))
+        try:    
             cur.execute(sql['tasks'].format(panid))
             db.commit()
         except Exception as e:
-            raise e
+            tqdm.tqdm.write("{0}".format(e))            

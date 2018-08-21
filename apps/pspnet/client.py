@@ -274,8 +274,8 @@ class pspnet_app_client(app_client):
     COL_MAX=4        
     def prepare(self):
         self.p_list=None
-        self.p_mainthread_count=1
-        self.p_mainthread_gpu_count=1
+        self.p_mainthread_count=2
+        self.p_mainthread_gpu_count=2
         self.is_ready=multiprocessing.Semaphore(self.p_mainthread_count*self.p_mainthread_gpu_count)
         manager=multiprocessing.Manager()
         for i in range(self.p_mainthread_count*self.p_mainthread_gpu_count):
@@ -301,7 +301,7 @@ class pspnet_app_client(app_client):
         
         self.is_ready.acquire()
         print("\nclient ready, booting pthread_loop..")
-        self.boot_mp(1)
+        self.boot_mp(10)
         self.run_ready.release()
 
 
