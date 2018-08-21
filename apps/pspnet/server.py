@@ -109,9 +109,9 @@ class pspnet_app_server(app_server):
             db=self.dbpool[0]
             db.ping()
             cursor = db.cursor()
-            cursor.execute(sql1)
-            cursor.execute(sql2)
             cursor.execute(sql3)
+            cursor.execute(sql2)
+            cursor.execute(sql1)
             db.commit()
             cursor.close()
             #db.close()
@@ -121,7 +121,7 @@ class pspnet_app_server(app_server):
             db.rollback()
             cursor.close()
             #db.close()
-            raise e
+            print(e)
                 
 
 def handler():
