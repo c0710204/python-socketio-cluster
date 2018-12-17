@@ -20,13 +20,18 @@ sql1="select pid from tasks "
 sql2="select panid from result_percent "
 count=0
 count_rmt=0
+ldb_reused=0
 final_list=[]
 with db.cursor() as cur:
   cur.execute(sql2)
   lines=cur.fetchall()
   db.commit()
+  
   for l in tqdm.tqdm(lines):
+    if ldb[l[0]]:
+      ldb_reused+=1
     ldb[l[0]]=True
+
   cur.execute(sql1)
   lines2=cur.fetchall()
   for l2 in tqdm.tqdm(lines2):
@@ -36,9 +41,11 @@ with db.cursor() as cur:
        count_rmt=count_rmt+1
 
 import json
-with open("no_result_pid.txt",'w+') as f:
+with open("no_result_pid_steve.txt",'w+') as f:
     f.write(json.dumps(final_list))
-print("\n\n\ntotal={0}\nnot found={1}\n\n\n".format(count,count_rmt))
+print("\n total={0} \n".format(count,count_rmt))
+print("\n not found={1} \n".format(count,count_rmt))
+print("\n reused={1} \n".format(count,ldb_reused))
 # read result list
 # compare
 # output

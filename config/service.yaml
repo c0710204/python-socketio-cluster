@@ -12,4 +12,4 @@ services:
     port: 50022
     type: tcp
   mysql:
-    port: 33060
+    port: 33061

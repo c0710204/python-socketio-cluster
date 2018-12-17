@@ -34,4 +34,4 @@ if __name__ == '__main__':
     sio.register_namespace(srv_handle('/task'))
     #pywsgi.WSGIServer(('', port), app,handler_class=WebSocketHandler).serve_forever()
     #pywsgi.WSGIServer(('', port), app,spawn=gevent.spawn_raw  ,log=None).serve_forever()
-    eventlet.wsgi.server(eventlet.listen(('', port)), app,max_size =16)
+    eventlet.wsgi.server(eventlet.listen(('', port)), app,max_size =256)

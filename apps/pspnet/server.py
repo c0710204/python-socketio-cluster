@@ -38,7 +38,7 @@ class pspnet_app_server(app_server):
         self.dbpool=[None for  i in range(self.fetcher_count)]
         for i in range(self.fetcher_count):
             self.dbpool[i]=pymysql.connect(
-                port=33061,autocommit=False,host="localhost", 
+                port=33061,autocommit=False,host="127.0.0.1", 
                 user="guxi",passwd="dHtFkI6g",db="gsv_file_list",
                 read_timeout=60,write_timeout=60)
         print("[{1}]db connection ok".format(0,time.asctime( time.localtime(time.time()) )))
