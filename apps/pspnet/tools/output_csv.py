@@ -22,7 +22,7 @@ def yield_fetch(cur):
     yield a
 """  
 
-with open('result_child.csv', 'w+') as csvfile:
+with open('result_steve.csv', 'w+') as csvfile:
   #spamwriter = csv.writer(csvfile, delimiter=',',quotechar='"', quoting=csv.QUOTE_MINIMAL)
   try:
     dt2={}

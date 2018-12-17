@@ -71,13 +71,21 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
 
     #fix utf-8
     text=resp.text.encode('utf8')
-    print(len(text))
+    #print(len(text))
     # bypass jsonp
     text=text.replace("/**/_xdc_._v2mub5 && _xdc_._v2mub5(","")
     text=text[:-1]
     json_content=json.loads(text,object_pairs_hook=OrderedDict)
-
+    """
+    try:
+    """
+    if len(json_content)!=3:
+        #print(json_content)
+        if json_content[0][0]==5:
+            #print('no image')
+            return [],json_content[0][2]
     loc_info=json_content[1][5][0][3][0]
+
     # Get all the panorama ids and coordinates
     # I think the latest panorama should be the first one. And the previous
     # successive ones ought to be in reverse order from bottom to top. The final
@@ -96,12 +104,17 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
     #   The time list include the id link image metadata list and used for historial information
     #   Other images are the around image and use for the 360 view.
     #
+    def try_with_default(f,default):
+        try:
+            return f()
+        except:
+            return default
     nearest_point = {
         "panoid": loc_info[0][0][1],
         "lat":float(loc_info[0][2][0][2]),
         "lon":float(loc_info[0][2][0][3]),
-        'year': json_content[1][6][7][0],
-        "month": json_content[1][6][7][1]
+        'year': try_with_default(lambda :json_content[1][6][7][0],-1),
+        "month": try_with_default(lambda :json_content[1][6][7][1],-1)
     }
     historial_list=[]
     if len( json_content[1][5][0])>=9:
@@ -114,6 +127,9 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
     for i in range(len(loc_info)):
         if i in historial_dict.keys():
             dt=historial_dict[i]
+            #print(dt)
+            if len(dt)!=2:
+              dt=[9999,9]
             p=loc_info[i]
             pans.append({
             "panoid": p[0][1],
@@ -121,14 +137,24 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
             "lon": float(p[2][0][3]),
             'year': dt[0], "month": dt[1]
             })
-
+    """
+    except Exception as e:
+        print('**************************')
+        print(e)
+        with open('temp{0}.json'.format(uuid.uuid4()),'w+')as fout:
+            try:
+                fout.write(text.encode('utf8'))        
+            except:
+                fout.write(text)        
+    """    
+    
     if disp:
         for pan in pans:
             print(pan)
     if closest:
-        return [pans[i] for i in range(len(dates))]
+        return [pans[i] for i in range(len(dates))],''
     else:
-        return pans
+        return pans,''
     pass
     #except Exception as e:
         #print(e.args)
